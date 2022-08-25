@@ -1,0 +1,76 @@
+<% layout('layouts/boilerplate')%>
+    <link rel="stylesheet" href="/stylesheets/stars.css">
+    <% if(currentUser){%>
+        <% if(currentUser.memberships.includes(campground.id)){%>
+            <div class="btn-group">
+                <form action="/posts/new/<%=campground.id%>" method="GET">
+                    <button class="btn btn-success ">Postear en este Meet</button>
+                </form>
+
+                <form action="/campgrounds/<%=campground._id%>" method="GET">
+                    <button class="btn btn-success ml-2">Ver Otros Miembros</button>
+                </form>
+            </div>
+            <%}%>
+                <% if(!currentUser.memberships.includes(campground.id)){%>
+                    <form action="/join/<%=campground.id%>" method="GET">
+                        <button class="mt-2 btn btn-success">Unirse al Meet</button>
+                    </form>
+                    <%}%>
+
+                        <%}%>
+                            <form action="/campgrounds/find_tag_posts/<%=campground.id%>" method="GET">
+                                <% for (let tag of campground.tags){%>
+                                    <input class="form-check-input  mt-2" type="checkbox" value="<%=tag%>"
+                                        name="membership[tags]" id="<%=tag%>">
+                                    <label class="form-check-label text-dark" for="<%=tag%>">
+                                        <%=tag%>
+                                    </label>
+                                    <%}%>
+                                        <button class="btn btn-outline-success">Buscar Tags</button>
+                            </form>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div>
+                                        <h1>
+                                            <%= campground.name %>
+                                        </h1>
+                                        <h3>
+                                            <%= campground.description%>
+                                        </h3>
+                                    </div>
+
+                                </div>
+                                <% for(let post of all_posts) {%>
+                                    <div class="card mb-3">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <%if(post.images.length) {%>
+                                                    <img class="img-fluid" alt="" src="<%=post.images[0].url%>">
+                                                    <% }else {%>
+                                                        <img class="img-fluid" alt=""
+                                                            src="https://res.cloudinary.com/squr/image/upload/v1600103881/YelpCamp/lz8jjv2gyynjil7lswf4.png">
+                                                        <% } %>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <div class="card-body">
+                                                    <h3 class="card-text">
+                                                        <%= post.title %>
+                                                    </h3>
+                                                    <p class="card-text">
+                                                        Tags: <%= post.tags %>
+                                                    </p>
+                                                    <p class="card-text">
+                                                        <%= post.caption %>
+                                                    </p>
+                                                    <form action="/posts/show/<%=post._id%>" method="GET"> <button>Ver
+                                                            Post</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                            </div>
+                            </a>
+                            <% } %>
+                                </div>

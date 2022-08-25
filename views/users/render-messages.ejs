@@ -1,0 +1,9 @@
+<% layout('layouts/boilerplate')%>
+    <% for (let message of Current_user.messages) { %>
+        <form action='/message-active/<%=message.id%>' method="GET">
+            <button class="mt-3 btn btn-success">
+                <%=message.to.username%> y <%=message.from.username%>
+                        <%=message.body[message.body.length - 1]%>
+            </button>
+        </form>
+        <%}%>

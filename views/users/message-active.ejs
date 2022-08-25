@@ -1,0 +1,45 @@
+<%- layout('layouts/boilerplate')%>
+    <div class="container">
+        <div class="row">
+            <div class="col" data-spy="scroll" data-target="#myScrollspy" data-offset="20">
+                <div style="overflow-y: scroll;">
+                    <!-- <span style="width:200px; word-wrap:break-word; display:inline-block;"> -->
+                    <% for (let each_message of message.body) { %>
+                        <p>
+                            <% if (each_message.includes('stripe')) {%>
+                                <a class="btn btn-success" href=<%=each_message%> >Pagar servicio</a>
+                                <%} else {%>
+                                    <%=each_message%>
+                                        <%}%>
+                        </p>
+                        <%}%>
+
+                            <!-- </span> -->
+                </div>
+                <form action='/message/<%=message.id%>?_method=PUT' method="POST">
+                    <label class="form-label" for="body">
+                        <%=user_to.username%> y <%=user_from.username%>
+                    </label>
+                    <textarea class="form-control" name="message[body]" id="body" cols="30" rows="3"
+                        required></textarea>
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
+                    <button class="mt-3 btn btn-success">Enviar</button>
+                </form>
+
+                <form action="/show/<%= user_to.id %>" method='GET'>
+                    <button class="mt-3 btn btn-success">Ver a <%=user_to.username%></button>
+                </form>
+            </div>
+            <div class="col">
+                <% for (let message of Current_user.messages) { %>
+                    <form action='/message-active/<%=message.id%>' method="GET">
+                        <button class="mt-3 btn btn-success">
+                            <%=message.to.username%> y <%=message.from.username%>
+                        </button>
+                    </form>
+                    <%}%>
+            </div>
+        </div>
+    </div>

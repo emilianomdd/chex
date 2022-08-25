@@ -1,0 +1,41 @@
+<% layout('layouts/boilerplate')%>
+    <div class="container">
+        <h1>
+            <%= user.username%>
+        </h1>
+        <% if(currentUser){ %>
+            <form action="/message/<%=user._id%>" method="GET">
+                <button class="btn btn-success mb-2">Messajear a <%=user.username%></button>
+            </form>
+            <% } %>
+                <% for (let campground of user.posts){%>
+                    <div class="card mb-3">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <%if(campground.images.length) {%>
+                                    <img class="img-fluid" alt="" src="<%=campground.images[0].url%>">
+                                    <% }else {%>
+                                        <img class="img-fluid" alt=""
+                                            src="https://res.cloudinary.com/squr/image/upload/v1600103881/YelpCamp/lz8jjv2gyynjil7lswf4.png">
+                                        <% } %>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <%= campground.title %>
+                                    </h5>
+
+                                    <p class="card-text">
+                                        <%= campground.caption %>
+                                    </p>
+                                    <form action="/posts/show/<%=campground._id%>" method="GET"><button> View
+                                            <%=campground.title%>
+                                        </button></form>
+
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <% }%>
+    </div>

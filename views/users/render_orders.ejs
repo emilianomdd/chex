@@ -1,0 +1,68 @@
+<% layout('layouts/boilerplate')%>
+    <link rel="stylesheet" href="/stylesheets/stars.css">
+    <div class="row">
+        <div class="col-6">
+            <div>
+                <h1>
+                    <%= user.username %>
+                </h1>
+
+            </div>
+
+        </div>
+
+        <% if (user.orders.length> 0) {%>
+
+            <h3>Orders: </h3>
+            <% for(let order of user.orders) {%>
+                <% const total_price=((order.price + .3)/(1-.059)).toFixed(2)%>
+                    <% const fees=(total_price - order.price).toFixed(2)%>
+                        <% if((!order.is_delivered && order.is_paid) || (!order.is_delivered && order.cash)){%>
+                            <div class="card mb-3">
+                                <div class="col-md-8">
+                                    <div class="card-body">
+                                        <h3>
+                                            <%= order.posts.title%>
+                                                <br>
+                                                Status: <%= order.status %>
+                                        </h3>
+                                        <h5>
+                                            <br>
+                                            Price: <%=order.price%>$
+                                                <br>
+                                                Fees: <%=fees%>
+                                        </h5>
+                                        <br>
+                                        <h3>
+                                            Total Price: <%=total_price%>
+                                        </h3>
+                                        <% if (order.drop_off ){%>
+                                            <h3 class="card-text">
+                                                Drop off: <%= order.drop_off %>
+                                            </h3>
+                                            <%}%>
+                                                <% if (order.seat){%>
+                                                    <h3 class="card-text">
+                                                        Seat: <%= order.seat %>
+                                                            Section: <%= order.section%>
+                                                    </h3>
+                                                    <%}%>
+                                                        <% if(order.cash){%>
+                                                            <p class="card-text">
+                                                                Paymet Method: Efectivo
+                                                            </p>
+                                                            <%}%>
+
+                                                                <p class="card-text">
+                                                                    Confirmation Number: <%= order.conf_num %>
+                                                                </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <%}%>
+                                <%}%>
+                                    <% } else{ %>
+                                        <h1>No Orders</h1>
+                                        <%}%>
+
+    </div>

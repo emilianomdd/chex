@@ -1,0 +1,29 @@
+<% layout('layouts/boilerplate')%>
+    <div class="row">
+        <h1 class="text-center">Edit Campground</h1>
+        <div class="col-md-6 offset-md-3">
+            <form action="/campgrounds/<%=campground._id%>?_method=PUT" method="POST" novalidate class="validated-form"
+                enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label class="form-label" for="type">Description</label>
+                    <input class="form-control" type="description" id="description" name="campground[description]"
+                        value="<%=campground.description %>" required>
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
+                </div>
+                <!-- <div class="mb-3">
+                    <label class="form-label" for="invite">Invite Only</label>
+                    <input class="form-control" type="checkbox" id="invite" name="checkbox" required>
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
+                </div> -->
+                <div class="mb-3">
+                    <button class="btn btn-info">Edit Place</button>
+                </div>
+            </form>
+            <a href="/campgrounds/<%= campground._id%>">Return to Place</a>
+
+        </div>
+    </div>

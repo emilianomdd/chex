@@ -1,0 +1,88 @@
+<% layout('layouts/boilerplate')%>
+    <link rel="stylesheet" href="/stylesheets/stars.css">
+    <div class="row">
+        <form action="/render_vendor_section/<%=user.id%>" method="GET">
+            <% for(let section of campground.sections){%>
+                <input class="form-check-input  mt-2" type="checkbox" value="<%=section%>" name="section"
+                    id="<%=section%>">
+                <label class="form-check-label text-dark" for="<%=section%>">
+                    <%=section%>
+                </label>
+                <%}%>
+                    <button>Look up specific section</button>
+        </form>
+        <div class="col-6">
+            <div>
+                <h1>
+                    <%= user.username %>
+                </h1>
+                <h3>
+                    Orders:
+                </h3>
+            </div>
+
+        </div>
+        <% for(let order of user.orders_to_complete) {%>
+            <% if((!order.is_delivered && order.is_paid) || (!order.is_delivered && order.cash)){%>
+                <div class="card mb-3">
+
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <h3>
+                                <%= order.posts.title%> for <%= order.customer.username%>
+                            </h3>
+                            <h3>
+                                <%=order.customer.phone%>
+                            </h3>
+                            <h3>
+                                Username: <%=order.customer.username%>
+                            </h3>
+                            <h3>
+                                price: <%=order.price_final%>$
+                            </h3>
+                            <% if(order.drop_off){%>
+                                <h3 class="card-text">
+                                    Dropoff: <%= order.drop_off %>
+                                </h3>
+                                <%}%>
+                                    <% if(order.seat && order.section){%>
+                                        <h3 class="card-text">
+                                            Seat: <%= order.seat %>, Seccion: <%= order.section %>
+                                        </h3>
+                                        <%}%>
+                                            <% if (order.seat && !order.section){%>
+                                                <h3>Asiento: <%= order.seat%>
+                                                </h3>
+                                                <%}%>
+                                                    <p class="card-text">
+                                                        <%= order.conf_num %>
+                                                    </p>
+                                                    <% if(order.cash){%>
+                                                        <p class="card-text">
+                                                            Payment Method: Efectivo
+                                                        </p>
+                                                        <%} else{%>
+                                                            <p class="card-text">
+                                                                Payment Method: Paid
+                                                            </p>
+                                                            <%}%>
+                                                                <form action="/order/complete/<%=order.id%>"
+                                                                    method="POST">
+                                                                    <button>Complete Order</button>
+                                                                </form>
+                                                                <form action="/five/<%=order.id%>" method="POST">
+                                                                    <button>Ready in 5</button>
+                                                                </form>
+
+                                                                <form action="/ready/<%=order.id%>" method="POST">
+                                                                    <button>Ready for pickup</button>
+                                                                </form>
+                        </div>
+                    </div>
+                </div>
+                <%}%>
+    </div>
+    </div>
+
+    <% } %>
+        </div>

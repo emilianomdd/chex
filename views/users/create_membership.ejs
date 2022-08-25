@@ -1,0 +1,30 @@
+<% layout('layouts/boilerplate')%>
+
+    <div class="row">
+        <h1 class="text-center">Hazte Mienbro de <%= campground.name%>
+        </h1>
+        <div class="col-md-8 offset-md-2">
+            <form action="/join/<%= campground.id%>" method="POST" novalidate class="validated-form">
+                <div class="mb-3">
+                    <label class="form-label" for="description">Descripcion</label>
+                    <input class="form-control" type="text" id="description" name="membership[description]" required>
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
+                    <% for (tag of campground.tags) {%>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input  mt-2" type="checkbox" id="<%=tag%>" value="<%=tag%>"
+                                name="membership[tags]" id="<%=tag%>">
+                            <label class="form-check-label text-dark" for="<%=tag%>">
+                                <%=tag%>
+                            </label>
+                        </div>
+                        <%}%>
+                            <div class="mb-3">
+                                <button class="btn btn-success mt-2">Crear Membresia</button>
+                            </div>
+            </form>
+            <a href="/campgrounds">Home</a>
+        </div>
+    </div>
+    </div>

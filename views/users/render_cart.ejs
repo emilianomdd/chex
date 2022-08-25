@@ -1,0 +1,74 @@
+<% layout('layouts/boilerplate')%>
+    <link rel="stylesheet" href="/stylesheets/stars.css">
+
+
+    <div class="row">
+        <div class="col-6">
+            <div>
+                <h1>
+                    <%= user.username %>
+                </h1>
+                <h3>
+                    Cart
+                </h3>
+            </div>
+
+        </div>
+        <% for(let post of all_posts) {%>
+            <% const total_price=((post.price + .3)/(1-.059)).toFixed(2)%>
+                <% const fees=(total_price - post.price).toFixed(2)%>
+                    <% const how_many=post.price / post.posts.price%>
+                        <div class="row">
+                            <div class="card col-12 col-md-6 single-post-card p-1">
+                                <div id="campgroundCarousel" class="carousel slide" data-ride="carousel">
+                                    <div class="carousel-inner">
+
+                                        <%if(post.posts.images.length) {%>
+                                            <img class="d-block w-100" alt="" src="<%=post.posts.images[0].url%>">
+
+                                            <% }else {%>
+                                                <img class="d-block w-100" alt=""
+                                                    src="https://res.cloudinary.com/squr/image/upload/v1600103881/YelpCamp/lz8jjv2gyynjil7lswf4.png">
+                                                <% } %>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-body">
+                                        <h3>
+                                            <%= post.posts.author.username%>
+                                        </h3>
+                                        <h3 class="card-text">
+
+                                            <%=post.quantity%>
+                                                <%= post.posts.title %>
+                                        </h3>
+                                        <p>
+                                            Price: <%=post.price%>$
+                                                <br>
+                                                Fees: <%=fees%>$
+                                                    <br>
+                                                    Total price: <%=total_price%>
+                                        </p>
+                                        <p class="card-text">
+                                            <%= post.posts.caption %>
+                                        </p>
+
+                                        <form action="/posts/purchase/<%=post.id%>" method="POST">
+                                            <button class="btn btn-primary mb-2">Pay With Card</button>
+                                        </form>
+                                        <form action="/posts/purchase_efectivo/<%=post.id%>" method="POST">
+                                            <button class="btn btn-primary mb-2">Pay With Cash</button>
+                                        </form>
+                                        <form action="/posts/cancel/<%=post.id%>" method="POST"> <button
+                                                class="btn btn-primary">Delete from Cart</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+    </div>
+    </div>
+    </div>
+    </a>
+    <% } %>
+        </div>

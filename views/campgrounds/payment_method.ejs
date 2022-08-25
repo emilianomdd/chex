@@ -1,0 +1,37 @@
+<% layout('layouts/boilerplate')%>
+    <link rel="stylesheet" href="/stylesheets/stars.css">
+
+    <div class="container">
+        <div class="card mb-3">
+            <div class="col-md-8">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <%= order.posts.title %>
+                    </h5>
+
+                    <p class="card-text">
+                        Quantity:<%= order.quantity%>
+
+                            <br>
+                            Price: <%= order.price %>$
+                                </br>
+                                <br>
+                                Transaction Fees & Comission: <%=transaction_fee%>$
+                                    </br> <br>
+                                    Total Price: <%= price%>$
+                                        </br>
+                    </p>
+                    <p class="card-text">
+                        Seat: <%=order.seat%> Seccion: <%=order.section%>
+                    </p>
+
+                    <form action="/posts/rapid_cash/<%=order.id%>" method="POST">
+                        <button class="btn btn-primary mb-2">Pay with Cash</button>
+                    </form>
+                    <form action="/posts/rapid_card/<%=order.id%>" method="POST">
+                        <button class="btn btn-primary">Pay with Card</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>

@@ -1,0 +1,41 @@
+<% layout('layouts/boilerplate')%>
+    <div class="row">
+        <h1 class="text-center">Edit Post</h1>
+        <div class="col-md-6 offset-md-3">
+            <form action="/posts/<%=posts._id%>?_method=PUT" method="POST" novalidate class="validated-form"
+                enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label class="form-label" for="type">Caption</label>
+                    <input class="form-control" type="description" id="description" name="post[description]"
+                        value="<%=post.caption %>" required>
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="form-file custom-file">
+                        <input type="file" class="form-file-input" id="image" name="image" multiple>
+                        <label class="form-file-label" for="image">
+                            <span class="form-file-text custom-file-label">Add Image(s)...</span>
+                            <span class="form-file-button">Look in Library</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <% post.images.forEach(function(img, i) { %>
+
+                        <img src="<%=img.thumbnail %>" class="img-thumbnail" alt="">
+                        <div class="form-check-inline">
+                            <input type="checkbox" id="image-<%=i%>" name="deleteImages[]" value="<%=img.filename%>">
+                        </div>
+                        <label for="image-<%=i%>">Delete?</label>
+                        <% })%>
+                </div>
+                <div class="mb-3">
+                    <button class="btn btn-info">Edit Post</button>
+                </div>
+            </form>
+            <a href="/posts/<%= posts._id%>">Return to Product</a>
+
+        </div>
+    </div>
