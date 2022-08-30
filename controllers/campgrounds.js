@@ -65,19 +65,32 @@ module.exports.createCampground = async (req, res, next) => {
 }
 
 module.exports.showCampground = async (req, res,) => {
-    const { id } = req.params
-    const campground = await Campground.findById(id).populate({
-        path: 'posts',
-        populate: {
-            path: 'author'
+    if (req.user) {
+        const { id } = req.params
+        const campground = await Campground.findById(id).populate({
+            path: 'posts',
+            populate: {
+                path: 'author'
+            }
+        }).populate('author');
+        const all_posts = campground.posts
+        if (!campground) {
+            req.flash('error', 'Cannot find that campground!');
+            return res.redirect('/campgrounds');
         }
-    }).populate('author');
-    const all_posts = campground.posts
-    if (!campground) {
-        req.flash('error', 'Cannot find that campground!');
-        return res.redirect('/campgrounds');
+        res.render('campgrounds/show.ejs', { campground, all_posts })
     }
-    res.render('campgrounds/show.ejs', { campground, all_posts })
+    else {
+        const { id } = req.params
+        const campground = await Campground.findById(id).populate({
+            path: 'posts',
+            populate: {
+                path: 'author'
+            }
+        }).populate('author');
+        res.render('users/register_route', { campground })
+    }
+
 }
 
 module.exports.renderMeet = async (req, res) => {

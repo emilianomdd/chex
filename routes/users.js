@@ -12,6 +12,8 @@ router.route('/register')
     .get(users.renderRegister)
     .post(catchAsync(users.register));
 
+router.post('register_special', users.register)
+
 router.get('/render_vendor_register/:id', users.RenderVendor)
 
 router.post('/create_store/:id', users.RegisterVendor)
@@ -59,5 +61,11 @@ router.route('/join/:id')
 // router.route('/reset/:token')
 //     .get(users.getToken)
 //     .post(users.postToken)
+
+
+// router.route('/users/reset')
+//     .get(users.renderReset)
+
+
 
 module.exports = router;

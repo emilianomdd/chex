@@ -174,11 +174,26 @@ module.exports.renderPost = async (req, res) => {
 }
 
 module.exports.showPost = async (req, res) => {
-    const { id } = req.params
-    const post = await Post.findById(id).populate('campground');
-    const campground = post.campground
-    res.render('posts/show', { post, campground })
-}
+    const { id } = req.params;
+    const post = await Post.findById(id).populate("campground");
+    const campground = post.campground;
+    let productData = {
+        section: "",
+        drop_off: "",
+        seat: "",
+        how_many: "",
+    };
+
+    if (req.session?.hasOwnProperty("product")) {
+        productData = {
+            section: req.session?.product[id]?.section || "",
+            drop_off: req.session?.product[id]?.drop_off || "",
+            seat: req.session?.product[id]?.seat || "",
+            how_many: req.session?.product[id]?.how_many || "",
+        };
+    }
+    res.render("posts/show", { post, campground, product: productData });
+};
 
 module.exports.deletePost = async (req, res) => {
     const { id } = req.params;
@@ -375,9 +390,23 @@ module.exports.RapidCard = async (req, res) => {
     res.redirect(session.url)
 }
 module.exports.ShowRapid = async (req, res) => {
+    const { id } = req.params;
+    const post = await Post.findById(id).populate("campground");
+    const campground = post.campground;
 
-    const { id } = req.params
-    const post = await Post.findById(id).populate('campground');
-    const campground = post.campground
-    res.render('posts/show_rapid', { post, campground })
+    let product = {
+        section: "",
+        drop_off: "",
+        seat: "",
+        how_many: "",
+    };
+    if (req.session?.hasOwnProperty("product")) {
+        product = {
+            section: req.session?.product[id]?.section || "",
+            drop_off: req.session?.product[id]?.drop_off || "",
+            seat: req.session?.product[id]?.seat || "",
+            how_many: req.session?.product[id]?.how_many || "",
+        };
+    }
+    res.render("posts/show_rapid", { post, campground, product });
 }

@@ -24,7 +24,7 @@
         </div>
         <% for(let order of user.orders_to_complete) {%>
 
-            <% if(!order.is_delivered && order.is_paid){%>
+            <% if((!order.is_delivered && order.is_paid) || (!order.is_delivered && order.cash)){%>
                 <%if(order.section==section){%>
 
                     <div class="card mb-3">
