@@ -1,4 +1,14 @@
 <% layout('layouts/boilerplate')%>
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>CARGI</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css"
+            integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
+        <link rel="stylesheet" href="/stylesheets/home.css">
+        <link rel="stylesheet" href="/stylesheets/main-theme.css">
+    </head>
     <div class="container d-flex justify-content-center align-items-center mt-5">
         <div class="row">
 
@@ -6,7 +16,7 @@
             <div class="col-md-6 offset-md-3 col-xl-4 offset-xl-4">
                 <div class="card shadow">
                     <div class="card-body">
-                        <h5 class="card-title">Registrate Para Acceder a <%=campground.name%>
+                        <h5 class="card-title">Registrate Ordenar Comidas/Bebidas a tu Asiento al Mismo Precio
                         </h5>
                         <form action="/register" method="POST" class="validated-form" novalidate>
                             <input type="hidden" name="campground" value="<%=campground.id%>">
