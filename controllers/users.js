@@ -47,7 +47,7 @@ module.exports.RenderVendor = async (req, res, next) => {
         res.render('users/register_vendor', { campground })
     }
     catch (e) {
-        res.flash('Refresca la Pagina e Intenta de Nuevo')
+        req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/camoground')
     }
 }
@@ -143,7 +143,7 @@ module.exports.RenderMyOrders = async (req, res) => {
 
         res.render('users/render_orders', { user })
     } catch (e) {
-        res.flash('Refresca la Pagina e Intenta de Nuevo')
+        req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/campground')
     }
 }
@@ -165,7 +165,7 @@ module.exports.RenderStoreOrders = async (req, res) => {
 
         res.render('users/render_vendor_orders', { user, campground })
     } catch (e) {
-        res.flash('Refresca la Pagina e Intenta de Nuevo')
+        req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/campground')
     }
 }
@@ -190,7 +190,7 @@ module.exports.RenderSelect = async (req, res) => {
         const campground = user.campgrounds[0]
         res.render('users/render_vendor_section', { user, campground, section })
     } catch (e) {
-        res.flash('Refresca la Pagina e Intenta de Nuevo')
+        req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/campground')
     }
 }
@@ -227,7 +227,7 @@ module.exports.completeOrder = async (req, res) => {
         res.render('users/render_vendor_orders', { user, campground })
 
     } catch (e) {
-        res.flash('Refresca la Pagina e Intenta de Nuevo')
+        req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/campground')
     }
 }
@@ -255,7 +255,7 @@ module.exports.renderActiveMessage = async (req, res) => {
         await message.save()
         res.render('users/message-active', { message, user_to, user_from, Current_user })
     } catch (e) {
-        res.flash('Refresca la Pagina e Intenta de Nuevo')
+        req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/campground')
     }
 }
@@ -279,7 +279,7 @@ module.exports.renderActiveMessageOther = async (req, res) => {
         const user_from = await User.findById(message.from)
         res.render('users/message-active', { message, user_to, user_from, Current_user })
     } catch (e) {
-        res.flash('Refresca la Pagina e Intenta de Nuevo')
+        req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/campground')
     }
 }
@@ -396,7 +396,7 @@ module.exports.FiveMin = async (req, res) => {
         const campground = user.campgrounds[0]
         res.render('users/render_vendor_orders', { user, campground })
     } catch (e) {
-        res.flash('Refresca la Pagina e Intenta de Nuevo')
+        req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/campground')
     }
 }
@@ -430,7 +430,7 @@ module.exports.Ready = async (req, res) => {
         const campground = user.campgrounds[0]
         res.render('users/render_vendor_orders', { user, campground })
     } catch (e) {
-        res.flash('Refresca la Pagina e Intenta de Nuevo')
+        req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/campground')
     }
 }
