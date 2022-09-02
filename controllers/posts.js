@@ -62,7 +62,6 @@ module.exports.purchase = async (req, res) => {
         order.price_final = price
         var comish = price - order.price
         comish = comish.toFixed(2)
-        console.log(order, '1')
         await user.save()
         await post_author.save()
         await order.save()
@@ -323,7 +322,6 @@ module.exports.RapidOrder = async (req, res) => {
 }
 
 module.exports.RenderConfirmOrder = async (req, res) => {
-    console.log('here')
     try {
         const order = new Order()
         order.status = 'En proceso'
@@ -334,8 +332,6 @@ module.exports.RenderConfirmOrder = async (req, res) => {
         order.is_delivered = false
         await Pre_order.findByIdAndDelete(id)
         const campground = await Campground.findById(order.posts.campground)
-
-        console.log(order, '3')
         await user.save()
         await order.save()
         const all_posts = campground.posts
@@ -369,7 +365,6 @@ module.exports.purchaseCash = async (req, res) => {
     try {
         const { id } = req.params
         const pre_order = await Pre_order.findById(id).populate('posts')
-        console.log(pre_order)
         const post_author = await User.findById(pre_order.posts.author)
         const order = new Order()
         order.status = 'En proceso'
