@@ -25,8 +25,10 @@
         <% for(let order of user.orders_to_complete) {%>
             <% if((!order.is_delivered && order.is_paid) || (!order.is_delivered && order.cash)){%>
                 <div class="card mb-3">
-
-                    <div class="col-md-8">
+                    <div>
+                        <%=order%>
+                    </div>
+                    <!-- <div class="col-md-8">
                         <div class="card-body">
                             <h3>
                                 <%= order.posts.title%> para <%= order.customer.username%>
@@ -80,7 +82,7 @@
                                                                     <button>Lista para Recoger</button>
                                                                 </form>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
                 <%}%>
     </div>

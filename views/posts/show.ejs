@@ -79,7 +79,7 @@
                                 </label>
                                 <%}%>
                         </div> -->
-                                            <%if(campground.drop_offs){%>
+                                            <!-- <%if(campground.drop_offs){%>
                                                 <div class="col-12 col-md-4 mb-2">
                                                     <label class="form-label" for="drop_off">Drop Off:</label>
                                                     <select id="drop_off" name="drop_off" class="form-control">
@@ -92,32 +92,30 @@
                                                             <%}%>
                                                     </select>
                                                 </div>
-                                                <%}%>
-                                                    <div class="col-7 col-md-4 mb-2">
-                                                        <label class="form-label" for="seat">Numero de Asiento:</label>
-                                                        <input type="text" name="seat" id="seat" class="form-control"
-                                                            value="<%= product.seat %>" placeholder="23">
+                                                <%}%> -->
+                                            <div class="col-7 col-md-4 mb-2">
+                                                <label class="form-label" for="seat">Numero de Asiento:</label>
+                                                <input type="text" name="seat" id="seat" class="form-control"
+                                                    value="<%= product.seat %>" placeholder="23">
+                                            </div>
+                                            <div class="col-5 col-md-4 mb-2">
+                                                <label class="form-label" for="letter">Letra:</label>
+                                                <input type="text" name="letter" id="letter" class="form-control"
+                                                    value="<%= product.letter %>" placeholder="D">
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="row mt-3">
+                                                    <div class="col-12 mb-2">
+                                                        <label class="form-label" for="how_many">Cantidad:</label>
+                                                        <input type="number" name="how_many" id="how_many"
+                                                            placeholder="Cantidad" class="form-control"
+                                                            value="<%= product.how_many %>" required>
                                                     </div>
-                                                    <div class="col-5 col-md-4 mb-2">
-                                                        <label class="form-label" for="letter">Letra:</label>
-                                                        <input type="text" name="letter" id="letter"
-                                                            class="form-control" value="<%= product.letter %>"
-                                                            placeholder="D">
+                                                    <div class="col-8 mb-2">
+                                                        <button type="submit" class="btn btn-primary btn-block">Agregar
+                                                            a
+                                                            Carrito</button>
                                                     </div>
-                                                    <div class="col-12">
-                                                        <div class="row mt-3">
-                                                            <div class="col-12 mb-2">
-                                                                <label class="form-label"
-                                                                    for="how_many">Cantidad:</label>
-                                                                <input type="number" name="how_many" id="how_many"
-                                                                    placeholder="Cantidad" class="form-control"
-                                                                    value="<%= product.how_many %>" required>
-                                                            </div>
-                                                            <div class="col-8 mb-2">
-                                                                <button type="submit"
-                                                                    class="btn btn-primary btn-block">Agregar a
-                                                                    Carrito</button>
-                                                            </div>
                             </form>
                             <form action="/campgrounds/<%=campground._id%>" method="GET">
                                 <div class="col-8 mb-2">

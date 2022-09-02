@@ -4,7 +4,8 @@ const Message = require('../models/message');
 const stripe = require('stripe')(process.env.STRIPE_KEY)
 const Membership = require('../models/membership');
 const Order = require('../models/order')
-const Carrito = require('../models/carrito')
+const Carrito = require('../models/carrito');
+const { UserBindingPage } = require('twilio/lib/rest/chat/v2/service/user/userBinding');
 const accountSid = process.env.TW_ID;
 const authToken = process.env.TW_AUTH;
 const client = require('twilio')(accountSid, authToken);
@@ -151,10 +152,7 @@ module.exports.RenderStoreOrders = async (req, res) => {
     try {
         const { id } = req.params
         const user = await User.findById(id).populate({
-            path: 'orders_to_complete',
-            populate: {
-                path: 'posts',
-            }
+            path: 'orders_to_complete'
         }).populate(
             {
                 path: 'orders_to_complete',
@@ -164,6 +162,9 @@ module.exports.RenderStoreOrders = async (req, res) => {
             }
         ).populate('campgrounds')
         const campground = user.campgrounds[0]
+        for (let order of user.orders_to_complete) {
+            await Order.findByIdAndDelete(order)
+        }
         res.render('users/render_vendor_orders', { user, campground })
     } catch (e) {
         res.flash('Refresca la Pagina e Intenta de Nuevo')
