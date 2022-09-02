@@ -65,32 +65,37 @@ module.exports.createCampground = async (req, res, next) => {
 }
 
 module.exports.showCampground = async (req, res,) => {
-    if (req.user) {
-        const { id } = req.params
-        const campground = await Campground.findById(id).populate({
-            path: 'posts',
-            populate: {
-                path: 'author'
+    try {
+        if (req.user) {
+            const { id } = req.params
+            const campground = await Campground.findById(id).populate({
+                path: 'posts',
+                populate: {
+                    path: 'author'
+                }
+            }).populate('author');
+            const all_posts = campground.posts
+            if (!campground) {
+                req.flash('error', 'Cannot find that campground!');
+                return res.redirect('/campgrounds');
             }
-        }).populate('author');
-        const all_posts = campground.posts
-        if (!campground) {
-            req.flash('error', 'Cannot find that campground!');
-            return res.redirect('/campgrounds');
+            res.render('campgrounds/show.ejs', { campground, all_posts })
         }
-        res.render('campgrounds/show.ejs', { campground, all_posts })
-    }
-    else {
-        const { id } = req.params
-        const campground = await Campground.findById(id).populate({
-            path: 'posts',
-            populate: {
-                path: 'author'
-            }
-        }).populate('author');
-        res.render('users/register_route', { campground })
-    }
+        else {
+            const { id } = req.params
+            const campground = await Campground.findById(id).populate({
+                path: 'posts',
+                populate: {
+                    path: 'author'
+                }
+            }).populate('author');
+            res.render('users/register_route', { campground })
+        }
 
+    } catch (e) {
+        res.falsh('Refresca la Pagina e Intenta de Nuevo')
+        res.render('/campgrounds')
+    }
 }
 
 module.exports.renderMeet = async (req, res) => {
@@ -107,48 +112,72 @@ module.exports.renderMeet = async (req, res) => {
 }
 
 module.exports.renderEditForm = async (req, res) => {
-    const { id } = req.params;
-    const campground = await Campground.findById(id)
-    if (!campground) {
-        req.flash('error', 'Cannot find that space!');
-        return res.redirect('/campgrounds');
+
+    try {
+        const { id } = req.params;
+        const campground = await Campground.findById(id)
+        if (!campground) {
+            req.flash('error', 'Cannot find that space!');
+            return res.redirect('/campgrounds');
+        }
+        res.render('campgrounds/edit', { campground });
     }
-    res.render('campgrounds/edit', { campground });
+    catch (e) {
+        res.falsh('Refresca la Pagina e Intenta de Nuevo')
+        res.render('/campgrounds')
+    }
 }
 
 module.exports.updateCampground = async (req, res) => {
-    const { id } = req.params;
-    const campground = await Campground.findByIdAndUpdate(id, { ...req.body.campground });
-    await campground.save();
-    req.flash('success', 'Successfully updated space!');
-    res.redirect(`/campgrounds/${campground._id}`)
+    try {
+        const { id } = req.params;
+        const campground = await Campground.findByIdAndUpdate(id, { ...req.body.campground });
+        await campground.save();
+        req.flash('success', 'Successfully updated space!');
+        res.redirect(`/campgrounds/${campground._id}`)
+    }
+    catch (e) {
+        res.falsh('Refresca la Pagina e Intenta de Nuevo')
+        res.render('/campgrounds')
+    }
 }
 
 module.exports.deleteCampground = async (req, res) => {
-    const { id } = req.params;
-    await Campground.findByIdAndDelete(id);
-    req.flash('success', 'Successfully deleted space')
-    res.redirect('/campgrounds');
+    try {
+        const { id } = req.params;
+        await Campground.findByIdAndDelete(id);
+        req.flash('success', 'Successfully deleted space')
+        res.redirect('/campgrounds');
+    }
+    catch (e) {
+        res.falsh('Refresca la Pagina e Intenta de Nuevo')
+        res.render('/campgrounds')
+    }
 }
 
-
 module.exports.RenderConfirmOrder = async (req, res) => {
-    const user = await User.findById(req.user.id).populate('messages').populate({
-        path: 'orders',
-        populate: {
-            path: 'posts'
-        }
-    })
-    const order = user.orders[user.orders.length - 1]
-    order.is_paid = true
-    const campground = await Campground.findById(order.posts.campground).populate({
-        path: 'posts',
-        populate: {
-            path: 'author'
-        }
-    }).populate('author')
-    await user.save()
-    await order.save()
-    const all_posts = campground.posts
-    res.render('campgrounds/show.ejs', { campground, all_posts })
+    try {
+        const user = await User.findById(req.user.id).populate('messages').populate({
+            path: 'orders',
+            populate: {
+                path: 'posts'
+            }
+        })
+        const order = user.orders[user.orders.length - 1]
+        order.is_paid = true
+        const campground = await Campground.findById(order.posts.campground).populate({
+            path: 'posts',
+            populate: {
+                path: 'author'
+            }
+        }).populate('author')
+        await user.save()
+        await order.save()
+        const all_posts = campground.posts
+        res.render('campgrounds/show.ejs', { campground, all_posts })
+    }
+    catch (e) {
+        res.falsh('Refresca la Pagina e Intenta de Nuevo')
+        res.render('/campgrounds')
+    }
 } 

@@ -18,6 +18,7 @@ const OrderSchema = new Schema({
         ref: 'Post'
     },
     seat: String,
+    letter: String,
     is_paid: Boolean,
     section: String,
     status: String,

@@ -40,28 +40,33 @@
                                         <h3 class="card-text">
 
                                             <%=post.quantity%>
-                                                <%= post.posts.title %>
+                                                <%= post.posts.title %> Entregados en Asiento: <%=post.seat%>
+                                                        <%=post.letter%>
                                         </h3>
                                         <p>
-                                            Price: <%=post.price%>$
-                                                <br>
-                                                Fees: <%=fees%>$
-                                                    <br>
-                                                    Total price: <%=total_price%>
-                                        </p>
-                                        <p class="card-text">
-                                            <%= post.posts.caption %>
-                                        </p>
+                                            Precio: <%=post.price%>$
+                                                <!-- <br>
+                                                Fees: <%=fees%>
+                                        </h5>
+                                        <br>
+                                        <h3>
+                                            Total Price: <%=total_price%>
+                                        </h3> -->
 
-                                        <form action="/posts/purchase/<%=post.id%>" method="POST">
-                                            <button class="btn btn-primary mb-2">Pay With Card</button>
-                                        </form>
-                                        <form action="/posts/purchase_efectivo/<%=post.id%>" method="POST">
-                                            <button class="btn btn-primary mb-2">Pay With Cash</button>
-                                        </form>
-                                        <form action="/posts/cancel/<%=post.id%>" method="POST"> <button
-                                                class="btn btn-primary">Delete from Cart</button>
-                                        </form>
+                                                <p class="card-text">
+                                                    <%= post.posts.caption %>
+                                                </p>
+
+                                                <!-- <form action="/posts/purchase/<%=post.id%>" method="POST">
+                                                    <button class="btn btn-primary mb-2">Pago con Tarjeta</button>
+                                                </form> -->
+                                                <form action="/posts/purchase_efectivo/<%=post.id%>" method="POST">
+                                                    <button class="btn btn-primary mb-2">Pago con
+                                                        Efectivo/Terminal</button>
+                                                </form>
+                                                <form action="/posts/cancel/<%=post.id%>" method="POST"> <button
+                                                        class="btn btn-primary">Borrar del Carrito</button>
+                                                </form>
                                     </div>
                                 </div>
                             </div>

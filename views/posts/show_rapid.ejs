@@ -197,31 +197,37 @@
                                                     </select>
                                                 </div>
                                                 <%}%>
-                                                    <div class="col-12 col-md-4 mb-2">
-                                                        <label class="form-label" for="seat">Seat:</label>
+                                                    <div class="col-7 col-md-4 mb-2">
+                                                        <label class="form-label" for="seat">Numero de Asiento:</label>
                                                         <input type="text" name="seat" id="seat" class="form-control"
-                                                            value="<%= product.seat %>" placeholder="23D">
+                                                            value="<%= product.seat %>" placeholder="23">
+                                                    </div>
+                                                    <div class="col-5 col-md-4 mb-2">
+                                                        <label class="form-label" for="letter">Letra:</label>
+                                                        <input type="text" name="letter" id="letter"
+                                                            class="form-control" value="<%= product.letter %>"
+                                                            placeholder="K">
                                                     </div>
                                                     <div class="col-12">
                                                         <div class="row mt-3">
                                                             <div class="col-12 mb-2">
                                                                 <label class="form-label"
-                                                                    for="how_many">Quantity:</label>
+                                                                    for="how_many">Cantidad:</label>
                                                                 <input type="number" name="how_many" id="how_many"
                                                                     value="<%= product.how_many %>"
                                                                     placeholder="Cantidad" class="form-control"
                                                                     required>
                                                             </div>
                                                             <div class="col-8 mb-2 mt-2">
-                                                                <button class="btn btn-primary btn-block">Payment
-                                                                    Method</button>
+                                                                <button class="btn btn-primary btn-block">Metodo de
+                                                                    Pago</button>
                                                             </div>
                                                         </div>
                                                     </div>
                             </form>
                             <form action="/campgrounds/<%=campground._id%>" method="GET">
                                 <div class="col-8 mb-2">
-                                    <button class="btn btn-primary btn-block">Return to
+                                    <button class="btn btn-primary btn-block">Regresar a
                                         <%= campground.name%>
                                     </button>
                                 </div>

@@ -5,18 +5,17 @@
             <%}%>
                 <% if(currentUser) {%>
                     <% if(currentUser.cart) {%>
-                        <a class="navbar-brand" href="/render-cart/<%=currentUser.id%>">View Cart</a>
+                        <a class="navbar-brand" href="/render-cart/<%=currentUser.id%>">Ver Carrito</a>
                         <%}%>
 
                             <a class="navbar-brand" href="/campgrounds">CARGI</a>
 
 
                             <% if(!currentUser.campgrounds.length> 0){%>
-                                <a class="navbar-brand" href="/render_orders/<%=currentUser.id%>">My
-                                    Orders</a>
+                                <a class="navbar-brand" href="/render_orders/<%=currentUser.id%>">Mis Ordenes</a>
                                 <%} else{%>
-                                    <a class="navbar-brand" href="/render-orders-store/<%=currentUser.id%>">Manage
-                                        Orders</a>
+                                    <a class="navbar-brand" href="/render-orders-store/<%=currentUser.id%>">Manejo de
+                                        Ordenes</a>
 
                                     <%} %>
                                         <%}%>
@@ -87,7 +86,7 @@
                                                                         href="/login">Login</a>
                                                                 </li>
                                                                 <li><a class="nav-link text-primary p-2"
-                                                                        href="/register">Register</a>
+                                                                        href="/register">Registrate</a>
                                                                 </li>
                                                             </ul>
                                                         </li>

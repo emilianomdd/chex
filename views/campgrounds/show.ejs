@@ -4,13 +4,13 @@
         <% if(currentUser.campgrounds.includes(campground.id)){%>
             <div class="btn-group">
                 <form action="/posts/new/<%=campground.id%>" method="GET">
-                    <button class="btn btn-success">Add Product</button>
+                    <button class="btn btn-success">Agrgar Producto</button>
                 </form>
             </div>
             <%}%>
                 <% if(currentUser.campgrounds.includes(campground.id) && currentUser.is_admin){%>
                     <div class="btn-group">
-                        <a href="/render_vendor_register/<%=campground.id%>">link to invite vendors</a>
+                        <a href="/render_vendor_register/<%=campground.id%>">link para invitar a vandedores</a>
                     </div>
                     <%}%>
 
@@ -61,22 +61,23 @@
                                                                 <form action="/posts/show_cart/<%=post._id%>"
                                                                     method="GET">
                                                                     <button
-                                                                        class="btn btn-outline-secondary btn-block">Add
-                                                                        to Cart</button>
+                                                                        class="btn btn-outline-secondary btn-block">Agregar
+                                                                        a Carrito</button>
                                                                 </form>
                                                             </div>
                                                             <div class="col-md-4 mt-3">
                                                                 <form action="/posts/show_rapid/<%=post._id%>"
                                                                     method="GET">
 
-                                                                    <button class="btn btn-dark btn-block">Quick
-                                                                        Checkout</button>
+                                                                    <button class="btn btn-dark btn-block">Compra
+                                                                        Rapida</button>
                                                                 </form>
                                                             </div>
                                                         </div>
                                                         <%}else {%>
                                                             <br>
-                                                            <h3> <a href="/register">Register</a> To Buy Product</h3>
+                                                            <h3> <a href="/register">Registrate</a> Para Comprar el
+                                                                Producto</h3>
                                                             <%}%>
                                                 </div>
                                             </div>

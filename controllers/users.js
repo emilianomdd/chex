@@ -38,12 +38,18 @@ module.exports.register = async (req, res, next) => {
 }
 
 module.exports.RenderVendor = async (req, res, next) => {
-    const { id } = req.params
-    const campground = await Campground.findById(id)
-    res.render('users/register_vendor', { campground })
+    try {
+        const { id } = req.params
+        const campground = await Campground.findById(id)
+        res.render('users/register_vendor', { campground })
+    }
+    catch (e) {
+        res.flash('Refresca la Pagina e Intenta de Nuevo')
+        res.render('/camoground')
+    }
 }
-
 module.exports.RegisterVendor = async (req, res, next) => {
+
     const { id } = req.params
     const campground = await Campground.findById(id)
     const { email } = req.body
@@ -70,7 +76,7 @@ module.exports.RegisterVendor = async (req, res, next) => {
         })
     } catch (e) {
         req.flash('error', e.message);
-        res.redirect(accountLink.url);
+        res.redirect('/campground');
     }
 
 }
@@ -123,128 +129,158 @@ module.exports.createMessage = async (req, res) => {
 }
 
 module.exports.RenderMyOrders = async (req, res) => {
-    const { id } = req.params
-    const user = await User.findById(id).populate({
-        path: 'orders',
-        populate: {
-            path: 'posts'
-        }
-    })
+    try {
+        const { id } = req.params
+        const user = await User.findById(id).populate({
+            path: 'orders',
+            populate: {
+                path: 'posts'
+            }
+        })
 
-    res.render('users/render_orders', { user })
+        res.render('users/render_orders', { user })
+    } catch (e) {
+        res.flash('Refresca la Pagina e Intenta de Nuevo')
+        res.render('/campground')
+    }
 }
 
 module.exports.RenderStoreOrders = async (req, res) => {
-    const { id } = req.params
-    const user = await User.findById(id).populate({
-        path: 'orders_to_complete',
-        populate: {
-            path: 'posts',
-        }
-    }).populate(
-        {
+    try {
+        const { id } = req.params
+        const user = await User.findById(id).populate({
             path: 'orders_to_complete',
             populate: {
-                path: 'customer',
+                path: 'posts',
             }
-        }
-    ).populate('campgrounds')
-    const campground = user.campgrounds[0]
-    res.render('users/render_vendor_orders', { user, campground })
+        }).populate(
+            {
+                path: 'orders_to_complete',
+                populate: {
+                    path: 'customer',
+                }
+            }
+        ).populate('campgrounds')
+        const campground = user.campgrounds[0]
+        res.render('users/render_vendor_orders', { user, campground })
+    } catch (e) {
+        res.flash('Refresca la Pagina e Intenta de Nuevo')
+        res.render('/campground')
+    }
 }
 
 module.exports.RenderSelect = async (req, res) => {
-    const section = req.query.section
-    const { id } = req.params
-    const user = await User.findById(id).populate({
-        path: 'orders_to_complete',
-        populate: {
-            path: 'posts',
-        }
-    }).populate(
-        {
+    try {
+        const section = req.query.section
+        const { id } = req.params
+        const user = await User.findById(id).populate({
             path: 'orders_to_complete',
             populate: {
-                path: 'customer',
+                path: 'posts',
             }
-        }
-    ).populate('campgrounds')
-    const campground = user.campgrounds[0]
-    res.render('users/render_vendor_section', { user, campground, section })
+        }).populate(
+            {
+                path: 'orders_to_complete',
+                populate: {
+                    path: 'customer',
+                }
+            }
+        ).populate('campgrounds')
+        const campground = user.campgrounds[0]
+        res.render('users/render_vendor_section', { user, campground, section })
+    } catch (e) {
+        res.flash('Refresca la Pagina e Intenta de Nuevo')
+        res.render('/campground')
+    }
 }
 
 module.exports.completeOrder = async (req, res) => {
-    const { id } = req.params
-    const order = await Order.findById(id)
-    const user = await User.findById(req.user.id).populate({
-        path: 'orders_to_complete',
-        populate: {
-            path: 'posts',
-        }
-    }).populate(
-        {
+    try {
+        const { id } = req.params
+        const order = await Order.findById(id)
+        const user = await User.findById(req.user.id).populate({
             path: 'orders_to_complete',
             populate: {
-                path: 'customer',
+                path: 'posts',
             }
-        }
-    ).populate('campgrounds')
-    client.messages
-        .create({
-            body: 'Su orden ha sido entregada',
-            from: 'whatsapp:+14155238886',
-            to: `whatsapp:+15129654086`
-        })
-        .done()
-    order.is_delivered = true
-    order.is_paid = true
-    await order.save()
+        }).populate(
+            {
+                path: 'orders_to_complete',
+                populate: {
+                    path: 'customer',
+                }
+            }
+        ).populate('campgrounds')
+        client.messages
+            .create({
+                body: 'Su orden ha sido entregada',
+                from: 'whatsapp:+14155238886',
+                to: `whatsapp:+15129654086`
+            })
+            .done()
+        order.is_delivered = true
+        order.is_paid = true
+        await order.save()
 
-    const campground = user.campgrounds[0]
-    res.render('users/render_vendor_orders', { user, campground })
+        const campground = user.campgrounds[0]
+        res.render('users/render_vendor_orders', { user, campground })
 
+    } catch (e) {
+        res.flash('Refresca la Pagina e Intenta de Nuevo')
+        res.render('/campground')
+    }
 }
 
 module.exports.renderActiveMessage = async (req, res) => {
-    const { id } = req.params
-    const message = await Message.findById(id)
-    var txt = req.body.message.body
-    const Current_user = await User.findById(req.user.id).populate({
-        path: 'messages',
-        populate: {
-            path: 'to'
-        }
-    }).populate({
-        path: 'messages',
-        populate: {
-            path: 'from'
-        }
-    });
-    txt = txt + ` - ${Current_user.username}`
-    const user_to = await User.findById(message.to)
-    const user_from = await User.findById(message.from)
-    message.body.push(txt)
-    await message.save()
-    res.render('users/message-active', { message, user_to, user_from, Current_user })
+    try {
+        const { id } = req.params
+        const message = await Message.findById(id)
+        var txt = req.body.message.body
+        const Current_user = await User.findById(req.user.id).populate({
+            path: 'messages',
+            populate: {
+                path: 'to'
+            }
+        }).populate({
+            path: 'messages',
+            populate: {
+                path: 'from'
+            }
+        });
+        txt = txt + ` - ${Current_user.username}`
+        const user_to = await User.findById(message.to)
+        const user_from = await User.findById(message.from)
+        message.body.push(txt)
+        await message.save()
+        res.render('users/message-active', { message, user_to, user_from, Current_user })
+    } catch (e) {
+        res.flash('Refresca la Pagina e Intenta de Nuevo')
+        res.render('/campground')
+    }
 }
 
 module.exports.renderActiveMessageOther = async (req, res) => {
-    const { id } = req.params
-    const message = await Message.findById(id)
-    const Current_user = await User.findById(req.user.id).populate({
-        path: 'messages',
-        populate: {
-            path: 'to'
-        }
-    }).populate({
-        path: 'messages',
-        populate: {
-            path: 'from'
-        }
-    });
-    const user_to = await User.findById(message.to)
-    const user_from = await User.findById(message.from)
-    res.render('users/message-active', { message, user_to, user_from, Current_user })
+    try {
+        const { id } = req.params
+        const message = await Message.findById(id)
+        const Current_user = await User.findById(req.user.id).populate({
+            path: 'messages',
+            populate: {
+                path: 'to'
+            }
+        }).populate({
+            path: 'messages',
+            populate: {
+                path: 'from'
+            }
+        });
+        const user_to = await User.findById(message.to)
+        const user_from = await User.findById(message.from)
+        res.render('users/message-active', { message, user_to, user_from, Current_user })
+    } catch (e) {
+        res.flash('Refresca la Pagina e Intenta de Nuevo')
+        res.render('/campground')
+    }
 }
 
 module.exports.renderMessage = async (req, res) => {
@@ -330,62 +366,72 @@ module.exports.renderMember = async (req, res) => {
 
 
 module.exports.FiveMin = async (req, res) => {
-    const { id } = req.params
-    const order = await Order.findById(id).populate('customer')
-    order.status = 'Su orden estara lista para recoger en 5 minutos'
-    const user = await User.findById(req.user.id).populate({
-        path: 'orders_to_complete',
-        populate: {
-            path: 'posts',
-        }
-    }).populate(
-        {
+    try {
+        const { id } = req.params
+        const order = await Order.findById(id).populate('customer')
+        order.status = 'Su orden estara lista para recoger en 5 minutos'
+        const user = await User.findById(req.user.id).populate({
             path: 'orders_to_complete',
             populate: {
-                path: 'customer',
+                path: 'posts',
             }
-        }
-    ).populate('campgrounds')
+        }).populate(
+            {
+                path: 'orders_to_complete',
+                populate: {
+                    path: 'customer',
+                }
+            }
+        ).populate('campgrounds')
 
-    client.messages
-        .create({
-            body: 'Su orden estara lista en 5 minutos',
-            from: 'whatsapp:+14155238886',
-            to: `whatsapp:+15129654086`
-        })
-        .done()
-    await order.save()
-    const campground = user.campgrounds[0]
-    res.render('users/render_vendor_orders', { user, campground })
+        client.messages
+            .create({
+                body: 'Su orden estara lista en 5 minutos',
+                from: 'whatsapp:+14155238886',
+                to: `whatsapp:+15129654086`
+            })
+            .done()
+        await order.save()
+        const campground = user.campgrounds[0]
+        res.render('users/render_vendor_orders', { user, campground })
+    } catch (e) {
+        res.flash('Refresca la Pagina e Intenta de Nuevo')
+        res.render('/campground')
+    }
 }
 
 module.exports.Ready = async (req, res) => {
-    const { id } = req.params
-    const order = await Order.findById(id).populate('customer')
-    const user = await User.findById(req.user.id).populate({
-        path: 'orders_to_complete',
-        populate: {
-            path: 'posts',
-        }
-    }).populate(
-        {
+    try {
+        const { id } = req.params
+        const order = await Order.findById(id).populate('customer')
+        const user = await User.findById(req.user.id).populate({
             path: 'orders_to_complete',
             populate: {
-                path: 'customer',
+                path: 'posts',
             }
-        }
-    ).populate('campgrounds')
-    client.messages
-        .create({
-            body: 'Su orden esta lista para recoger',
-            from: 'whatsapp:+14155238886',
-            to: `whatsapp:+15129654086`
-        })
-        .done()
-    order.status = 'Orden lista para recoger'
-    await order.save()
-    const campground = user.campgrounds[0]
-    res.render('users/render_vendor_orders', { user, campground })
+        }).populate(
+            {
+                path: 'orders_to_complete',
+                populate: {
+                    path: 'customer',
+                }
+            }
+        ).populate('campgrounds')
+        client.messages
+            .create({
+                body: 'Su orden esta lista para recoger',
+                from: 'whatsapp:+14155238886',
+                to: `whatsapp:+15129654086`
+            })
+            .done()
+        order.status = 'Orden lista para recoger'
+        await order.save()
+        const campground = user.campgrounds[0]
+        res.render('users/render_vendor_orders', { user, campground })
+    } catch (e) {
+        res.flash('Refresca la Pagina e Intenta de Nuevo')
+        res.render('/campground')
+    }
 }
 
 // module.exports.renderForgot = async (req, res) => {
@@ -560,4 +606,4 @@ module.exports.Ready = async (req, res) => {
 //         req.flash("error", "Something went wrong Please try again.");
 //         res.redirect("/forgot");
 //     }
-// };
+// }

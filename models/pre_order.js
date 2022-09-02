@@ -21,6 +21,7 @@ const Pre_orderSchema = new Schema({
     seat: String,
     section: String,
     ready: String,
+    letter: String,
     five: String,
     campground: {
         type: Schema.Types.ObjectId,

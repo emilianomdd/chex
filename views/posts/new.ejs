@@ -6,21 +6,21 @@
             <form action="/posts/<%= campground.id%>" method="POST" novalidate class="validated-form"
                 enctype="multipart/form-data">
                 <div class="mb-3">
-                    <label class="form-label" for="title">Title</label>
+                    <label class="form-label" for="title">Tiulo</label>
                     <input class="form-control" type="text" id="title" name="post[title]" required>
                     <div class="valid-feedback">
                         Looks good!
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label" for="caption">Caption</label>
+                    <label class="form-label" for="caption">Descripcion</label>
                     <input class="form-control" type="text" id="caption" name="post[caption]" required>
                     <div class="valid-feedback">
                         Looks good!
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label" for="price">Price</label>
+                    <label class="form-label" for="price">Precio</label>
                     <input class="form-control" type="text" id="price" name="post[price]" required>
                     <div class="valid-feedback">
                         Looks good!
@@ -31,13 +31,13 @@
                     <div class="form-file custom-file">
                         <input type="file" class="form-file-input" id="image" name="image" multiple>
                         <label class="form-file-label" for="image">
-                            <span class="form-file-text custom-file-label">Choose Iimage(s)...</span>
+                            <span class="form-file-text custom-file-label">Seleccione Imagen(es)...</span>
                             <span class="form-file-button">Look up in Library</span>
                         </label>
                     </div>
                 </div>
                 <div class="mb-3">
-                    <button class="btn btn-success">Add Product</button>
+                    <button class="btn btn-success">Agregar Articulo</button>
                 </div>
             </form>
             <a href="/campgrounds">Home</a>

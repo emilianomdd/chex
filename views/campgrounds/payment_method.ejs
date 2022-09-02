@@ -10,27 +10,22 @@
                     </h5>
 
                     <p class="card-text">
-                        Quantity:<%= order.quantity%>
+                        Cantidad:<%= order.quantity%>
 
                             <br>
-                            Price: <%= order.price %>$
+                            Precio: <%= order.price %>$
                                 </br>
-                                <br>
-                                Transaction Fees & Comission: <%=transaction_fee%>$
-                                    </br> <br>
-                                    Total Price: <%= price%>$
-                                        </br>
                     </p>
                     <p class="card-text">
                         Seat: <%=order.seat%> Seccion: <%=order.section%>
                     </p>
 
                     <form action="/posts/rapid_cash/<%=order.id%>" method="POST">
-                        <button class="btn btn-primary mb-2">Pay with Cash</button>
+                        <button class="btn btn-primary mb-2">Pagar con efectivo/terminal</button>
                     </form>
-                    <form action="/posts/rapid_card/<%=order.id%>" method="POST">
-                        <button class="btn btn-primary">Pay with Card</button>
-                    </form>
+                    <!-- <form action="/posts/rapid_card/<%=order.id%>" method="POST">
+                                        <button class="btn btn-primary">Pay with Card</button>
+                                    </form> -->
                 </div>
             </div>
         </div>

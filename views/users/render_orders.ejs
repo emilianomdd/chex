@@ -22,47 +22,52 @@
                                 <div class="col-md-8">
                                     <div class="card-body">
                                         <h3>
-                                            <%= order.posts.title%>
-                                                <br>
-                                                Status: <%= order.status %>
+                                            <%=order.quantity%>
+                                                <%= order.posts.title%>
+                                                    <br>
+                                                    Status: <%= order.status %>
                                         </h3>
                                         <h5>
                                             <br>
-                                            Price: <%=order.price%>$
-                                                <br>
+                                            Precio: <%=order.price%>$
+                                                <!-- <br>
                                                 Fees: <%=fees%>
                                         </h5>
                                         <br>
                                         <h3>
                                             Total Price: <%=total_price%>
-                                        </h3>
-                                        <% if (order.drop_off ){%>
-                                            <h3 class="card-text">
-                                                Drop off: <%= order.drop_off %>
-                                            </h3>
-                                            <%}%>
-                                                <% if (order.seat){%>
-                                                    <h3 class="card-text">
-                                                        Seat: <%= order.seat %>
-                                                            Section: <%= order.section%>
-                                                    </h3>
-                                                    <%}%>
-                                                        <% if(order.cash){%>
-                                                            <p class="card-text">
-                                                                Paymet Method: Efectivo
-                                                            </p>
-                                                            <%}%>
+                                        </h3> -->
+                                                <% if (order.drop_off=='N/A' ){%>
 
-                                                                <p class="card-text">
-                                                                    Confirmation Number: <%= order.conf_num %>
-                                                                </p>
+                                                    <%}else{%>
+                                                        <h3 class="card-text">
+                                                            Drop off: <%= order.drop_off %>
+                                                        </h3>
+                                                        <%}%>
+                                                            <% if (order.seat !='N/A' ){%>
+                                                                <h3 class="card-text">
+                                                                    Asiento: <%= order.seat %>
+                                                                        <%=order.letter%>
+                                                                            Section: <%= order.section%>
+                                                                </h3>
+                                                                <%}%>
+                                                                    <% if(order.cash){%>
+                                                                        <p class="card-text">
+                                                                            Metodo de Pago: Efectivo/Terminal
+                                                                        </p>
+                                                                        <%}%>
+
+                                                                            <p class="card-text">
+                                                                                Numero de Confirmacion: <%=
+                                                                                    order.conf_num %>
+                                                                            </p>
                                     </div>
                                 </div>
                             </div>
                             <%}%>
                                 <%}%>
                                     <% } else{ %>
-                                        <h1>No Orders</h1>
+                                        <h1>Sin Ordenes al Momento</h1>
                                         <%}%>
 
     </div>
