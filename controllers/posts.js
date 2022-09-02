@@ -24,7 +24,7 @@ module.exports.createPost = async (req, res, next) => {
         await user.save();
         res.redirect('/campgrounds')
     } catch (e) {
-        res.falsh('Refresca la Pagina e Intenta de Nuevo')
+        req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/campgrounds')
     }
 }
@@ -89,7 +89,7 @@ module.exports.purchase = async (req, res) => {
         });
         res.redirect(session.url)
     } catch (e) {
-        res.falsh('Refresca la Pagina e Intenta de Nuevo')
+        req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/campgrounds')
     }
 
@@ -108,7 +108,7 @@ module.exports.renderNew = async (req, res) => {
         const campground = await Campground.findById(id)
         res.render('posts/new.ejs', { campground })
     } catch (e) {
-        res.falsh('Refresca la Pagina e Intenta de Nuevo')
+        req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/campgrounds')
     }
 }
@@ -141,7 +141,7 @@ module.exports.renderTag = async (req, res) => {
             res.redirect('/')
         }
     } catch (e) {
-        res.falsh('Refresca la Pagina e Intenta de Nuevo')
+        req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/campgrounds')
     }
 }
@@ -184,7 +184,7 @@ module.exports.carrito = async (req, res) => {
         const all_posts = campground.posts
         res.render('campgrounds/show.ejs', { campground, all_posts })
     } catch (e) {
-        res.falsh('Refresca la Pagina e Intenta de Nuevo')
+        req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/campgrounds')
     }
 }
@@ -201,7 +201,7 @@ module.exports.renderPost = async (req, res) => {
         const all_posts = campground.posts
         res.render('campgrounds/show_posts.ejs', { campground, all_posts })
     } catch (e) {
-        res.falsh('Refresca la Pagina e Intenta de Nuevo')
+        req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/campgrounds')
     }
 }
@@ -231,7 +231,7 @@ module.exports.showPost = async (req, res) => {
         }
         res.render("posts/show", { post, campground, product: productData })
     } catch (e) {
-        res.falsh('Refresca la Pagina e Intenta de Nuevo')
+        req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/campgrounds')
     }
 };
@@ -243,7 +243,7 @@ module.exports.deletePost = async (req, res) => {
         req.flash('success', 'Successfully deleted post')
         res.redirect('/campgrounds');
     } catch (e) {
-        res.falsh('Refresca la Pagina e Intenta de Nuevo')
+        req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/campgrounds')
     }
 }
@@ -264,7 +264,7 @@ module.exports.updatePost = async (req, res) => {
         req.flash('success', 'Successfully updated space!');
         res.redirect(`/posts/${post._id}`)
     } catch (e) {
-        res.falsh('Refresca la Pagina e Intenta de Nuevo')
+        req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/campgrounds')
     }
 }
@@ -316,7 +316,7 @@ module.exports.RapidOrder = async (req, res) => {
         await order.save()
         res.render('campgrounds/payment_method', { order, transaction_fee, price })
     } catch (e) {
-        res.falsh('Refresca la Pagina e Intenta de Nuevo')
+        req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/campgrounds')
     }
 }
@@ -337,7 +337,7 @@ module.exports.RenderConfirmOrder = async (req, res) => {
         const all_posts = campground.posts
         res.render('campgrounds/show.ejs', { campground, all_posts })
     } catch (e) {
-        res.falsh('Refresca la Pagina e Intenta de Nuevo')
+        req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/campgrounds')
     }
 }
@@ -356,7 +356,7 @@ module.exports.Delete = async (req, res) => {
         const all_posts = cart.pre_orders
         res.render('users/render_cart', { user, all_posts })
     } catch (e) {
-        res.falsh('Refresca la Pagina e Intenta de Nuevo')
+        req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/campgrounds')
     }
 }
@@ -450,7 +450,7 @@ module.exports.RapidCash = async (req, res) => {
         const all_posts = campground.posts
         res.render('campgrounds/show.ejs', { campground, all_posts })
     } catch (e) {
-        res.falsh('Refresca la Pagina e Intenta de Nuevo')
+        req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/campgrounds')
     }
 }
@@ -492,7 +492,7 @@ module.exports.RapidCard = async (req, res) => {
         });
         res.redirect(session.url)
     } catch (e) {
-        res.falsh('Refresca la Pagina e Intenta de Nuevo')
+        req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/campgrounds')
     }
 }
@@ -521,7 +521,7 @@ module.exports.ShowRapid = async (req, res) => {
         }
         res.render("posts/show_rapid", { post, campground, product })
     } catch (e) {
-        res.falsh('Refresca la Pagina e Intenta de Nuevo')
+        req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/campgrounds')
     }
 }

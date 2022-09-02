@@ -68,7 +68,7 @@ module.exports.showCampground = async (req, res,) => {
     try {
         if (req.user) {
             const { id } = req.params
-            const campground = await Campground.findById(id).populate({
+            const campground = await Campground.findById('6312813b7f3c204870d56d3c').populate({
                 path: 'posts',
                 populate: {
                     path: 'author'
@@ -93,7 +93,7 @@ module.exports.showCampground = async (req, res,) => {
         }
 
     } catch (e) {
-        res.falsh('Refresca la Pagina e Intenta de Nuevo')
+        req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/campgrounds')
     }
 }
@@ -123,7 +123,7 @@ module.exports.renderEditForm = async (req, res) => {
         res.render('campgrounds/edit', { campground });
     }
     catch (e) {
-        res.falsh('Refresca la Pagina e Intenta de Nuevo')
+        req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/campgrounds')
     }
 }
@@ -137,7 +137,7 @@ module.exports.updateCampground = async (req, res) => {
         res.redirect(`/campgrounds/${campground._id}`)
     }
     catch (e) {
-        res.falsh('Refresca la Pagina e Intenta de Nuevo')
+        req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/campgrounds')
     }
 }
@@ -150,7 +150,7 @@ module.exports.deleteCampground = async (req, res) => {
         res.redirect('/campgrounds');
     }
     catch (e) {
-        res.falsh('Refresca la Pagina e Intenta de Nuevo')
+        req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/campgrounds')
     }
 }
@@ -177,7 +177,7 @@ module.exports.RenderConfirmOrder = async (req, res) => {
         res.render('campgrounds/show.ejs', { campground, all_posts })
     }
     catch (e) {
-        res.falsh('Refresca la Pagina e Intenta de Nuevo')
+        req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/campgrounds')
     }
 } 
