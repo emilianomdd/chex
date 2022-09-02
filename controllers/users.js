@@ -24,6 +24,8 @@ module.exports.register = async (req, res, next) => {
         const final_phone = (countryCode + phone).replace(/[^0-9]/g, '')
         user.phone = '+' + final_phone
         user.cart = cart
+        const day = new Date()
+        user.date = day.getTime()
         await cart.save()
         const registeredUser = await User.register(user, password);
         req.login(registeredUser, err => {

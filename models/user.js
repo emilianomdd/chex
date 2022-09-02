@@ -9,6 +9,7 @@ const Order = require('./order')
 const Carrito = require('./carrito')
 
 const UserSchema = new Schema({
+    date: Date,
     store: Boolean,
     stripe_account: String,
     phone: String,
