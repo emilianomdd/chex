@@ -34,7 +34,8 @@ module.exports.purchase = async (req, res) => {
         const day = new Date()
         const { id } = req.params
         const pre_order = await Pre_order.findById(id).populate('posts')
-        const post_author = await User.findById(pre_order.posts.author)
+        const pre_orderr = await Pre_order.findById(id).populate('posts')
+        const post_author = await User.findById(pre_order.posts.author).populate('posts')
         const order = new Order()
         const user = await User.findById(req.user.id).populate('messages')
         order.status = 'En proceso'
@@ -43,6 +44,7 @@ module.exports.purchase = async (req, res) => {
         order.customer = pre_order.customer
         order.quantity = pre_order.quantity
         order.posts = pre_order.posts
+        order.name = pre_orderr.posts.title
         order.drop_off = pre_order.drop_off
         order.section = pre_order.section
         order.seat = pre_order.seat
@@ -289,6 +291,7 @@ module.exports.RapidOrder = async (req, res) => {
         order.is_paid = false
         order.is_delivered = false
         order.posts = post
+        order.name = post.title
         order.letter = req.body.letter
         if (req.body.drop_off != 'N/A') {
 
@@ -365,16 +368,17 @@ module.exports.purchaseCash = async (req, res) => {
     try {
         const { id } = req.params
         const pre_order = await Pre_order.findById(id).populate('posts')
+        const see_pre = await Pre_order.findById(id).populate('posts')
         const post_author = await User.findById(pre_order.posts.author)
         const order = new Order()
         order.status = 'En proceso'
         const day = new Date()
         order.date = day.getTime()
         const user = await User.findById(req.user.id).populate('messages')
-        user.orders.push(order)
         order.letter = pre_order.letter
         order.customer = pre_order.customer
         order.posts = pre_order.posts
+        order.name = see_pre.posts.title
         if (req.body.drop_off != 'N/A') {
 
             order.drop_off = req.body.drop_off
@@ -430,7 +434,6 @@ module.exports.purchaseCash = async (req, res) => {
 module.exports.RapidCash = async (req, res) => {
     try {
         const { id } = req.params
-
         const user = await User.findById(req.user.id)
         const order = await Order.findById(id).populate({
             path: 'campground',

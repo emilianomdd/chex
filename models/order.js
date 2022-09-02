@@ -12,6 +12,7 @@ const User = require('./user')
 const OrderSchema = new Schema({
     price: Number,
     price_final: Number,
+    name: String,
     is_delivered: Boolean,
     posts: {
         type: Schema.Types.ObjectId,

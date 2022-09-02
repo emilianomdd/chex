@@ -162,9 +162,7 @@ module.exports.RenderStoreOrders = async (req, res) => {
             }
         ).populate('campgrounds')
         const campground = user.campgrounds[0]
-        for (let order of user.orders_to_complete) {
-            await Order.findByIdAndDelete(order)
-        }
+
         res.render('users/render_vendor_orders', { user, campground })
     } catch (e) {
         res.flash('Refresca la Pagina e Intenta de Nuevo')
