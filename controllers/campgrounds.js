@@ -76,10 +76,10 @@ module.exports.showCampground = async (req, res,) => {
         }).populate('author');
         const all_posts = campground.posts
         if (!campground) {
-            req.flash('error', 'Cannot find that campground!');
+            req.flash('error', 'No se encontro el Lugar!');
             return res.redirect('/campgrounds');
         }
-        console.log(campground.name)
+        console.log(all_posts)
         res.render('campgrounds/show.ejs', { campground, all_posts })
 
 
