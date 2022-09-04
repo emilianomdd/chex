@@ -139,6 +139,11 @@ module.exports.RenderMyOrders = async (req, res) => {
             populate: {
                 path: 'posts'
             }
+        }).populate({
+            path: 'orders',
+            populate: {
+                path: 'campground'
+            }
         })
 
         res.render('users/render_orders', { user })

@@ -66,31 +66,22 @@ module.exports.createCampground = async (req, res, next) => {
 
 module.exports.showCampground = async (req, res,) => {
     try {
-        if (req.user) {
-            const { id } = req.params
-            const campground = await Campground.findById('6312813b7f3c204870d56d3c').populate({
-                path: 'posts',
-                populate: {
-                    path: 'author'
-                }
-            }).populate('author');
-            const all_posts = campground.posts
-            if (!campground) {
-                req.flash('error', 'Cannot find that campground!');
-                return res.redirect('/campgrounds');
+
+        const { id } = req.params
+        const campground = await Campground.findById(id).populate({
+            path: 'posts',
+            populate: {
+                path: 'author'
             }
-            res.render('campgrounds/show.ejs', { campground, all_posts })
+        }).populate('author');
+        const all_posts = campground.posts
+        if (!campground) {
+            req.flash('error', 'Cannot find that campground!');
+            return res.redirect('/campgrounds');
         }
-        else {
-            const { id } = req.params
-            const campground = await Campground.findById(id).populate({
-                path: 'posts',
-                populate: {
-                    path: 'author'
-                }
-            }).populate('author');
-            res.render('users/register_route', { campground })
-        }
+        console.log(campground.name)
+        res.render('campgrounds/show.ejs', { campground, all_posts })
+
 
     } catch (e) {
         req.flash('Refresca la Pagina e Intenta de Nuevo')

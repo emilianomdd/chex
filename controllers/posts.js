@@ -241,7 +241,10 @@ module.exports.showPost = async (req, res) => {
 module.exports.deletePost = async (req, res) => {
     try {
         const { id } = req.params;
+        const post = await Post.find(id)
+        console.log(post)
         await Post.findByIdAndDelete(id);
+        console.log(post)
         req.flash('success', 'Successfully deleted post')
         res.redirect('/campgrounds');
     } catch (e) {
@@ -274,6 +277,7 @@ module.exports.updatePost = async (req, res) => {
 
 module.exports.RapidOrder = async (req, res) => {
     try {
+
         const { id } = req.params
         const post = await Post.findById(id).populate({
             path: 'campground',
@@ -318,7 +322,8 @@ module.exports.RapidOrder = async (req, res) => {
         await user.save()
         await order.save()
         res.render('campgrounds/payment_method', { order, transaction_fee, price })
-    } catch (e) {
+    }
+    catch (e) {
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/campgrounds')
     }
@@ -502,27 +507,40 @@ module.exports.RapidCard = async (req, res) => {
 
 module.exports.ShowRapid = async (req, res) => {
     try {
-        const { id } = req.params;
-        const post = await Post.findById(id).populate("campground");
-        const campground = post.campground;
+        if (req.user) {
+            const { id } = req.params;
+            const post = await Post.findById(id).populate("campground");
+            const campground = post.campground;
 
-        let product = {
-            section: "",
-            drop_off: "",
-            seat: "",
-            how_many: "",
-            letetr: ""
-        };
-        if (req.session?.hasOwnProperty("product")) {
-            product = {
-                letter: req.session?.product[id]?.letter || "",
-                section: req.session?.product[id]?.section || "",
-                drop_off: req.session?.product[id]?.drop_off || "",
-                seat: req.session?.product[id]?.seat || "",
-                how_many: req.session?.product[id]?.how_many || "",
+            let product = {
+                section: "",
+                drop_off: "",
+                seat: "",
+                how_many: "",
+                letetr: ""
             };
+            if (req.session?.hasOwnProperty("product")) {
+                product = {
+                    letter: req.session?.product[id]?.letter || "",
+                    section: req.session?.product[id]?.section || "",
+                    drop_off: req.session?.product[id]?.drop_off || "",
+                    seat: req.session?.product[id]?.seat || "",
+                    how_many: req.session?.product[id]?.how_many || "",
+                };
+            }
+            res.render("posts/show_rapid", { post, campground, product })
+        } else {
+            const { id } = req.params;
+            const post = await Post.findById(id).populate("campground");
+            const campground_id = post.campground;
+            const campground = await Campground.findById(campground_id.id).populate({
+                path: 'posts',
+                populate: {
+                    path: 'author'
+                }
+            }).populate('author');
+            res.render('users/register_route', { campground })
         }
-        res.render("posts/show_rapid", { post, campground, product })
     } catch (e) {
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/campgrounds')
