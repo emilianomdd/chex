@@ -29,7 +29,6 @@ router.route('/message/:id')
     .put(users.renderActiveMessage)
     .post(users.createMessage)
 
-router.get('/show/:id', users.showUser)
 
 router.get('/render-orders-store/:id', users.RenderStoreOrders)
 
@@ -50,9 +49,7 @@ router.route('/login')
 router.get('/logout', users.logout)
 
 
-router.route('/join/:id')
-    .get(users.renderMember)
-    .post(users.createMembership)
+
 
 // router.route('/forgot')
 //     .get(users.renderForgot)

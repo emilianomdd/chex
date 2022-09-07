@@ -15,7 +15,7 @@ router.route('/:id')
     .get(catchAsync(posts.renderPost))
     .delete(catchAsync(posts.deletePost))
     .put(catchAsync(posts.updatePost))
-router.get('/show_cart/:id', isLoggedIn, catchAsync(posts.showPost))
+router.get('/show_cart/:id', catchAsync(posts.showPost))
 
 router.get('/show_rapid/:id', posts.ShowRapid)
 

@@ -8,44 +8,20 @@ const campground = require('../models/campground');
 const stripe = require('stripe')(process.env.STRIPE_KEY)
 const Order = require('../models/order')
 
+//shows the spaces listed in the platform
 module.exports.index = async (req, res) => {
     const campgrounds = await Campground.find();
     res.render('campgrounds/index', { campgrounds })
 }
 
+//renders the form to create a new place
 module.exports.renderNewForm = (req, res) => {
     res.render('campgrounds/new');
 }
 
-module.exports.showTags = async (req, res,) => {
-    const tags = req.query
-    const final_tags = tags.membership.tags
-    const campground = await Campground.findById(req.params.id).populate({
-        path: 'members',
-        populate: {
-            path: 'member'
-        }
-    })
-    if (!campground) {
-        req.flash('error', 'Cannot find that campground!');
-        return res.redirect('/camprgounds');
-    }
-    var members_total = []
-    for (let member of campground.members) {
-        if (member.tags.some(r => final_tags.includes(r))) {
-            members_total.push(member)
-        }
-    }
-    if (members_total.length > 0) {
-        req.flash('success', `Showing members with ${final_tags} tags!`)
-        res.render('campgrounds/show', { campground, members_total });
-    }
-    else {
-        req.flash('failure', `There are no posts with those tags`)
-        res.redirect('/')
-    }
-}
 
+
+//Function to create a place
 module.exports.createCampground = async (req, res, next) => {
     const campground = new Campground(req.body.campground);
     const user = await User.findById(req.user._id);
@@ -64,9 +40,10 @@ module.exports.createCampground = async (req, res, next) => {
     res.redirect(`/campgrounds/${campground._id}`)
 }
 
+
+//function that will show the place and it's products
 module.exports.showCampground = async (req, res,) => {
     try {
-
         const { id } = req.params
         const campground = await Campground.findById(id).populate({
             path: 'posts',
@@ -76,32 +53,19 @@ module.exports.showCampground = async (req, res,) => {
         }).populate('author');
         const all_posts = campground.posts
         if (!campground) {
-            req.flash('error', 'No se encontro el Lugar!');
+            req.flash('error', 'Cannot find that campground!');
             return res.redirect('/campgrounds');
         }
-        console.log(all_posts)
         res.render('campgrounds/show.ejs', { campground, all_posts })
 
-
     } catch (e) {
-        req.flash('Refresca la Pagina e Intenta de Nuevo')
+        res.falsh('Refresca la Pagina e Intenta de Nuevo')
         res.render('/campgrounds')
     }
 }
 
-module.exports.renderMeet = async (req, res) => {
-    const gem_search = await req.query.city_name;
-    const all_gems = await Campground.find({ "name": { $all: [gem_search] } });
-    if (all_gems.length == 0) {
-        req.flash('error', `${gem_search} not found`)
-        res.redirect('/campgrounds')
-    }
-    else {
-        res.render('users/find_users', { gem_search, all_gems })
-    }
 
-}
-
+//renders the form to edit a place
 module.exports.renderEditForm = async (req, res) => {
 
     try {
@@ -119,6 +83,7 @@ module.exports.renderEditForm = async (req, res) => {
     }
 }
 
+//uses info from edit form to change the info on the place
 module.exports.updateCampground = async (req, res) => {
     try {
         const { id } = req.params;
@@ -133,6 +98,8 @@ module.exports.updateCampground = async (req, res) => {
     }
 }
 
+
+//deletes the place
 module.exports.deleteCampground = async (req, res) => {
     try {
         const { id } = req.params;
@@ -146,6 +113,7 @@ module.exports.deleteCampground = async (req, res) => {
     }
 }
 
+//I think this is what confirms that a cash order has been paid must check
 module.exports.RenderConfirmOrder = async (req, res) => {
     try {
         const user = await User.findById(req.user.id).populate('messages').populate({

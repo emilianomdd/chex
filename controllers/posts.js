@@ -7,6 +7,8 @@ const Order = require('../models/order');
 const Pre_order = require('../models/pre_order');
 const Carrito = require('../models/carrito')
 
+
+//Creates an article in a campground
 module.exports.createPost = async (req, res, next) => {
     try {
         const { id } = req.params
@@ -29,6 +31,7 @@ module.exports.createPost = async (req, res, next) => {
     }
 }
 
+//
 module.exports.purchase = async (req, res) => {
     try {
         const day = new Date()
@@ -97,13 +100,14 @@ module.exports.purchase = async (req, res) => {
 
 }
 
-
+//unfinished order cancelation function
 module.exports.cancelOrder = async (req, res) => {
     const refund = await stripe.refunds.create({
         payment_intent: 'pi_Aabcxyz01aDfoo',
     });
 }
 
+//shows form to create a new article
 module.exports.renderNew = async (req, res) => {
     try {
         const { id } = req.params
@@ -115,6 +119,7 @@ module.exports.renderNew = async (req, res) => {
     }
 }
 
+//I believe this function is the one that shows selected orders in sections
 module.exports.renderTag = async (req, res) => {
     try {
         const final_tags = req.query.membership.tags
@@ -148,6 +153,7 @@ module.exports.renderTag = async (req, res) => {
     }
 }
 
+//agrefa orden al carrito
 module.exports.carrito = async (req, res) => {
     try {
         const { id } = req.params
@@ -191,6 +197,7 @@ module.exports.carrito = async (req, res) => {
     }
 }
 
+//Renders the selected campground?
 module.exports.renderPost = async (req, res) => {
     try {
         const { id } = req.params
@@ -208,36 +215,51 @@ module.exports.renderPost = async (req, res) => {
     }
 }
 
+//render show post when user looks to add to cart 
 module.exports.showPost = async (req, res) => {
     try {
-        const { id } = req.params;
-        const post = await Post.findById(id).populate("campground");
-        const campground = post.campground;
-        let productData = {
-            section: "",
-            drop_off: "",
-            seat: "",
-            letter: "",
-            how_many: "",
-        };
-
-        if (req.session?.hasOwnProperty("product")) {
-            productData = {
-
-                letter: req.session?.product[id]?.letter || "",
-                section: req.session?.product[id]?.section || "",
-                drop_off: req.session?.product[id]?.drop_off || "",
-                seat: req.session?.product[id]?.seat || "",
-                how_many: req.session?.product[id]?.how_many || "",
+        if (req.user) {
+            const { id } = req.params;
+            const post = await Post.findById(id).populate("campground");
+            const campground = post.campground;
+            let productData = {
+                section: "",
+                drop_off: "",
+                seat: "",
+                letter: "",
+                how_many: "",
             };
+
+            if (req.session?.hasOwnProperty("product")) {
+                productData = {
+
+                    letter: req.session?.product[id]?.letter || "",
+                    section: req.session?.product[id]?.section || "",
+                    drop_off: req.session?.product[id]?.drop_off || "",
+                    seat: req.session?.product[id]?.seat || "",
+                    how_many: req.session?.product[id]?.how_many || "",
+                };
+            }
+            res.render("posts/show", { post, campground, product: productData })
         }
-        res.render("posts/show", { post, campground, product: productData })
+        else {
+            const { id } = req.params;
+            const post = await Post.findById(id).populate("campground");
+            const campground_id = post.campground;
+            const campground = await Campground.findById(campground_id.id).populate({
+                path: 'posts',
+                populate: {
+                    path: 'author'
+                }
+            }).populate('author');
+            res.render('users/register_route', { campground })
+        }
     } catch (e) {
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/campgrounds')
-    }
-};
-
+    };
+}
+//delete posts
 module.exports.deletePost = async (req, res) => {
     try {
         const { id } = req.params;
@@ -253,6 +275,7 @@ module.exports.deletePost = async (req, res) => {
     }
 }
 
+//update post
 module.exports.updatePost = async (req, res) => {
     try {
         const { id } = req.params;
@@ -274,7 +297,7 @@ module.exports.updatePost = async (req, res) => {
     }
 }
 
-
+//creates order but doesn't show anyewhere until iser specifies ppayment method
 module.exports.RapidOrder = async (req, res) => {
     try {
 
@@ -329,6 +352,7 @@ module.exports.RapidOrder = async (req, res) => {
     }
 }
 
+//see what this is for?
 module.exports.RenderConfirmOrder = async (req, res) => {
     try {
         const order = new Order()
@@ -350,6 +374,7 @@ module.exports.RenderConfirmOrder = async (req, res) => {
     }
 }
 
+//deletes pre order
 module.exports.Delete = async (req, res) => {
     try {
         const { id } = req.params
@@ -368,6 +393,7 @@ module.exports.Delete = async (req, res) => {
         res.render('/campgrounds')
     }
 }
+
 
 module.exports.purchaseCash = async (req, res) => {
     try {
@@ -435,7 +461,7 @@ module.exports.purchaseCash = async (req, res) => {
 
 
 
-
+//route used when user decides to do rapid checkout and uses cash
 module.exports.RapidCash = async (req, res) => {
     try {
         const { id } = req.params
@@ -463,7 +489,7 @@ module.exports.RapidCash = async (req, res) => {
     }
 }
 
-
+//route used when user chooses to pay with card after rapid checkout
 module.exports.RapidCard = async (req, res) => {
     try {
         const { id } = req.params
@@ -505,6 +531,7 @@ module.exports.RapidCard = async (req, res) => {
     }
 }
 
+//show  route for when user clicks rapid checkout
 module.exports.ShowRapid = async (req, res) => {
     try {
         if (req.user) {

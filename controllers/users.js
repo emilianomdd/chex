@@ -40,6 +40,7 @@ module.exports.register = async (req, res, next) => {
     }
 }
 
+//renders page to register a vendor in a specific place
 module.exports.RenderVendor = async (req, res, next) => {
     try {
         const { id } = req.params
@@ -51,6 +52,8 @@ module.exports.RenderVendor = async (req, res, next) => {
         res.render('/camoground')
     }
 }
+
+//registers the vendor in the system with stripe onboarding andliked to its proper place
 module.exports.RegisterVendor = async (req, res, next) => {
 
     const { id } = req.params
@@ -85,7 +88,7 @@ module.exports.RegisterVendor = async (req, res, next) => {
 }
 
 
-
+//show route to see your cart
 module.exports.RenderCart = async (req, res) => {
 
     const { id } = req.params
@@ -101,6 +104,8 @@ module.exports.RenderCart = async (req, res) => {
 
 }
 
+
+//shelfed messaging function to create a message
 module.exports.createMessage = async (req, res) => {
     const { id } = req.params;
     const to = id
@@ -131,6 +136,7 @@ module.exports.createMessage = async (req, res) => {
     res.render('users/message-active', { message, user_to, user_from, Current_user })
 }
 
+//renders orders of final customers
 module.exports.RenderMyOrders = async (req, res) => {
     try {
         const { id } = req.params
@@ -153,6 +159,8 @@ module.exports.RenderMyOrders = async (req, res) => {
     }
 }
 
+
+//renders incoming orders to a vendor
 module.exports.RenderStoreOrders = async (req, res) => {
     try {
         const { id } = req.params
@@ -175,6 +183,7 @@ module.exports.RenderStoreOrders = async (req, res) => {
     }
 }
 
+//Renders incomoing orders on a specific location
 module.exports.RenderSelect = async (req, res) => {
     try {
         const section = req.query.section
@@ -200,6 +209,8 @@ module.exports.RenderSelect = async (req, res) => {
     }
 }
 
+
+//Completes order
 module.exports.completeOrder = async (req, res) => {
     try {
         const { id } = req.params
@@ -237,6 +248,7 @@ module.exports.completeOrder = async (req, res) => {
     }
 }
 
+//renders messages between people
 module.exports.renderActiveMessage = async (req, res) => {
     try {
         const { id } = req.params
@@ -265,6 +277,7 @@ module.exports.renderActiveMessage = async (req, res) => {
     }
 }
 
+//don't know doesn't matter right now
 module.exports.renderActiveMessageOther = async (req, res) => {
     try {
         const { id } = req.params
@@ -288,6 +301,7 @@ module.exports.renderActiveMessageOther = async (req, res) => {
         res.render('/campground')
     }
 }
+
 
 module.exports.renderMessage = async (req, res) => {
     const user = await User.findById(req.params.id)
@@ -327,50 +341,7 @@ module.exports.logout = (req, res) => {
 }
 
 
-
-module.exports.showUserSpace = async (req, res) => {
-    const user = await User.findById(req.params.id).populate({
-        path: 'reviews',
-        populate: {
-            path: 'campgrounds'
-        }
-    }).populate('campgrounds')
-    const campgrounds = user.campgrounds
-    res.render('users/show_user', { user, campgrounds })
-}
-
-
-
-module.exports.createMembership = async (req, res) => {
-    const campground = await Campground.findById(req.params.id)
-    const user = await User.findById(req.user.id)
-    const membership = new Membership(req.body.membership)
-    user.memberships.push(campground)
-    membership.member = user
-    membership.meetio = campground
-    await membership.save()
-    campground.members.push(membership)
-    await user.save()
-    await campground.save()
-    res.redirect(`/campgrounds/${campground.id}`)
-}
-
-module.exports.showUser = async (req, res) => {
-    const { id } = req.params
-
-    const user = await User.findById(id).populate('posts')
-    res.render('users/show_user.ejs', { user })
-
-
-}
-
-module.exports.renderMember = async (req, res) => {
-    const campground = await Campground.findById(req.params.id)
-    res.render('users/create_membership', { campground })
-}
-
-
-
+//updates order status and sends a whatsapp message indicating that the order is 5 min away
 module.exports.FiveMin = async (req, res) => {
     try {
         const { id } = req.params
@@ -406,6 +377,9 @@ module.exports.FiveMin = async (req, res) => {
     }
 }
 
+
+
+//updates order status and sends a whatsapp message indicating that the order is ready
 module.exports.Ready = async (req, res) => {
     try {
         const { id } = req.params
