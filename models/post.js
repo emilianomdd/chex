@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Review = require('./review')
 const Schema = mongoose.Schema;
-const campground = require('./campground')
+const palce = require('./place')
 
 // https://res.cloudinary.com/douqbebwk/image/upload/w_300/v1600113904/YelpCamp/gxgle1ovzd2f3dgcpass.png
 
@@ -25,9 +25,9 @@ const postSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User'
     },
-    campground: {
+    place: {
         type: Schema.Types.ObjectId,
-        ref: 'Campground'
+        ref: 'Place'
     },
     reviews: [{
         type: Schema.Types.ObjectId,

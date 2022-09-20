@@ -1,8 +1,7 @@
 const User = require('../models/user');
-const Campground = require('../models/campground');
+const Place = require('../models/place');
 const Message = require('../models/message');
 const stripe = require('stripe')(process.env.STRIPE_KEY)
-const Membership = require('../models/membership');
 const Order = require('../models/order')
 const Carrito = require('../models/carrito');
 const { UserBindingPage } = require('twilio/lib/rest/chat/v2/service/user/userBinding');
@@ -32,11 +31,11 @@ module.exports.register = async (req, res, next) => {
         req.login(registeredUser, err => {
             if (err) return next(err);
             req.flash('success', 'Welcome to Cargi!');
-            res.redirect('/campgrounds');
+            res.redirect('/places');
         })
     } catch (e) {
         req.flash('error', e.message);
-        res.redirect('/campgrounds');
+        res.redirect('/places');
     }
 }
 
@@ -44,8 +43,8 @@ module.exports.register = async (req, res, next) => {
 module.exports.RenderVendor = async (req, res, next) => {
     try {
         const { id } = req.params
-        const campground = await Campground.findById(id)
-        res.render('users/register_vendor', { campground })
+        const place = await Place.findById(id)
+        res.render('users/register_vendor', { place })
     }
     catch (e) {
         req.flash('Refresca la Pagina e Intenta de Nuevo')
@@ -57,23 +56,24 @@ module.exports.RenderVendor = async (req, res, next) => {
 module.exports.RegisterVendor = async (req, res, next) => {
 
     const { id } = req.params
-    const campground = await Campground.findById(id)
+    const place = await Place.findById(id)
     const { email } = req.body
     const account = await stripe.accounts.create({ type: 'express' });
     const accountLink = await stripe.accountLinks.create({
 
         account: account.id,
-        refresh_url: 'https://cargi.herokuapp.com/campgrounds',
-        return_url: 'https://cargi.herokuapp.com/campgrounds',
+        refresh_url: 'https://cargi.herokuapp.com/places',
+        return_url: 'https://cargi.herokuapp.com/places',
         type: 'account_onboarding'
     });
 
     try {
         const { username, password } = req.body;
         const user = new User({ email, username, password });
-        user.campgrounds.push(campground)
+        user.places.push(place)
         user.store = true
         user.stripe_account = account.id
+        user.is_vendor = true
         const registeredUser = await User.register(user, password);
         req.login(registeredUser, err => {
             if (err) return next(err);
@@ -82,7 +82,7 @@ module.exports.RegisterVendor = async (req, res, next) => {
         })
     } catch (e) {
         req.flash('error', e.message);
-        res.redirect('/campground');
+        res.redirect('/place');
     }
 
 }
@@ -148,14 +148,14 @@ module.exports.RenderMyOrders = async (req, res) => {
         }).populate({
             path: 'orders',
             populate: {
-                path: 'campground'
+                path: 'place'
             }
         })
 
         res.render('users/render_orders', { user })
     } catch (e) {
         req.flash('Refresca la Pagina e Intenta de Nuevo')
-        res.render('/campground')
+        res.render('/place')
     }
 }
 
@@ -173,13 +173,13 @@ module.exports.RenderStoreOrders = async (req, res) => {
                     path: 'customer',
                 }
             }
-        ).populate('campgrounds')
-        const campground = user.campgrounds[0]
+        ).populate('places')
+        const place = user.places[0]
 
-        res.render('users/render_vendor_orders', { user, campground })
+        res.render('users/render_vendor_orders', { user, place })
     } catch (e) {
         req.flash('Refresca la Pagina e Intenta de Nuevo')
-        res.render('/campground')
+        res.render('/place')
     }
 }
 
@@ -200,12 +200,12 @@ module.exports.RenderSelect = async (req, res) => {
                     path: 'customer',
                 }
             }
-        ).populate('campgrounds')
-        const campground = user.campgrounds[0]
-        res.render('users/render_vendor_section', { user, campground, section })
+        ).populate('places')
+        const place = user.places[0]
+        res.render('users/render_vendor_section', { user, place, section })
     } catch (e) {
         req.flash('Refresca la Pagina e Intenta de Nuevo')
-        res.render('/campground')
+        res.render('/place')
     }
 }
 
@@ -227,7 +227,7 @@ module.exports.completeOrder = async (req, res) => {
                     path: 'customer',
                 }
             }
-        ).populate('campgrounds')
+        ).populate('places')
         client.messages
             .create({
                 body: 'Su orden ha sido entregada',
@@ -239,12 +239,12 @@ module.exports.completeOrder = async (req, res) => {
         order.is_paid = true
         await order.save()
 
-        const campground = user.campgrounds[0]
-        res.render('users/render_vendor_orders', { user, campground })
+        const place = user.places[0]
+        res.render('users/render_vendor_orders', { user, place })
 
     } catch (e) {
         req.flash('Refresca la Pagina e Intenta de Nuevo')
-        res.render('/campground')
+        res.render('/place')
     }
 }
 
@@ -273,7 +273,7 @@ module.exports.renderActiveMessage = async (req, res) => {
         res.render('users/message-active', { message, user_to, user_from, Current_user })
     } catch (e) {
         req.flash('Refresca la Pagina e Intenta de Nuevo')
-        res.render('/campground')
+        res.render('/place')
     }
 }
 
@@ -298,7 +298,7 @@ module.exports.renderActiveMessageOther = async (req, res) => {
         res.render('users/message-active', { message, user_to, user_from, Current_user })
     } catch (e) {
         req.flash('Refresca la Pagina e Intenta de Nuevo')
-        res.render('/campground')
+        res.render('/place')
     }
 }
 
@@ -328,7 +328,7 @@ module.exports.renderLogin = (req, res) => {
 
 module.exports.login = (req, res) => {
     req.flash('success', 'welcome back!');
-    const redirectUrl = req.session.returnTo || '/campgrounds';
+    const redirectUrl = req.session.returnTo || '/places';
     delete req.session.returnTo;
     res.redirect(redirectUrl);
 }
@@ -337,7 +337,7 @@ module.exports.logout = (req, res) => {
     req.logout();
     // req.session.destroy();
     req.flash('success', "Goodbye!");
-    res.redirect('/campgrounds');
+    res.redirect('/places');
 }
 
 
@@ -359,7 +359,7 @@ module.exports.FiveMin = async (req, res) => {
                     path: 'customer',
                 }
             }
-        ).populate('campgrounds')
+        ).populate('places')
 
         client.messages
             .create({
@@ -369,11 +369,11 @@ module.exports.FiveMin = async (req, res) => {
             })
             .done()
         await order.save()
-        const campground = user.campgrounds[0]
-        res.render('users/render_vendor_orders', { user, campground })
+        const place = user.places[0]
+        res.render('users/render_vendor_orders', { user, place })
     } catch (e) {
         req.flash('Refresca la Pagina e Intenta de Nuevo')
-        res.render('/campground')
+        res.render('/place')
     }
 }
 
@@ -396,7 +396,7 @@ module.exports.Ready = async (req, res) => {
                     path: 'customer',
                 }
             }
-        ).populate('campgrounds')
+        ).populate('places')
         client.messages
             .create({
                 body: 'Su orden esta lista para recoger',
@@ -406,11 +406,11 @@ module.exports.Ready = async (req, res) => {
             .done()
         order.status = 'Orden lista para recoger'
         await order.save()
-        const campground = user.campgrounds[0]
-        res.render('users/render_vendor_orders', { user, campground })
+        const place = user.places[0]
+        res.render('users/render_vendor_orders', { user, place })
     } catch (e) {
         req.flash('Refresca la Pagina e Intenta de Nuevo')
-        res.render('/campground')
+        res.render('/place')
     }
 }
 
@@ -574,7 +574,7 @@ module.exports.Ready = async (req, res) => {
 //                         },
 //                     ],
 //                     function (err) {
-//                         res.redirect("/campgrounds");
+//                         res.redirect("/places");
 //                     }
 //                 );
 //             } else {

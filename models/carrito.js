@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 const Pre_order = require('./pre_order')
 const Order = require('./order')
 const Post = require('./post')
-const Campground = require('./campground')
+const Place = require('./place')
 const User = require('./user')
 
 // https://res.cloudinary.com/douqbebwk/image/upload/w_300/v1600113904/YelpCamp/gxgle1ovzd2f3dgcpass.png

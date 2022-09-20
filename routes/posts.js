@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const campgrounds = require('../controllers/campgrounds');
+const places = require('../controllers/places');
 const catchAsync = require('../utils/catchAsync');
-const { isLoggedIn, isAuthor, validateCampground } = require('../middleware');
+const { isLoggedIn, isAuthor, validatePlace } = require('../middleware');
 const multer = require('multer');
 const { storage } = require('../cloudinary');
 const upload = multer({ storage });
@@ -36,6 +36,7 @@ router.get('/purchase', isLoggedIn, posts.RenderConfirmOrder)
 
 router.post('/carrito/:id', isLoggedIn, posts.carrito)
 
-
+router.route('/create_PDF')
+    .post(posts.createPDF)
 
 module.exports = router;  

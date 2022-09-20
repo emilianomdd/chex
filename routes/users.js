@@ -6,7 +6,7 @@ const User = require('../models/user');
 const users = require('../controllers/users');
 const reviews = require('../controllers/reviews')
 
-const { isLoggedIn, isAuthor, validateCampground } = require('../middleware');
+const { isLoggedIn, isAuthor, validatePlace } = require('../middleware');
 
 router.route('/register')
     .get(users.renderRegister)

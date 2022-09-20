@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const passportLocalMongoose = require('passport-local-mongoose');
-const Campground = require('./campground')
+const Place = require('./place')
 const Review = require('./review')
 const Message = require('./message')
 const Post = require('./post')
@@ -9,6 +9,9 @@ const Order = require('./order')
 const Carrito = require('./carrito')
 
 const UserSchema = new Schema({
+    is_vendor: Boolean,
+    is_manager: Boolean,
+    is_cartero: Boolean,
     date: Date,
     store: Boolean,
     stripe_account: String,
@@ -30,7 +33,6 @@ const UserSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Order'
     }],
-    is_admin: Boolean,
     posts: [
         {
             type: Schema.Types.ObjectId,
@@ -41,10 +43,10 @@ const UserSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Order'
     }],
-    campgrounds: [
+    places: [
         {
             type: Schema.Types.ObjectId,
-            ref: 'Campground'
+            ref: 'Place'
         }
     ],
     reviews: [

@@ -1,6 +1,6 @@
-const Campground = require('../models/campground');
+const Place = require('../models/place');
 const User = require('../models/user');
-const campground = require('../models/campground');
+const place = require('../models/place');
 const stripe = require('stripe')(process.env.STRIPE_KEY)
 const Post = require('../models/post');
 const Order = require('../models/order');
@@ -8,8 +8,10 @@ const Pre_order = require('../models/pre_order');
 const Carrito = require('../models/carrito')
 
 
-//Creates an article in a campground
+//Creates an article in a place
 module.exports.createPost = async (req, res, next) => {
+    console.log("New")
+    console.log(req.body)
     try {
         const { id } = req.params
         const post = new Post(req.body.post);
@@ -18,16 +20,16 @@ module.exports.createPost = async (req, res, next) => {
         post.author = req.user._id;
         post.price = parseInt(req.body.post.price)
         user.posts.push(post);
-        const campground = await Campground.findById(id)
-        campground.posts.push(post)
-        post.campground = campground
+        const place = await Place.findById(id)
+        place.posts.push(post)
+        post.place = place
         await post.save();
-        await campground.save();
+        await place.save();
         await user.save();
-        res.redirect('/campgrounds')
+        res.redirect('/places')
     } catch (e) {
         req.flash('Refresca la Pagina e Intenta de Nuevo')
-        res.render('/campgrounds')
+        res.redirect('/places')
     }
 }
 
@@ -53,13 +55,13 @@ module.exports.purchase = async (req, res) => {
         order.seat = pre_order.seat
         post_author.orders_to_complete.push(order)
         order.price = pre_order.price
-        order.campground = pre_order.posts.campground
+        order.place = pre_order.posts.place
         order.is_delivered = false
         order.is_paid = false
         order.cash = false
         await Pre_order.findByIdAndDelete(id)
-        const campground = await Campground.findById(pre_order.posts.campground)
-        campground.orders.push(order)
+        const place = await Place.findById(pre_order.posts.place)
+        place.orders.push(order)
         order.conf_num = Math.floor(1000 + Math.random() * 9000);
         user.orders.push(order)
         var price = (pre_order.price + .3) / (1 - 0.066)
@@ -70,7 +72,7 @@ module.exports.purchase = async (req, res) => {
         await user.save()
         await post_author.save()
         await order.save()
-        await campground.save()
+        await place.save()
 
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
@@ -89,13 +91,13 @@ module.exports.purchase = async (req, res) => {
                 quantity: 1,
             }],
             mode: 'payment',
-            success_url: 'https://cargi.herokuapp.com/campgrounds/purchase',
-            cancel_url: 'https://cargi.herokuapp.com/campgrounds',
+            success_url: 'https://cargi.herokuapp.com/places/purchase',
+            cancel_url: 'https://cargi.herokuapp.com/places',
         });
         res.redirect(session.url)
     } catch (e) {
         req.flash('Refresca la Pagina e Intenta de Nuevo')
-        res.render('/campgrounds')
+        res.render('/places')
     }
 
 }
@@ -111,54 +113,21 @@ module.exports.cancelOrder = async (req, res) => {
 module.exports.renderNew = async (req, res) => {
     try {
         const { id } = req.params
-        const campground = await Campground.findById(id)
-        res.render('posts/new.ejs', { campground })
+        const place = await Place.findById(id)
+        res.render('posts/new.ejs', { place })
     } catch (e) {
         req.flash('Refresca la Pagina e Intenta de Nuevo')
-        res.render('/campgrounds')
+        res.render('/places')
     }
 }
 
-//I believe this function is the one that shows selected orders in sections
-module.exports.renderTag = async (req, res) => {
-    try {
-        const final_tags = req.query.membership.tags
-        const campground = await Campground.findById(req.params.id).populate({
-            path: 'posts',
-            populate: {
-                path: 'author'
-            }
-        }).populate('author')
-        if (!campground) {
-            req.flash('error', 'Cannot find that campground!');
-            return res.redirect('/campgrounds');
-        }
-        var all_posts = []
-        for (let member of campground.posts) {
-            if (member.tags.some(r => final_tags.includes(r))) {
-                all_posts.push(member)
-            }
-        }
-        if (all_posts.length > 0) {
-            req.flash('success', `Showing posts with ${final_tags} tags!`)
-            res.render('campgrounds/show_posts', { campground, all_posts });
-        }
-        else {
-            req.flash('failure', `There are no members with those tags`)
-            res.redirect('/')
-        }
-    } catch (e) {
-        req.flash('Refresca la Pagina e Intenta de Nuevo')
-        res.render('/campgrounds')
-    }
-}
 
 //agrefa orden al carrito
 module.exports.carrito = async (req, res) => {
     try {
         const { id } = req.params
         const post = await Post.findById(id).populate({
-            path: 'campground',
+            path: 'place',
             populate: {
                 path: 'posts'
             }
@@ -188,30 +157,30 @@ module.exports.carrito = async (req, res) => {
         await cart.save()
         await user.save()
         await pre_order.save()
-        const campground = post.campground
-        const all_posts = campground.posts
-        res.render('campgrounds/show.ejs', { campground, all_posts })
+        const place = post.place
+        const all_posts = place.posts
+        res.render('places/show.ejs', { place, all_posts })
     } catch (e) {
         req.flash('Refresca la Pagina e Intenta de Nuevo')
-        res.render('/campgrounds')
+        res.render('/places')
     }
 }
 
-//Renders the selected campground?
+//Renders the selected place?
 module.exports.renderPost = async (req, res) => {
     try {
         const { id } = req.params
-        const campground = await Campground.findById(id).populate({
+        const place = await Place.findById(id).populate({
             path: 'posts',
             populate: {
                 path: 'author'
             }
         }).populate('author');
-        const all_posts = campground.posts
-        res.render('campgrounds/show_posts.ejs', { campground, all_posts })
+        const all_posts = place.posts
+        res.render('places/show_posts.ejs', { place, all_posts })
     } catch (e) {
         req.flash('Refresca la Pagina e Intenta de Nuevo')
-        res.render('/campgrounds')
+        res.render('/places')
     }
 }
 
@@ -220,8 +189,8 @@ module.exports.showPost = async (req, res) => {
     try {
         if (req.user) {
             const { id } = req.params;
-            const post = await Post.findById(id).populate("campground");
-            const campground = post.campground;
+            const post = await Post.findById(id).populate("place");
+            const place = post.place;
             let productData = {
                 section: "",
                 drop_off: "",
@@ -240,23 +209,23 @@ module.exports.showPost = async (req, res) => {
                     how_many: req.session?.product[id]?.how_many || "",
                 };
             }
-            res.render("posts/show", { post, campground, product: productData })
+            res.render("posts/show", { post, place, product: productData })
         }
         else {
             const { id } = req.params;
-            const post = await Post.findById(id).populate("campground");
-            const campground_id = post.campground;
-            const campground = await Campground.findById(campground_id.id).populate({
+            const post = await Post.findById(id).populate("place");
+            const place_id = post.place;
+            const place = await Place.findById(place_id.id).populate({
                 path: 'posts',
                 populate: {
                     path: 'author'
                 }
             }).populate('author');
-            res.render('users/register_route', { campground })
+            res.render('users/register_route', { place })
         }
     } catch (e) {
         req.flash('Refresca la Pagina e Intenta de Nuevo')
-        res.render('/campgrounds')
+        res.render('/places')
     };
 }
 //delete posts
@@ -268,10 +237,10 @@ module.exports.deletePost = async (req, res) => {
         await Post.findByIdAndDelete(id);
         console.log(post)
         req.flash('success', 'Successfully deleted post')
-        res.redirect('/campgrounds');
+        res.redirect('/places');
     } catch (e) {
         req.flash('Refresca la Pagina e Intenta de Nuevo')
-        res.render('/campgrounds')
+        res.render('/places')
     }
 }
 
@@ -293,7 +262,7 @@ module.exports.updatePost = async (req, res) => {
         res.redirect(`/posts/${post._id}`)
     } catch (e) {
         req.flash('Refresca la Pagina e Intenta de Nuevo')
-        res.render('/campgrounds')
+        res.render('/places')
     }
 }
 
@@ -303,7 +272,7 @@ module.exports.RapidOrder = async (req, res) => {
 
         const { id } = req.params
         const post = await Post.findById(id).populate({
-            path: 'campground',
+            path: 'place',
             populate: {
                 path: 'posts'
             }
@@ -336,7 +305,7 @@ module.exports.RapidOrder = async (req, res) => {
         var transaction_fee = ((order.price + .3) / (1 - .059)) - order.price
         transaction_fee = transaction_fee.toFixed(2)
         order.quantity = req.body.how_many
-        order.campground = post.campground
+        order.place = post.place
         order.conf_num = Math.floor(1000 + Math.random() * 9000);
         user.orders.push(order)
         post_author.orders_to_complete.push(order)
@@ -344,11 +313,11 @@ module.exports.RapidOrder = async (req, res) => {
         await post_author.save()
         await user.save()
         await order.save()
-        res.render('campgrounds/payment_method', { order, transaction_fee, price })
+        res.render('places/payment_method', { order, transaction_fee, price })
     }
     catch (e) {
         req.flash('Refresca la Pagina e Intenta de Nuevo')
-        res.render('/campgrounds')
+        res.render('/places')
     }
 }
 
@@ -363,14 +332,14 @@ module.exports.RenderConfirmOrder = async (req, res) => {
         // find last order here and call it order
         order.is_delivered = false
         await Pre_order.findByIdAndDelete(id)
-        const campground = await Campground.findById(order.posts.campground)
+        const place = await Place.findById(order.posts.place)
         await user.save()
         await order.save()
-        const all_posts = campground.posts
-        res.render('campgrounds/show.ejs', { campground, all_posts })
+        const all_posts = place.posts
+        res.render('places/show.ejs', { place, all_posts })
     } catch (e) {
         req.flash('Refresca la Pagina e Intenta de Nuevo')
-        res.render('/campgrounds')
+        res.render('/places')
     }
 }
 
@@ -390,7 +359,7 @@ module.exports.Delete = async (req, res) => {
         res.render('users/render_cart', { user, all_posts })
     } catch (e) {
         req.flash('Refresca la Pagina e Intenta de Nuevo')
-        res.render('/campgrounds')
+        res.render('/places')
     }
 }
 
@@ -424,19 +393,19 @@ module.exports.purchaseCash = async (req, res) => {
         var price = (pre_order.price + .3) / (1 - 0.59)
         price = price.toFixed(2)
         order.price_final = price
-        order.campground = pre_order.posts.campground
+        order.place = pre_order.posts.place
         order.is_delivered = false
         order.is_paid = false
         order.cash = true
         await Pre_order.findByIdAndDelete(id)
-        const campground = await Campground.findById(pre_order.posts.campground)
-        campground.orders.push(order)
+        const place = await Place.findById(pre_order.posts.place)
+        place.orders.push(order)
         order.conf_num = Math.floor(1000 + Math.random() * 9000);
 
         await user.save()
         await post_author.save()
         await order.save()
-        await campground.save()
+        await place.save()
         const cart = await Carrito.findById(user.cart).populate({
             path: 'pre_orders',
             populate: {
@@ -467,25 +436,25 @@ module.exports.RapidCash = async (req, res) => {
         const { id } = req.params
         const user = await User.findById(req.user.id)
         const order = await Order.findById(id).populate({
-            path: 'campground',
+            path: 'place',
             populate: {
                 path: 'posts'
             }
         }).populate('posts')
-        const campground = order.campground
-        campground.orders.push(order)
+        const place = order.place
+        place.orders.push(order)
         const post_author = await User.findById(order.posts.author)
         order.cash = true
         order.is_delivered = false
-        await campground.save()
+        await place.save()
         await post_author.save()
         await user.save()
         await order.save()
-        const all_posts = campground.posts
-        res.render('campgrounds/show.ejs', { campground, all_posts })
+        const all_posts = place.posts
+        res.render('places/show.ejs', { place, all_posts })
     } catch (e) {
         req.flash('Refresca la Pagina e Intenta de Nuevo')
-        res.render('/campgrounds')
+        res.render('/places')
     }
 }
 
@@ -493,7 +462,7 @@ module.exports.RapidCash = async (req, res) => {
 module.exports.RapidCard = async (req, res) => {
     try {
         const { id } = req.params
-        const order = await Order.findById(id).populate('campground').populate('posts')
+        const order = await Order.findById(id).populate('place').populate('posts')
         const post_author = await User.findById(order.posts.author)
         order.cash = false
         await order.save()
@@ -521,13 +490,13 @@ module.exports.RapidCard = async (req, res) => {
                 quantity: 1,
             }],
             mode: 'payment',
-            success_url: 'https://cargi.herokuapp.com/campgrounds/purchase',
-            cancel_url: 'https://cargi.herokuapp.com/campgrounds',
+            success_url: 'https://cargi.herokuapp.com/places/purchase',
+            cancel_url: 'https://cargi.herokuapp.com/places',
         });
         res.redirect(session.url)
     } catch (e) {
         req.flash('Refresca la Pagina e Intenta de Nuevo')
-        res.render('/campgrounds')
+        res.render('/places')
     }
 }
 
@@ -536,8 +505,8 @@ module.exports.ShowRapid = async (req, res) => {
     try {
         if (req.user) {
             const { id } = req.params;
-            const post = await Post.findById(id).populate("campground");
-            const campground = post.campground;
+            const post = await Post.findById(id).populate("place");
+            const place = post.place;
 
             let product = {
                 section: "",
@@ -555,21 +524,30 @@ module.exports.ShowRapid = async (req, res) => {
                     how_many: req.session?.product[id]?.how_many || "",
                 };
             }
-            res.render("posts/show_rapid", { post, campground, product })
+            res.render("posts/show_rapid", { post, place, product })
         } else {
             const { id } = req.params;
-            const post = await Post.findById(id).populate("campground");
-            const campground_id = post.campground;
-            const campground = await Campground.findById(campground_id.id).populate({
+            const post = await Post.findById(id).populate("place");
+            const place_id = post.place;
+            const place = await Place.findById(place_id.id).populate({
                 path: 'posts',
                 populate: {
                     path: 'author'
                 }
             }).populate('author');
-            res.render('users/register_route', { campground })
+            res.render('users/register_route', { place })
         }
     } catch (e) {
         req.flash('Refresca la Pagina e Intenta de Nuevo')
-        res.render('/campgrounds')
+        res.render('/places')
     }
+}
+
+//grab the orders and create a pdf invoce with the selected items
+module.exports.createPDF = async (res, req) => {
+    console.log("hi")
+    console.log(req.body, "body")
+    console.log(req.query, "query")
+    console.log(req.params, "params")
+    res.redirect("/places")
 }

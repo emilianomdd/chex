@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const Order = require('./order')
 const Post = require('./post')
-const Campground = require('./campground')
+const Place = require('./place')
 const User = require('./user')
 
 // https://res.cloudinary.com/douqbebwk/image/upload/w_300/v1600113904/YelpCamp/gxgle1ovzd2f3dgcpass.png
@@ -23,9 +23,9 @@ const OrderSchema = new Schema({
     is_paid: Boolean,
     section: String,
     status: String,
-    campground: {
+    place: {
         type: Schema.Types.ObjectId,
-        ref: 'Campground'
+        ref: 'Place'
     },
     quantity: Number,
     drop_off: String,

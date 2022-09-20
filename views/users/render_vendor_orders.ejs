@@ -2,7 +2,7 @@
     <link rel="stylesheet" href="/stylesheets/stars.css">
     <div class="row">
         <form action="/render_vendor_section/<%=user.id%>" method="GET">
-            <% for(let section of campground.sections){%>
+            <% for(let section of place.sections){%>
                 <input class="form-check-input  mt-2" type="checkbox" value="<%=section%>" name="section"
                     id="<%=section%>">
                 <label class="form-check-label text-dark" for="<%=section%>">
@@ -22,69 +22,78 @@
             </div>
 
         </div>
-        <% for(let order of user.orders_to_complete) {%>
-            <% if((!order.is_delivered && order.is_paid) || (!order.is_delivered && order.cash)){%>
-                <div class="card mb-3">
+        <form action="/posts/create_PDF" method="POST">
+            <button>Crear Recivo</button>
+            <% for(let order of user.orders_to_complete) {%>
+                <% if((!order.is_delivered && order.is_paid) || (!order.is_delivered && order.cash)){%>
+                    <div class="card mb-3">
 
-                    <div class="col-md-8">
-                        <div class="card-body">
-                            <h3>
-                                <%= order.name%> para <%= order.customer.username%>
-                            </h3>
-                            <h3>
-                                <%=order.customer.phone%>
-                            </h3>
-                            <h3>
-                                Nombre de Usuario: <%=order.customer.username%>
-                            </h3>
-                            <h3>
-                                precio: <%=order.price%>$
-                            </h3>
-                            <% if(order.drop_off){%>
-                                <h3 class="card-text">
-                                    Dropoff: <%= order.drop_off %>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <input class="form-check-input  mt-2" type="checkbox" value="<%=order.id%>"
+                                    name="<%=order.id%>" id="<%=order.id%>">
+                                <label class="form-check-label text-dark" for="<%=order.id%>">
+                                    Seleccionar para crear recivo
+                                </label>
+                                <h3>
+                                    <%= order.name%> para <%= order.customer.username%>
                                 </h3>
-                                <%}%>
-                                    <% if(order.seat && order.section){%>
-                                        <h3 class="card-text">
-                                            Asiento: <%= order.seat %>
-                                                <%=order.letter%>, Seccion: <%= order.section %>
-                                        </h3>
-                                        <%}%>
-                                            <% if (order.seat && !order.section){%>
-                                                <h3>Asiento: <%= order.seat %>
-                                                        <%=order.letter%>
-                                                </h3>
-                                                <%}%>
-                                                    <p class="card-text">
-                                                        <%= order.conf_num %>
-                                                    </p>
-                                                    <% if(order.cash){%>
+                                <h3>
+                                    <%=order.customer.phone%>
+                                </h3>
+                                <h3>
+                                    Nombre de Usuario: <%=order.customer.username%>
+                                </h3>
+                                <h3>
+                                    precio: <%=order.price%>$
+                                </h3>
+                                <% if(order.drop_off){%>
+                                    <h3 class="card-text">
+                                        Dropoff: <%= order.drop_off %>
+                                    </h3>
+                                    <%}%>
+                                        <% if(order.seat && order.section){%>
+                                            <h3 class="card-text">
+                                                Asiento: <%= order.seat %>
+                                                    <%=order.letter%>, Seccion: <%= order.section %>
+                                            </h3>
+                                            <%}%>
+                                                <% if (order.seat && !order.section){%>
+                                                    <h3>Asiento: <%= order.seat %>
+                                                            <%=order.letter%>
+                                                    </h3>
+                                                    <%}%>
                                                         <p class="card-text">
-                                                            Metodo de Pago: Efectivo/Terminal
+                                                            <%= order.conf_num %>
                                                         </p>
-                                                        <%} else{%>
+                                                        <% if(order.cash){%>
                                                             <p class="card-text">
-                                                                Metodo de Pago: Paid
+                                                                Metodo de Pago: Efectivo/Terminal
                                                             </p>
-                                                            <%}%>
-                                                                <form action="/order/complete/<%=order.id%>"
-                                                                    method="POST">
-                                                                    <button>Completar Orden</button>
-                                                                </form>
-                                                                <form action="/five/<%=order.id%>" method="POST">
-                                                                    <button>Lista en 5 Minutos</button>
-                                                                </form>
+                                                            <%} else{%>
+                                                                <p class="card-text">
+                                                                    Metodo de Pago: Paid
+                                                                </p>
+                                                                <%}%>
+                                                                    <form action="/order/complete/<%=order.id%>"
+                                                                        method="POST">
+                                                                        <button>Completar Orden</button>
+                                                                    </form>
+                                                                    <form action="/five/<%=order.id%>" method="POST">
+                                                                        <button>Lista en 5 Minutos</button>
+                                                                    </form>
 
-                                                                <form action="/ready/<%=order.id%>" method="POST">
-                                                                    <button>Lista para Recoger</button>
-                                                                </form>
+                                                                    <form action="/ready/<%=order.id%>" method="POST">
+                                                                        <button>Lista para Recoger</button>
+                                                                    </form>
+                            </div>
                         </div>
-                    </div>
-                </div>
-                <%}%>
-    </div>
-    </div>
 
-    <% } %>
+        </form>
+    </div>
+    <%}%>
         </div>
+        </div>
+
+        <% } %>
+            </div>

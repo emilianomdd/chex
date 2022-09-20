@@ -15,7 +15,7 @@ const User = require('./models/user');
 const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const userRoutes = require('./routes/users');
-const campgroundRoutes = require('./routes/campgrounds');
+const placeRoutes = require('./routes/places');
 const reviewRoutes = require('./routes/reviews');
 const postRoutes = require('./routes/posts')
 
@@ -140,8 +140,8 @@ app.use((req, res, next) => {
 
 
 app.use('/', userRoutes);
-app.use('/campgrounds', campgroundRoutes)
-app.use('/campgrounds/:id/reviews', reviewRoutes)
+app.use('/places', placeRoutes)
+app.use('/places/:id/reviews', reviewRoutes)
 app.use('/posts', postRoutes)
 
 

@@ -2,7 +2,7 @@
     <link rel="stylesheet" href="/stylesheets/stars.css">
     <div class="row">
         <form action="/render_vendor_section/<%=user.id%>" method="GET">
-            <% for(let section of campground.sections){%>
+            <% for(let section of place.sections){%>
                 <input class="form-check-input  mt-2" type="checkbox" value="<%=section%>" name="section"
                     id="<%=section%>">
                 <label class="form-check-label text-dark" for="<%=section%>">

@@ -1,0 +1,92 @@
+<!-- <input type="hidden" name="place" value="<%=place.id%>"> -->
+
+<% layout('layouts/boilerplate')%>
+    <link rel="stylesheet" href="/stylesheets/stars.css">
+    <% if(currentUser){%>
+        <% if( currentUser.is_vendor && place.author.equals(currentUser._id) || currentUser.is_manager &&
+            place.author.equals(currentUser._id) ){%>
+            <div class="btn-group">
+                <form action="/posts/new/<%=place.id%>" method="GET">
+                    <button class="btn btn-success">Agrgar Producto</button>
+                </form>
+            </div>
+            <%}%>
+                <% if(currentUser.places.includes(place.id) && currentUser.is_manager){%>
+                    <div class="btn-group">
+                        <a href="/render_vendor_register/<%=place.id%>">link para invitar a vandedores</a>
+                    </div>
+                    <%}%>
+                        <%if( currentUser.is_vendor && place.author.equals(currentUser._id) || currentUser.is_manager &&
+                            place.author.equals(currentUser._id) ){%>
+                            <div class="btn-group">
+                                <a href="/render_carterp_register/<%=place.id%>">link para invitar a carteros</a>
+                            </div>
+                            <%}%>
+                                <%}%>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div>
+                                                <h1>
+                                                    <%= place.name %>
+                                                </h1>
+                                                <h3>
+                                                    <%= place.description%>
+                                                </h3>
+                                            </div>
+
+                                        </div>
+                                        <% for(let post of all_posts) {%>
+
+                                            <div class="card individual-cards-shows mt-3 pt-3 pb-3">
+                                                <div class="card-body">
+                                                    <div class="row">
+                                                        <div class="col-12 col-md-4">
+                                                            <%if(post.images.length) {%>
+                                                                <img class="img-fluid" alt=""
+                                                                    src="<%=post.images[0].url%>">
+                                                                <% }else {%>
+                                                                    <img class="img-fluid" alt=""
+                                                                        src="https://res.cloudinary.com/squr/image/upload/v1600103881/YelpCamp/lz8jjv2gyynjil7lswf4.png">
+                                                                    <% } %>
+                                                        </div>
+                                                        <div class="col-12 col-md-8">
+                                                            <div class="mt-3">
+                                                                <h3>
+                                                                    <%= post.author.username%>
+                                                                </h3>
+                                                                <h3 class="card-text">
+                                                                    <%= post.title %>: $<%=post.price%><br>
+
+                                                                </h3>
+
+                                                                <p class="card-text">
+                                                                    <%= post.caption %>
+                                                                </p>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-md-4 mt-3">
+                                                                    <form action="/posts/show_cart/<%=post._id%>"
+                                                                        method="GET">
+                                                                        <button
+                                                                            class="btn btn-outline-secondary btn-block">Agregar
+                                                                            a Carrito</button>
+                                                                    </form>
+                                                                </div>
+                                                                <div class="col-md-4 mt-3">
+                                                                    <form action="/posts/show_rapid/<%=post._id%>"
+                                                                        method="GET">
+
+                                                                        <button class="btn btn-dark btn-block">Compra
+                                                                            Rapida</button>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                    </div>
+                                    </a>
+                                    <% } %>
+                                        </div>

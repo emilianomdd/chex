@@ -1,0 +1,29 @@
+<% layout('layouts/boilerplate')%>
+    <div class="row">
+        <h1 class="text-center">Editar Lugar</h1>
+        <div class="col-md-6 offset-md-3">
+            <form action="/places/<%=place._id%>?_method=PUT" method="POST" novalidate class="validated-form"
+                enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label class="form-label" for="type">Descripcion</label>
+                    <input class="form-control" type="description" id="description" name="place[description]"
+                        value="<%=place.description %>" required>
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
+                </div>
+                <!-- <div class="mb-3">
+                    <label class="form-label" for="invite">Invite Only</label>
+                    <input class="form-control" type="checkbox" id="invite" name="checkbox" required>
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
+                </div> -->
+                <div class="mb-3">
+                    <button class="btn btn-info">Editar</button>
+                </div>
+            </form>
+            <a href="/places/<%= place._id%>">Regresar a <%=place.name%></a>
+
+        </div>
+    </div>
