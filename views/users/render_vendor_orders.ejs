@@ -22,7 +22,7 @@
             </div>
 
         </div>
-        <form action="/posts/create_PDF" method="POST">
+        <form action="/order/create_invoice" method="POST">
             <button>Crear Recivo</button>
             <% for(let order of user.orders_to_complete) {%>
                 <% if((!order.is_delivered && order.is_paid) || (!order.is_delivered && order.cash)){%>
@@ -30,10 +30,10 @@
 
                         <div class="col-md-8">
                             <div class="card-body">
-                                <input class="form-check-input  mt-2" type="checkbox" value="<%=order.id%>"
-                                    name="<%=order.id%>" id="<%=order.id%>">
+                                <input class="form-check-input  mt-2" type="checkbox" value="<%=order.id%>" name="id"
+                                    id="<%=order.id%>">
                                 <label class="form-check-label text-dark" for="<%=order.id%>">
-                                    Seleccionar para crear recivo
+                                    Seleccionar para crear recivo <%= order.id%>
                                 </label>
                                 <h3>
                                     <%= order.name%> para <%= order.customer.username%>
@@ -89,11 +89,13 @@
                             </div>
                         </div>
 
+                        <%}%>
+                            <% } %>
+                    </div>
+
         </form>
     </div>
-    <%}%>
-        </div>
-        </div>
+    </div>
 
-        <% } %>
-            </div>
+
+    </div>

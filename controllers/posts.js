@@ -6,12 +6,12 @@ const Post = require('../models/post');
 const Order = require('../models/order');
 const Pre_order = require('../models/pre_order');
 const Carrito = require('../models/carrito')
-
+const { jsPDF } = require('jspdf');
+const order = require('../models/order');
+const XLSX = require('xlsx')
 
 //Creates an article in a place
 module.exports.createPost = async (req, res, next) => {
-    console.log("New")
-    console.log(req.body)
     try {
         const { id } = req.params
         const post = new Post(req.body.post);
@@ -43,6 +43,7 @@ module.exports.purchase = async (req, res) => {
         const post_author = await User.findById(pre_order.posts.author).populate('posts')
         const order = new Order()
         const user = await User.findById(req.user.id).populate('messages')
+        order.is_reported = false
         order.status = 'En proceso'
         order.letter = pre_order.letter
         order.date = day.getTime()
@@ -233,9 +234,7 @@ module.exports.deletePost = async (req, res) => {
     try {
         const { id } = req.params;
         const post = await Post.find(id)
-        console.log(post)
         await Post.findByIdAndDelete(id);
-        console.log(post)
         req.flash('success', 'Successfully deleted post')
         res.redirect('/places');
     } catch (e) {
@@ -279,6 +278,7 @@ module.exports.RapidOrder = async (req, res) => {
         }).populate('author')
         const post_author = await post.author
         const order = new Order()
+        order.is_reported = false
         order.status = 'En proceso'
         const day = new Date()
         order.date = day.getTime()
@@ -325,6 +325,7 @@ module.exports.RapidOrder = async (req, res) => {
 module.exports.RenderConfirmOrder = async (req, res) => {
     try {
         const order = new Order()
+        order.is_reported = false
         order.status = 'En proceso'
         const day = new Date()
         order.date = day.getTime()
@@ -371,6 +372,7 @@ module.exports.purchaseCash = async (req, res) => {
         const see_pre = await Pre_order.findById(id).populate('posts')
         const post_author = await User.findById(pre_order.posts.author)
         const order = new Order()
+        order.is_reported = false
         order.status = 'En proceso'
         const day = new Date()
         order.date = day.getTime()
@@ -544,10 +546,66 @@ module.exports.ShowRapid = async (req, res) => {
 }
 
 //grab the orders and create a pdf invoce with the selected items
-module.exports.createPDF = async (res, req) => {
-    console.log("hi")
-    console.log(req.body, "body")
-    console.log(req.query, "query")
-    console.log(req.params, "params")
-    res.redirect("/places")
+module.exports.createPDF = async (req, res, next) => {
+    try {
+        const id = req.body.id
+        const doc = new jsPDF({
+            orientation: 'p',
+            unit: 'mm',
+            format: 'a4'
+        });
+        var txtFormat = ''
+        var recipt_name = ''
+        for (let id_num of id) {
+
+            const order = await Order.findById(id_num).populate('customer')
+            txtFormat += `Articulo: ${order.name} -- Precio: ${order.price} -- Nombre: ${order.customer.username}\nAsiento: ${order.seat}${order.letter} -- Seccion: ${order.section}\
+        \n*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\n`
+            recipt_name += order.name, ","
+        }
+        doc.text(txtFormat, 20, 20)
+        const date = new Date();
+        month = date.getMonth() + 1
+        day = date.getDate()
+        year = date.getFullYear()
+
+        file_num = Math.floor(1000 + Math.random() * 9000);
+        doc.save(`${day}_${month}_${year}--${file_num}.pdf`)
+        res.redirect('/places')
+
+    } catch (e) {
+        req.flash('Refresca la Pagina e Intenta de Nuevo')
+        res.redirect('/places')
+    }
+}
+
+module.exports.createReport = async (req, res) => {
+    const workBook = XLSX.utils.book_new();
+
+    const id = req.body.id
+    var all_orders = []
+    for (let id_num of id) {
+        const order = await Order.findById(id_num)
+        const new_order = { price: order.price, articulo: order.name, date: order.date, section: order.section }
+        all_orders.push(new_order)
+        order.is_reported = false
+        order.save()
+    }
+
+    const workSheet = XLSX.utils.json_to_sheet(all_orders);
+    XLSX.utils.book_append_sheet(workBook, workSheet, "orders")
+    // Generate buffer
+    XLSX.write(workBook, { bookType: 'xlsx', type: "buffer" })
+
+    // Binary string
+    XLSX.write(workBook, { bookType: "xlsx", type: "binary" })
+    const date = new Date();
+    month = date.getMonth() + 1
+    day = date.getDate()
+    year = date.getFullYear()
+
+    file_num = Math.floor(1000 + Math.random() * 9000);
+    XLSX.writeFile(workBook, `${day}_${month}_${year}--${file_num}.xlsx`)
+
+
 }

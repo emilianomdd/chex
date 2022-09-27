@@ -4,6 +4,7 @@ const passport = require('passport');
 const catchAsync = require('../utils/catchAsync');
 const User = require('../models/user');
 const users = require('../controllers/users');
+const posts = require('../controllers/posts')
 const reviews = require('../controllers/reviews')
 
 const { isLoggedIn, isAuthor, validatePlace } = require('../middleware');
@@ -40,6 +41,8 @@ router.get('/render-messages', users.renderMessages)
 
 router.post('/order/complete/:id', isLoggedIn, users.completeOrder)
 
+router.post('/order/create_invoice', posts.createPDF)
+
 router.get('/render_orders/:id', isLoggedIn, users.RenderMyOrders)
 
 router.route('/login')
@@ -48,8 +51,10 @@ router.route('/login')
 
 router.get('/logout', users.logout)
 
+router.get('/render_xlx/:id', users.renderReport)
 
 
+router.post('/order/create_report', posts.createReport)
 
 // router.route('/forgot')
 //     .get(users.renderForgot)

@@ -14,6 +14,7 @@ const OrderSchema = new Schema({
     price_final: Number,
     name: String,
     is_delivered: Boolean,
+    is_reported: Boolean,
     posts: {
         type: Schema.Types.ObjectId,
         ref: 'Post'

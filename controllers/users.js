@@ -414,6 +414,50 @@ module.exports.Ready = async (req, res) => {
     }
 }
 
+
+module.exports.renderPDF = async (req, res) => {
+    try {
+        const { id } = req.params
+        const user = await User.findById(id).populate({
+            path: 'orders_to_complete'
+        }).populate(
+            {
+                path: 'orders_to_complete',
+                populate: {
+                    path: 'customer',
+                }
+            }
+        ).populate('places')
+        const place = user.places[0]
+
+        res.render('users/order_xlx', { user, place })
+    } catch (e) {
+        req.flash('Refresca la Pagina e Intenta de Nuevo')
+        res.render('/place')
+    }
+}
+
+module.exports.renderReport = async (req, res) => {
+    try {
+        const { id } = req.params
+        const user = await User.findById(id).populate({
+            path: 'orders_to_complete'
+        }).populate(
+            {
+                path: 'orders_to_complete',
+                populate: {
+                    path: 'customer',
+                }
+            }
+        ).populate('places')
+        const place = user.places[0]
+
+        res.render('users/order_xlx', { user, place })
+    } catch (e) {
+        req.flash('Refresca la Pagina e Intenta de Nuevo')
+        res.render('/place')
+    }
+}
 // module.exports.renderForgot = async (req, res) => {
 //     res.render("users/forgot");
 // };

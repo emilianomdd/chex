@@ -36,7 +36,8 @@ router.get('/purchase', isLoggedIn, posts.RenderConfirmOrder)
 
 router.post('/carrito/:id', isLoggedIn, posts.carrito)
 
-router.route('/create_PDF')
+
+router.route('/create_invoice')
     .post(posts.createPDF)
 
 module.exports = router;  
