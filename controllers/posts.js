@@ -579,39 +579,3 @@ module.exports.createPDF = async (req, res, next) => {
     }
 }
 
-module.exports.createReport = async (req, res) => {
-    try {
-        const workBook = XLSX.utils.book_new();
-
-        const id = req.body.id
-        var all_orders = []
-        for (let id_num of id) {
-            const order = await Order.findById(id_num)
-            const new_order = { price: order.price, articulo: order.name, date: order.date, section: order.section }
-            all_orders.push(new_order)
-            order.is_reported = false
-            order.save()
-        }
-
-        const workSheet = XLSX.utils.json_to_sheet(all_orders);
-        XLSX.utils.book_append_sheet(workBook, workSheet, "orders")
-        // Generate buffer
-        XLSX.write(workBook, { bookType: 'xlsx', type: "buffer" })
-
-        // Binary string
-        XLSX.write(workBook, { bookType: "xlsx", type: "binary" })
-        const date = new Date();
-        month = date.getMonth() + 1
-        day = date.getDate()
-        year = date.getFullYear()
-
-        file_num = Math.floor(1000 + Math.random() * 9000);
-        XLSX.writeFile(workBook, `${day}_${month}_${year}--${file_num}.xlsx`)
-
-        res.redirect('/places')
-
-    } catch (e) {
-        req.flash('Refresca la Pagina e Intenta de Nuevo')
-        res.redirect('/places')
-    }
-}
