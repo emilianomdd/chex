@@ -5,7 +5,6 @@ const catchAsync = require('../utils/catchAsync');
 const User = require('../models/user');
 const users = require('../controllers/users');
 const posts = require('../controllers/posts')
-const reviews = require('../controllers/reviews')
 
 const { isLoggedIn, isAuthor, validatePlace } = require('../middleware');
 

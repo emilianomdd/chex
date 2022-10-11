@@ -598,20 +598,5 @@ module.exports.createReport = async (req, res) => {
         // Generate buffer
         XLSX.write(workBook, { bookType: 'xlsx', type: "buffer" })
 
-        // Binary string
-        XLSX.write(workBook, { bookType: "xlsx", type: "binary" })
-        const date = new Date();
-        month = date.getMonth() + 1
-        day = date.getDate()
-        year = date.getFullYear()
 
-        file_num = Math.floor(1000 + Math.random() * 9000);
-        XLSX.writeFile(workBook, `${day}_${month}_${year}--${file_num}.xlsx`)
 
-        res.redirect('/places')
-
-    } catch (e) {
-        req.flash('Refresca la Pagina e Intenta de Nuevo')
-        res.redirect('/places')
-    }
-}
