@@ -26,18 +26,24 @@
 
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <div>
-                                                <h1>
-                                                    <%= place.name %>
-                                                </h1>
-                                                <h3>
-                                                    <%= place.description%>
-                                                </h3>
-                                            </div>
+                                            <%=seat%>
+                                                <%=row%>
+                                                    <%=section%>
+                                                        <div>
+                                                            <h1>
+                                                                <%= place.name %>
+                                                            </h1>
+                                                            <h3>
+                                                                <%= place.description%>
+                                                            </h3>
+                                                        </div>
 
                                         </div>
 
-                                        <form action="/places/render_category/<%=place.id%>">
+                                        <form action="/places/render_category_numbered/<%=place.id%>">
+                                            <input type="hidden" id="seat" name="seat" value="<%=seat%>">
+                                            <input type="hidden" id="row" name="row" value="<%=row%>">
+                                            <input type="hidden" id="section" name="section" value="<%=section%>">
                                             <% for(let category of place.categories){%>
                                                 <input class="form-check-input  mt-2" type="checkbox"
                                                     value="<%=category%>" name="category" id="<%=category%>">
@@ -77,17 +83,31 @@
                                                             </div>
                                                             <div class="row">
                                                                 <div class="col-md-4 mt-3">
-                                                                    <form action="/posts/show_cart/<%=post._id%>"
+                                                                    <form
+                                                                        action="/posts/show_cart_numbered/<%=post._id%>"
                                                                         method="GET">
+                                                                        <input type="hidden" id="seat" name="seat"
+                                                                            value="<%=seat%>">
+                                                                        <input type="hidden" id="row" name="row"
+                                                                            value="<%=row%>">
+                                                                        <input type="hidden" id="section" name="section"
+                                                                            value="<%=section%>">
                                                                         <button
                                                                             class="btn btn-outline-secondary btn-block">Agregar
                                                                             a Carrito</button>
                                                                     </form>
                                                                 </div>
                                                                 <div class="col-md-4 mt-3">
-                                                                    <form action="/posts/show_rapid/<%=post._id%>"
+                                                                    <form
+                                                                        action="/posts/show_rapid_numbered/<%=post._id%>"
                                                                         method="GET">
 
+                                                                        <input type="hidden" id="seat" name="seat"
+                                                                            value="<%=seat%>">
+                                                                        <input type="hidden" id="row" name="row"
+                                                                            value="<%=row%>">
+                                                                        <input type="hidden" id="section" name="section"
+                                                                            value="<%=section%>">
                                                                         <button class="btn btn-dark btn-block">Compra
                                                                             Rapida</button>
                                                                     </form>

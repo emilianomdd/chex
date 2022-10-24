@@ -26,7 +26,17 @@
                         Looks good!
                     </div>
                 </div>
-
+                <div class="col-12 col-md-4 mb-3">
+                    <label class="form-label" for="category">Categoria:</label>
+                    <select id="category" name="category" class="form-control">
+                        <option value="N/A">N/A</option>
+                        <% for (let category of place.categories){ %>
+                            <option value="<%=category%>" <%=category%>>
+                                <%=category%>
+                            </option>
+                            <%}%>
+                    </select>
+                </div>
                 <div class="mb-3">
                     <div class="form-file custom-file">
                         <input type="file" class="form-file-input" id="image" name="image" multiple>

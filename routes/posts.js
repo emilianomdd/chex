@@ -19,6 +19,10 @@ router.get('/show_cart/:id', catchAsync(posts.showPost))
 
 router.get('/show_rapid/:id', posts.ShowRapid)
 
+router.get('/show_cart_numbered/:id', catchAsync(posts.showPostNum))
+
+router.get('/show_rapid_numbered/:id', posts.ShowRapidNum)
+
 router.post('/ordena_rapida/:id', isLoggedIn, posts.RapidOrder)
 
 router.post('/purchase/:id', isLoggedIn, posts.purchase)

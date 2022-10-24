@@ -39,9 +39,13 @@ router.route('/:id')
     .put(isLoggedIn, isAuthor, upload.array('image'), validatePlace, catchAsync(places.updateplace))
     .delete(isLoggedIn, isAuthor, catchAsync(places.deleteplace));
 
+router.get('/[a-zA-Z\d]+X[a-zA-Z\d]+X[a-zA-Z\d]+/:id', places.renderNumbered)
+
 router.get('/:id/edit', isLoggedIn, isAuthor, catchAsync(places.renderEditForm))
 
 router.get('/:id/checkout', isLoggedIn, catchAsync(places.checkout))
 
+router.get("/render_category/:id", places.renderCategory)
 
+router.get("/render_category_numbered/:id", places.renderCategoryNum)
 module.exports = router;    

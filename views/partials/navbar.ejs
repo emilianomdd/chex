@@ -3,14 +3,14 @@
         <% if(!currentUser) {%>
             <a class="navbar-brand" href="/places">CARGI</a>
             <%}else{%>
-                <% if(!currentUser.places) {%>
+                <% if(currentUser.places.length==0) {%>
                     <a class="navbar-brand" href="/render-cart/<%=currentUser.id%>">Ver Carrito</a>
                     <%}%>
 
                         <a class="navbar-brand" href="/places">CARGI</a>
 
 
-                        <% if(!currentUser.places){%>
+                        <% if(currentUser.places.length==0){%>
                             <a class="navbar-brand" href="/render_orders/<%=currentUser.id%>">Mis Ordenes</a>
                             <%} else{%>
                                 <a class="navbar-brand" href="/render-orders-store/<%=currentUser.id%>">Manejo de

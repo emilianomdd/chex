@@ -18,6 +18,7 @@ const opts = { toJSON: { virtuals: true } };
 
 const postSchema = new Schema({
     title: String,
+    category: String,
     images: [ImageSchema],
     caption: String,
     price: Number,

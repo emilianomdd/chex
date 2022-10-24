@@ -30,6 +30,7 @@ const PlaceSchema = new Schema({
     invite: Boolean,
     drop_offs: [String],
     sections: [String],
+    categories: [String],
     author: {
         type: Schema.Types.ObjectId,
         ref: 'User'

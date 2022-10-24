@@ -62,8 +62,8 @@
                                             <label class="form-label" for="section">Puerta:</label>
                                             <select id="section" name="section" class="form-control">
                                                 <option value="N/A">N/A</option>
-                                                <% for (let section of place.sections){ let selected=(
-                                                    product.section==section ) ? "selected" : "" ; %>
+                                                <% for (let section of place.sections){ let selected=( section==section
+                                                    ) ? "selected" : "" ; %>
                                                     <option value="<%=section%>" <%=selected%>>
                                                         <%=section%>
                                                     </option>
@@ -86,7 +86,7 @@
                                                     <select id="drop_off" name="drop_off" class="form-control">
                                                         <option value=" N/A">N/A</option>
                                                         <% for (let drop_off of place.drop_offs){ let selected=(
-                                                            product.drop_off==drop_off ) ? "selected" : "" ; %>
+                                                            drop_off==drop_off ) ? "selected" : "" ; %>
                                                             <option value="<%=drop_off%>" <%=selected%>>
                                                                 <%=drop_off%>
                                                             </option>
@@ -96,21 +96,18 @@
                                                 <%}%> -->
                                             <div class="col-7 col-md-4 mb-2">
                                                 <label class="form-label" for="seat">Numero de Asiento:</label>
-                                                <input type="text" name="seat" id="seat" class="form-control"
-                                                    value="<%= product.seat %>">
+                                                <input type="text" name="seat" id="seat" class="form-control">
                                             </div>
                                             <div class="col-5 col-md-4 mb-2">
                                                 <label class="form-label" for="letter">Letra:</label>
-                                                <input type="text" name="letter" id="letter" class="form-control"
-                                                    value="<%= product.letter %>">
+                                                <input type="text" name="letter" id="letter" class="form-control">
                                             </div>
                                             <div class="col-12">
                                                 <div class="row mt-3">
                                                     <div class="col-12 mb-2">
                                                         <label class="form-label" for="how_many">Cantidad:</label>
                                                         <input type="number" name="how_many" id="how_many"
-                                                            placeholder="Cantidad" class="form-control"
-                                                            value="<%= product.how_many %>" required>
+                                                            placeholder="Cantidad" class="form-control" required>
                                                     </div>
                                                     <div class="col-8 mb-2">
                                                         <button type="submit" class="btn btn-primary btn-block">Agregar

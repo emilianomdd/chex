@@ -15,14 +15,17 @@ module.exports.createPost = async (req, res, next) => {
     try {
         const { id } = req.params
         const post = new Post(req.body.post);
+        console.log(req.body)
         const user = await User.findById(req.user._id);
         post.images = req.files.map(f => ({ url: f.path, filename: f.filename }));
         post.author = req.user._id;
+        post.category = req.body.category
         post.price = parseInt(req.body.post.price)
         user.posts.push(post);
         const place = await Place.findById(id)
         place.posts.push(post)
         post.place = place
+        console.log(post)
         await post.save();
         await place.save();
         await user.save();
@@ -268,6 +271,8 @@ module.exports.updatePost = async (req, res) => {
 //creates order but doesn't show anyewhere until iser specifies ppayment method
 module.exports.RapidOrder = async (req, res) => {
     try {
+        console.log(req.protocol + '://' + req.get('host') + req.originalUrl)
+        console.log(req)
 
         const { id } = req.params
         const post = await Post.findById(id).populate({
@@ -600,3 +605,77 @@ module.exports.createReport = async (req, res) => {
 
 
 
+    } catch (e) {
+        req.flash('Refresca la Pagina e Intenta de Nuevo')
+        res.redirect('/')
+    }
+}
+
+module.exports.showPostNum = async (req, res) => {
+    try {
+        if (req.user) {
+            const { id } = req.params;
+            const post = await Post.findById(id).populate("place");
+            const place = post.place;
+            const seat = req.query.seat
+            const row = req.query.row
+            const section = req.query.section
+            if (req.query.seat) {
+                res.render("posts/show_num", { post, place, seat, row, section })
+            } else {
+                res.render("posts/show", { post, place })
+            }
+        }
+        else {
+            const { id } = req.params;
+            const post = await Post.findById(id).populate("place");
+            const place_id = post.place;
+            const place = await Place.findById(place_id.id).populate({
+                path: 'posts',
+                populate: {
+                    path: 'author'
+                }
+            }).populate('author');
+            res.render('users/register_route', { place })
+        }
+    } catch (e) {
+        console.log(e)
+        req.flash('Refresca la Pagina e Intenta de Nuevo')
+        res.redirect('/')
+    };
+}
+//show  route for when user clicks rapid checkout
+module.exports.ShowRapidNum = async (req, res) => {
+    try {
+        if (req.user) {
+            const { id } = req.params;
+            const post = await Post.findById(id).populate("place");
+            const place = post.place;
+
+            const seat = req.query.seat
+            const row = req.query.row
+            const section = req.query.section
+            if (req.query.seat) {
+                res.render("posts/show_rapid_num", { post, place, seat, row, section })
+            } else {
+                console.log("whyRapid")
+                res.render("posts/show", { post, place })
+            }
+        } else {
+            const { id } = req.params;
+            const post = await Post.findById(id).populate("place");
+            const place_id = post.place;
+            const place = await Place.findById(place_id.id).populate({
+                path: 'posts',
+                populate: {
+                    path: 'author'
+                }
+            }).populate('author');
+            res.render('users/register_route', { place })
+        }
+    } catch (e) {
+        console.log(e)
+        req.flash('Refresca la Pagina e Intenta de Nuevo')
+        res.redirect('/')
+    }
+}
