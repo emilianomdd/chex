@@ -2,6 +2,7 @@
 
 <% layout('layouts/boilerplate')%>
     <link rel="stylesheet" href="/stylesheets/stars.css">
+    <h1>HELLO</h1>
     <% if(currentUser){%>
         <% if( currentUser.is_vendor && place.author.equals(currentUser._id) || currentUser.is_manager &&
             place.author.equals(currentUser._id) ){%>
