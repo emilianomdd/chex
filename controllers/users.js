@@ -170,11 +170,19 @@ module.exports.RenderStoreOrders = async (req, res) => {
             {
                 path: 'orders_to_complete',
                 populate: {
-                    path: 'customer',
+                    path: 'customer'
+                }
+            }
+        ).populate(
+            {
+                path: 'orders_to_complete',
+                populate: {
+                    path: 'posts'
                 }
             }
         ).populate('places')
         const place = user.places[0]
+
 
         res.render('users/render_vendor_orders', { user, place })
     } catch (e) {

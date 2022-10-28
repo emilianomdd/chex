@@ -23,11 +23,11 @@ router.get('/show_cart_numbered/:id', catchAsync(posts.showPostNum))
 
 router.get('/show_rapid_numbered/:id', posts.ShowRapidNum)
 
-router.post('/ordena_rapida/:id', isLoggedIn, posts.RapidOrder)
+router.post('/ordena_rapida/:id', posts.RapidOrder)
 
 router.post('/purchase/:id', isLoggedIn, posts.purchase)
 
-router.post('/rapid_cash/:id', isLoggedIn, posts.RapidCash)
+router.post('/rapid_cash/:id', posts.RapidCash)
 
 router.post('/rapid_card/:id', isLoggedIn, posts.RapidCard)
 

@@ -45,7 +45,6 @@ module.exports.purchase = async (req, res) => {
         const pre_orderr = await Pre_order.findById(id).populate('posts')
         const post_author = await User.findById(pre_order.posts.author).populate('posts')
         const order = new Order()
-        const user = await User.findById(req.user.id).populate('messages')
         order.is_reported = false
         order.status = 'En proceso'
         order.letter = pre_order.letter
@@ -67,13 +66,17 @@ module.exports.purchase = async (req, res) => {
         const place = await Place.findById(pre_order.posts.place)
         place.orders.push(order)
         order.conf_num = Math.floor(1000 + Math.random() * 9000);
-        user.orders.push(order)
+        if (req.user.id) {
+            const user = await User.findById(req.user.id).populate('messages')
+            user.orders.push(order)
+            order.user = user
+            await user.save()
+        }
         var price = (pre_order.price + .3) / (1 - 0.066)
         price = price.toFixed(2)
         order.price_final = price
         var comish = price - order.price
         comish = comish.toFixed(2)
-        await user.save()
         await post_author.save()
         await order.save()
         await place.save()
@@ -203,16 +206,7 @@ module.exports.showPost = async (req, res) => {
                 how_many: "",
             };
 
-            if (req.session?.hasOwnProperty("product")) {
-                productData = {
 
-                    letter: req.session?.product[id]?.letter || "",
-                    section: req.session?.product[id]?.section || "",
-                    drop_off: req.session?.product[id]?.drop_off || "",
-                    seat: req.session?.product[id]?.seat || "",
-                    how_many: req.session?.product[id]?.how_many || "",
-                };
-            }
             res.render("posts/show", { post, place, product: productData })
         }
         else {
@@ -271,9 +265,6 @@ module.exports.updatePost = async (req, res) => {
 //creates order but doesn't show anyewhere until iser specifies ppayment method
 module.exports.RapidOrder = async (req, res) => {
     try {
-        console.log(req.protocol + '://' + req.get('host') + req.originalUrl)
-        console.log(req)
-
         const { id } = req.params
         const post = await Post.findById(id).populate({
             path: 'place',
@@ -287,13 +278,11 @@ module.exports.RapidOrder = async (req, res) => {
         order.status = 'En proceso'
         const day = new Date()
         order.date = day.getTime()
-        const user = await User.findById(req.user.id).populate('messages').populate('cart')
-        order.customer = user
+
         order.is_paid = false
         order.is_delivered = false
         order.posts = post
         order.name = post.title
-        order.letter = req.body.letter
         if (req.body.drop_off != 'N/A') {
 
             order.drop_off = req.body.drop_off
@@ -303,6 +292,7 @@ module.exports.RapidOrder = async (req, res) => {
             order.section = req.body.section
         }
         order.seat = req.body.seat
+        console.log(parseInt(req.body.how_many) * post.price)
         order.price = parseInt(req.body.how_many) * post.price
         var price = (order.price + .3) / (1 - .059)
         price = price.toFixed(2)
@@ -312,11 +302,17 @@ module.exports.RapidOrder = async (req, res) => {
         order.quantity = req.body.how_many
         order.place = post.place
         order.conf_num = Math.floor(1000 + Math.random() * 9000);
-        user.orders.push(order)
-        post_author.orders_to_complete.push(order)
 
+        post_author.orders_to_complete.push(order)
+        if (req.user) {
+            const user = await User.findById(req.user.id).populate('messages').populate('cart')
+
+            order.customer = user
+            user.orders.push(order)
+            await user.save()
+        }
         await post_author.save()
-        await user.save()
+
         await order.save()
         res.render('places/payment_method', { order, transaction_fee, price })
     }
@@ -381,7 +377,9 @@ module.exports.purchaseCash = async (req, res) => {
         order.status = 'En proceso'
         const day = new Date()
         order.date = day.getTime()
+
         const user = await User.findById(req.user.id).populate('messages')
+
         order.letter = pre_order.letter
         order.customer = pre_order.customer
         order.posts = pre_order.posts
@@ -396,7 +394,7 @@ module.exports.purchaseCash = async (req, res) => {
         }
         order.seat = pre_order.seat
         post_author.orders_to_complete.push(order)
-        order.price = pre_order.price
+        order.price = post.price
         var price = (pre_order.price + .3) / (1 - 0.59)
         price = price.toFixed(2)
         order.price_final = price
@@ -421,6 +419,7 @@ module.exports.purchaseCash = async (req, res) => {
         })
         const all_posts = cart.pre_orders
         res.render('users/render_cart', { user, all_posts })
+
     } catch (e) {
         const user = await User.findById(req.user.id)
         const cart = await Carrito.findById(user.cart).populate({
@@ -439,27 +438,52 @@ module.exports.purchaseCash = async (req, res) => {
 
 //route used when user decides to do rapid checkout and uses cash
 module.exports.RapidCash = async (req, res) => {
+
     try {
-        const { id } = req.params
-        const user = await User.findById(req.user.id)
-        const order = await Order.findById(id).populate({
-            path: 'place',
-            populate: {
-                path: 'posts'
-            }
-        }).populate('posts')
-        const place = order.place
-        place.orders.push(order)
-        const post_author = await User.findById(order.posts.author)
-        order.cash = true
-        order.is_delivered = false
-        await place.save()
-        await post_author.save()
-        await user.save()
-        await order.save()
-        const all_posts = place.posts
-        res.render('places/show.ejs', { place, all_posts })
+        if (req.user) {
+
+            const { id } = req.params
+            const user = await User.findById(req.user.id)
+            const order = await Order.findById(id).populate({
+                path: 'place',
+                populate: {
+                    path: 'posts'
+                }
+            }).populate('posts')
+            const place = order.place
+            place.orders.push(order)
+            const post_author = await User.findById(order.posts.author)
+            order.cash = true
+            order.is_delivered = false
+            order.user = user
+            await place.save()
+            await post_author.save()
+            await user.save()
+            await order.save()
+            const all_posts = place.posts
+            res.render('places/show.ejs', { place, all_posts })
+        }
+        else {
+            const { id } = req.params
+            const order = await Order.findById(id).populate({
+                path: 'place',
+                populate: {
+                    path: 'posts'
+                }
+            }).populate('posts')
+            const place = order.place
+            place.orders.push(order)
+            const post_author = await User.findById(order.posts.author)
+            order.cash = true
+            order.is_delivered = false
+            await place.save()
+            await post_author.save()
+            await order.save()
+            const all_posts = place.posts
+            res.render('places/show.ejs', { place, all_posts })
+        }
     } catch (e) {
+        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/places')
     }
@@ -613,31 +637,18 @@ module.exports.createReport = async (req, res) => {
 
 module.exports.showPostNum = async (req, res) => {
     try {
-        if (req.user) {
-            const { id } = req.params;
-            const post = await Post.findById(id).populate("place");
-            const place = post.place;
-            const seat = req.query.seat
-            const row = req.query.row
-            const section = req.query.section
-            if (req.query.seat) {
-                res.render("posts/show_num", { post, place, seat, row, section })
-            } else {
-                res.render("posts/show", { post, place })
-            }
+        const { id } = req.params;
+        const post = await Post.findById(id).populate("place");
+        const place = post.place;
+        const seat = req.query.seat
+        const row = req.query.row
+        const section = req.query.section
+        if (req.query.seat) {
+            res.render("posts/show_num", { post, place, seat, row, section })
+        } else {
+            res.render("posts/show", { post, place })
         }
-        else {
-            const { id } = req.params;
-            const post = await Post.findById(id).populate("place");
-            const place_id = post.place;
-            const place = await Place.findById(place_id.id).populate({
-                path: 'posts',
-                populate: {
-                    path: 'author'
-                }
-            }).populate('author');
-            res.render('users/register_route', { place })
-        }
+
     } catch (e) {
         console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
@@ -647,32 +658,21 @@ module.exports.showPostNum = async (req, res) => {
 //show  route for when user clicks rapid checkout
 module.exports.ShowRapidNum = async (req, res) => {
     try {
-        if (req.user) {
-            const { id } = req.params;
-            const post = await Post.findById(id).populate("place");
-            const place = post.place;
+        const { id } = req.params;
+        const post = await Post.findById(id).populate("place");
+        const place = post.place;
 
-            const seat = req.query.seat
-            const row = req.query.row
-            const section = req.query.section
-            if (req.query.seat) {
-                res.render("posts/show_rapid_num", { post, place, seat, row, section })
-            } else {
-                console.log("whyRapid")
-                res.render("posts/show", { post, place })
-            }
+        const seat = req.query.seat
+        const row = req.query.row
+        const section = req.query.section
+        if (req.query.seat) {
+            res.render("posts/show_rapid_num", { post, place, seat, row, section })
         } else {
-            const { id } = req.params;
-            const post = await Post.findById(id).populate("place");
-            const place_id = post.place;
-            const place = await Place.findById(place_id.id).populate({
-                path: 'posts',
-                populate: {
-                    path: 'author'
-                }
-            }).populate('author');
-            res.render('users/register_route', { place })
+            console.log("whyRapid")
+            res.render("posts/show", { post, place })
         }
+
+
     } catch (e) {
         console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')

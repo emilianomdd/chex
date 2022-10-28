@@ -49,7 +49,7 @@ module.exports.createplace = async (req, res, next) => {
 //function that will show the place and it's products
 module.exports.showplace = async (req, res,) => {
     try {
-
+        const user = req.user
         const { id } = req.params
         const place = await Place.findById(id).populate({
             path: 'posts',
@@ -66,7 +66,7 @@ module.exports.showplace = async (req, res,) => {
             const seat = req.query.seat
             const row = req.query.row
             const section = req.query.section
-            res.render('places/show_numbered.ejs', { place, all_posts, seat, row, section })
+            res.render('places/show_numbered.ejs', { place, all_posts, seat, row, section, user })
         } else {
             res.render('places/show.ejs', { place, all_posts })
         }
