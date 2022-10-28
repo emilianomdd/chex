@@ -228,13 +228,16 @@ module.exports.showPost = async (req, res) => {
 }
 //delete posts
 module.exports.deletePost = async (req, res) => {
+    console.log("hi")
     try {
         const { id } = req.params;
+        console.log(id)
         const post = await Post.find(id)
         await Post.findByIdAndDelete(id);
         req.flash('success', 'Successfully deleted post')
         res.redirect('/places');
     } catch (e) {
+        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/places')
     }
@@ -242,6 +245,7 @@ module.exports.deletePost = async (req, res) => {
 
 //update post
 module.exports.updatePost = async (req, res) => {
+    console.log("hi")
     try {
         const { id } = req.params;
         const post = await Post.findByIdAndUpdate(id, { ...req.body.post });

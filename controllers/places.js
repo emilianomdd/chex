@@ -156,6 +156,7 @@ module.exports.RenderConfirmOrder = async (req, res) => {
 }
 
 module.exports.renderCategory = async (req, res) => {
+    console.log('hi')
     try {
         const { id } = req.params
         const place = await Place.findById(id).populate({
@@ -174,6 +175,10 @@ module.exports.renderCategory = async (req, res) => {
         if (!place) {
             req.flash('error', 'Cannot find that place!');
             return res.redirect('/places');
+        }
+        if (all_posts.length == 0) {
+            res.flash('No hay articulos bajo esta categoria')
+            res.render('places/show.ejs', { place, all_posts })
         }
         res.render('places/show.ejs', { place, all_posts })
 
@@ -206,7 +211,6 @@ module.exports.renderCategoryNum = async (req, res) => {
             }
         }
         if (!place) {
-            req.flash('error', 'Cannot find that place!');
             return res.redirect('/places');
         }
 
@@ -216,8 +220,8 @@ module.exports.renderCategoryNum = async (req, res) => {
         res.render('places/show_numbered.ejs', { place, all_posts, seat, row, section })
 
     } catch (e) {
-        res.falsh('Refresca la Pagina e Intenta de Nuevo')
-        res.render('/places')
+        console.log(e)
+        res.redirect('/places')
     }
 }
 
