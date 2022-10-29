@@ -8,7 +8,8 @@ const Pre_order = require('../models/pre_order');
 const Carrito = require('../models/carrito')
 const { jsPDF } = require('jspdf');
 const order = require('../models/order');
-const XLSX = require('xlsx')
+const XLSX = require('xlsx');
+const { CommandInstance } = require('twilio/lib/rest/preview/wireless/command');
 
 //Creates an article in a place
 module.exports.createPost = async (req, res, next) => {
@@ -613,6 +614,7 @@ module.exports.createPDF = async (req, res, next) => {
 }
 
 module.exports.createReport = async (req, res) => {
+    console.log("hi")
     try {
         const workBook = XLSX.utils.book_new();
 
@@ -620,6 +622,7 @@ module.exports.createReport = async (req, res) => {
         var all_orders = []
         for (let id_num of id) {
             const order = await Order.findById(id_num)
+            console.log(order)
             const new_order = { price: order.price, articulo: order.name, date: order.date, section: order.section }
             all_orders.push(new_order)
             order.is_reported = false
@@ -631,7 +634,7 @@ module.exports.createReport = async (req, res) => {
         // Generate buffer
         XLSX.write(workBook, { bookType: 'xlsx', type: "buffer" })
 
-
+        console.log(XLSX)
 
     } catch (e) {
         req.flash('Refresca la Pagina e Intenta de Nuevo')
