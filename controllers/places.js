@@ -156,7 +156,7 @@ module.exports.RenderConfirmOrder = async (req, res) => {
 }
 
 module.exports.renderCategory = async (req, res) => {
-    console.log('hi')
+    console.log('RenderCategory')
     try {
         const { id } = req.params
         const place = await Place.findById(id).populate({
@@ -180,7 +180,7 @@ module.exports.renderCategory = async (req, res) => {
             res.flash('No hay articulos bajo esta categoria')
             res.render('places/show.ejs', { place, all_posts })
         }
-        res.render('places/show.ejs', { place, all_posts })
+        router.get('/render-orders-store/:id', users.RenderStoreOrders)
 
     } catch (e) {
         res.falsh('Refresca la Pagina e Intenta de Nuevo')

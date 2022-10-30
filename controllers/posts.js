@@ -9,6 +9,7 @@ const Carrito = require('../models/carrito')
 const { jsPDF } = require('jspdf');
 const order = require('../models/order');
 const XLSX = require('xlsx');
+const users = require('../controllers/users');
 const { CommandInstance } = require('twilio/lib/rest/preview/wireless/command');
 
 //Creates an article in a place
@@ -229,7 +230,7 @@ module.exports.showPost = async (req, res) => {
 }
 //delete posts
 module.exports.deletePost = async (req, res) => {
-    console.log("hi")
+    console.log("deletePost")
     try {
         const { id } = req.params;
         console.log(id)
@@ -246,7 +247,7 @@ module.exports.deletePost = async (req, res) => {
 
 //update post
 module.exports.updatePost = async (req, res) => {
-    console.log("hi")
+    console.log("updatePost")
     try {
         const { id } = req.params;
         const post = await Post.findByIdAndUpdate(id, { ...req.body.post });
@@ -270,6 +271,8 @@ module.exports.updatePost = async (req, res) => {
 //creates order but doesn't show anyewhere until iser specifies ppayment method
 module.exports.RapidOrder = async (req, res) => {
     try {
+        console.log('RapidOrder')
+        console.log(req.body)
         const { id } = req.params
         const post = await Post.findById(id).populate({
             path: 'place',
@@ -297,6 +300,8 @@ module.exports.RapidOrder = async (req, res) => {
             order.section = req.body.section
         }
         order.seat = req.body.seat
+        order.letter = req.body.row
+        console.log(order.le)
         console.log(parseInt(req.body.how_many) * post.price)
         order.price = parseInt(req.body.how_many) * post.price
         var price = (order.price + .3) / (1 - .059)
@@ -446,6 +451,7 @@ module.exports.RapidCash = async (req, res) => {
 
     try {
         if (req.user) {
+            console.log('hi')
 
             const { id } = req.params
             const user = await User.findById(req.user.id)
@@ -466,9 +472,13 @@ module.exports.RapidCash = async (req, res) => {
             await user.save()
             await order.save()
             const all_posts = place.posts
-            res.render('places/show.ejs', { place, all_posts })
+            const seat = order.seat
+            const row = order.letter
+            const section = order.section
+            res.render('places/show_numbered.ejs', { place, all_posts, seat, row, section })
         }
         else {
+            console.log("Rapid Cash no user")
             const { id } = req.params
             const order = await Order.findById(id).populate({
                 path: 'place',
@@ -485,7 +495,10 @@ module.exports.RapidCash = async (req, res) => {
             await post_author.save()
             await order.save()
             const all_posts = place.posts
-            res.render('places/show.ejs', { place, all_posts })
+            const seat = order.seat
+            const row = order.letter
+            const section = order.section
+            res.render('places/show_numbered.ejs', { place, all_posts, seat, row, section })
         }
     } catch (e) {
         console.log(e)
@@ -581,8 +594,10 @@ module.exports.ShowRapid = async (req, res) => {
 
 //grab the orders and create a pdf invoce with the selected items
 module.exports.createPDF = async (req, res, next) => {
+    console.log("CreatePdf")
     try {
         const id = req.body.id
+        console.log(id)
         const doc = new jsPDF({
             orientation: 'p',
             unit: 'mm',
@@ -590,12 +605,35 @@ module.exports.createPDF = async (req, res, next) => {
         });
         var txtFormat = ''
         var recipt_name = ''
-        for (let id_num of id) {
+        console.log(typeof id)
+        if (typeof id != "string") {
+            for (let id_num of id) {
 
-            const order = await Order.findById(id_num).populate('customer')
-            txtFormat += `Articulo: ${order.name} -- Precio: ${order.price} -- Nombre: ${order.customer.username}\nAsiento: ${order.seat}${order.letter} -- Seccion: ${order.section}\
+                const order = await Order.findById(id_num).populate('customer')
+
+                if (order.customer) {
+                    txtFormat += `Cantidad: ${order.quantity} -- Articulo: ${order.name} -- Precio: ${order.price} -- Nombre: ${order.customer.username}\nAsiento: ${order.seat}${order.letter} -- Seccion: ${order.section}\
+            \n*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\n`
+                    recipt_name += order.name, ","
+                } else {
+                    txtFormat += `Cantidad: ${order.quantity} -- Articulo: ${order.name} -- Precio: ${order.price} -- Asiento: ${order.seat}${order.letter}\n -- Seccion: ${order.section}\
+                \n*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\n`
+                    recipt_name += order.name, ","
+                }
+
+            }
+        } else {
+            const order = await Order.findById(id).populate('customer')
+
+            if (order.customer) {
+                txtFormat += `Cantidad: ${order.quantity} -- Articulo: ${order.name} -- Precio: ${order.price} -- Nombre: ${order.customer.username}\nAsiento: ${order.seat}${order.letter} -- Seccion: ${order.section}\
         \n*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\n`
-            recipt_name += order.name, ","
+                recipt_name += order.name, ","
+            } else {
+                txtFormat += `Cantidad: ${order.quantity} -- Articulo: ${order.name} -- Precio: ${order.price} -- Asiento: ${order.seat}${order.letter}\n -- Seccion: ${order.section}\
+            \n*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\n`
+                recipt_name += order.name, ","
+            }
         }
         doc.text(txtFormat, 20, 20)
         const date = new Date();
@@ -605,16 +643,42 @@ module.exports.createPDF = async (req, res, next) => {
 
         file_num = Math.floor(1000 + Math.random() * 9000);
         doc.save(`${day}_${month}_${year}--${file_num}.pdf`)
-        res.redirect('/places')
+        console.log(doc)
+
+        const id_user = req.user.id
+        const user = await User.findById(id_user).populate({
+            path: 'orders_to_complete'
+        }).populate(
+            {
+
+                path: 'orders_to_complete',
+                populate: {
+                    path: 'customer'
+                }
+            }
+        ).populate(
+            {
+                path: 'orders_to_complete',
+                populate: {
+                    path: 'posts'
+                }
+            }
+        ).populate('places')
+        const place = user.places[0]
+
+
+        res.render('users/render_vendor_orders', { user, place })
 
     } catch (e) {
+        console.log("sup")
+        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.redirect('/places')
     }
 }
 
 module.exports.createReport = async (req, res) => {
-    console.log("hi")
+    console.log("Create Report")
     try {
         const workBook = XLSX.utils.book_new();
 
@@ -623,20 +687,29 @@ module.exports.createReport = async (req, res) => {
         for (let id_num of id) {
             const order = await Order.findById(id_num)
             console.log(order)
-            const new_order = { price: order.price, articulo: order.name, date: order.date, section: order.section }
+            const new_order = { quantity: order.quantity, price: order.price, articulo: order.name, date: order.date, section: order.section }
             all_orders.push(new_order)
-            order.is_reported = false
+            order.is_reported = true
             order.save()
         }
 
         const workSheet = XLSX.utils.json_to_sheet(all_orders);
         XLSX.utils.book_append_sheet(workBook, workSheet, "orders")
         // Generate buffer
-        XLSX.write(workBook, { bookType: 'xlsx', type: "buffer" })
+        const date = new Date();
+        month = date.getMonth() + 1
+        day = date.getDate()
+        year = date.getFullYear()
+
+        file_num = Math.floor(1000 + Math.random() * 9000);
+        const filename = `${day}_${month}_${year}--${file_num}.xlsx`;
+        const wb_opts = { bookType: 'xlsx', type: 'binary' };   // workbook options
+        XLSX.writeFile(workBook, filename, wb_opts);
 
         console.log(XLSX)
-
+        res.redirect('/')
     } catch (e) {
+        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.redirect('/')
     }
@@ -684,5 +757,96 @@ module.exports.ShowRapidNum = async (req, res) => {
         console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.redirect('/')
+    }
+}
+
+module.exports.createPDFSection = async (req, res) => {
+    console.log("CreatePdfSection")
+    try {
+        const id = req.body.id
+        console.log(id)
+        const doc = new jsPDF({
+            orientation: 'p',
+            unit: 'mm',
+            format: 'a4'
+        });
+        var txtFormat = ''
+        var recipt_name = ''
+        console.log(typeof id)
+        if (typeof id != "string") {
+            for (let id_num of id) {
+
+                const order = await Order.findById(id_num).populate('customer')
+
+                if (order.customer) {
+                    txtFormat += `Cantidad: ${order.quantity} -- Articulo: ${order.name} -- Precio: ${order.price} -- Nombre: ${order.customer.username}\nAsiento: ${order.seat}${order.letter} -- Seccion: ${order.section}\
+            \n*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\n`
+                    recipt_name += order.name, ","
+                } else {
+                    txtFormat += `Cantidad: ${order.quantity} -- Articulo: ${order.name} -- Precio: ${order.price} -- Asiento: ${order.seat}${order.letter}\n -- Seccion: ${order.section}\
+                \n*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\n`
+                    recipt_name += order.name, ","
+                }
+
+            }
+        } else {
+            const order = await Order.findById(id).populate('customer')
+
+            if (order.customer) {
+                txtFormat += `Cantidad: ${order.quantity} -- Articulo: ${order.name} -- Precio: ${order.price} -- Nombre: ${order.customer.username}\nAsiento: ${order.seat}${order.letter} -- Seccion: ${order.section}\
+        \n*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\n`
+                recipt_name += order.name, ","
+            } else {
+                txtFormat += `Cantidad: ${order.quantity} -- Articulo: ${order.name} -- Precio: ${order.price} -- Asiento: ${order.seat}${order.letter}\n -- Seccion: ${order.section}\
+            \n*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\n`
+                recipt_name += order.name, ","
+            }
+        }
+        doc.text(txtFormat, 20, 20)
+        const date = new Date();
+        month = date.getMonth() + 1
+        day = date.getDate()
+        year = date.getFullYear()
+
+        file_num = Math.floor(1000 + Math.random() * 9000);
+        doc.save(`${day}_${month}_${year}--${file_num}.pdf`)
+        console.log(doc)
+
+        const id_user = req.user.id
+        const user = await User.findById(id_user).populate({
+            path: 'orders_to_complete'
+        }).populate(
+            {
+
+                path: 'orders_to_complete',
+                populate: {
+                    path: 'customer'
+                }
+            }
+        ).populate(
+            {
+                path: 'orders_to_complete',
+                populate: {
+                    path: 'posts'
+                }
+            }
+        ).populate('places')
+        const place = user.places[0]
+        const orders = user.orders_to_complete
+        const section = req.body.section
+        const all_posts = []
+        for (let order of orders) {
+            if (order.section == section) {
+                all_posts.push(order)
+            }
+        }
+        res.render('users/render_vendor_section', { user, place, section, all_posts })
+
+
+    } catch (e) {
+        console.log("sup")
+        console.log(e)
+        req.flash('Refresca la Pagina e Intenta de Nuevo')
+        res.redirect('/places')
     }
 }

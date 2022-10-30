@@ -42,6 +42,8 @@ router.post('/order/complete/:id', isLoggedIn, users.completeOrder)
 
 router.post('/order/create_invoice', posts.createPDF)
 
+router.post('/order/create_invoice_section', posts.createPDFSection)
+
 router.get('/render_orders/:id', isLoggedIn, users.RenderMyOrders)
 
 router.route('/login')

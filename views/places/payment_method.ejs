@@ -17,7 +17,8 @@
                                 </br>
                     </p>
                     <p class="card-text">
-                        Seat: <%=order.seat%> Seccion: <%=order.section%>
+                        Asiento: <%=order.seat%>
+                            <%=order.letter%> Seccion: <%=order.section%>
                     </p>
 
                     <form action="/posts/rapid_cash/<%=order.id%>" method="POST">

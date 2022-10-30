@@ -162,6 +162,7 @@ module.exports.RenderMyOrders = async (req, res) => {
 
 //renders incoming orders to a vendor
 module.exports.RenderStoreOrders = async (req, res) => {
+    console.log("gigi")
     try {
         const { id } = req.params
         const user = await User.findById(id).populate({
@@ -193,6 +194,7 @@ module.exports.RenderStoreOrders = async (req, res) => {
 
 //Renders incomoing orders on a specific location
 module.exports.RenderSelect = async (req, res) => {
+    console.log('Render Select')
     try {
         const section = req.query.section
         const { id } = req.params
@@ -210,7 +212,14 @@ module.exports.RenderSelect = async (req, res) => {
             }
         ).populate('places')
         const place = user.places[0]
-        res.render('users/render_vendor_section', { user, place, section })
+        const orders = user.orders_to_complete
+        const all_posts = []
+        for (let order of orders) {
+            if (order.section == section) {
+                all_posts.push(order)
+            }
+        }
+        res.render('users/render_vendor_section', { user, place, section, all_posts })
     } catch (e) {
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/place')
