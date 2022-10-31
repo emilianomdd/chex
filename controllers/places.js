@@ -69,7 +69,6 @@ module.exports.showplace = async (req, res,) => {
         } else {
             res.render('places/show.ejs', { place, all_posts })
         }
-        res.render('places/show.ejs', { place, all_posts })
 
     } catch (e) {
         res.falsh('Refresca la Pagina e Intenta de Nuevo')

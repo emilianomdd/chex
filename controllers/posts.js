@@ -700,6 +700,7 @@ module.exports.showPostNum = async (req, res) => {
         const seat = req.query.seat
         const row = req.query.row
         const section = req.query.section
+        console.log("showPost")
         if (req.query.seat) {
             res.render("posts/show_num", { post, place, seat, row, section })
         } else {
@@ -714,6 +715,7 @@ module.exports.showPostNum = async (req, res) => {
 //show  route for when user clicks rapid checkout
 module.exports.ShowRapidNum = async (req, res) => {
     try {
+        console.log("showRapidNum")
         const { id } = req.params;
         const post = await Post.findById(id).populate("place");
         const place = post.place;
