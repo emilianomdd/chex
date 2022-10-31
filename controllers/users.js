@@ -162,7 +162,6 @@ module.exports.RenderMyOrders = async (req, res) => {
 
 //renders incoming orders to a vendor
 module.exports.RenderStoreOrders = async (req, res) => {
-    console.log("gigi")
     try {
         const { id } = req.params
         const user = await User.findById(id).populate({
@@ -194,7 +193,6 @@ module.exports.RenderStoreOrders = async (req, res) => {
 
 //Renders incomoing orders on a specific location
 module.exports.RenderSelect = async (req, res) => {
-    console.log('Render Select')
     try {
         const section = req.query.section
         const { id } = req.params

@@ -1,15 +1,16 @@
 <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
         <% if(!currentUser) {%>
-            <a class="navbar-brand" href="/places">CARTERO</a>
+            <!-- <a class="navbar-brand" href="/places">CARTERO</a> -->
+            <a class="navbar-brand">CARTERO</a>
             <%}else{%>
                 <% if(currentUser.places.length==0) {%>
                     <a class="navbar-brand" href="/render-cart/<%=currentUser.id%>">Ver Carrito</a>
                     <%}%>
 
-                        <a class="navbar-brand" href="/places">CARTERO</a>
+                        <!-- <a class="navbar-brand" href="/places">CARTERO</a> -->
 
-
+                        <a class="navbar-brand">CARTERO</a>
                         <% if(currentUser.places.length==0){%>
                             <a class="navbar-brand" href="/render_orders/<%=currentUser.id%>">Mis Ordenes</a>
                             <%} else{%>

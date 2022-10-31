@@ -17,7 +17,6 @@ module.exports.createPost = async (req, res, next) => {
     try {
         const { id } = req.params
         const post = new Post(req.body.post);
-        console.log(req.body)
         const user = await User.findById(req.user._id);
         post.images = req.files.map(f => ({ url: f.path, filename: f.filename }));
         post.author = req.user._id;
@@ -27,7 +26,6 @@ module.exports.createPost = async (req, res, next) => {
         const place = await Place.findById(id)
         place.posts.push(post)
         post.place = place
-        console.log(post)
         await post.save();
         await place.save();
         await user.save();
@@ -230,16 +228,13 @@ module.exports.showPost = async (req, res) => {
 }
 //delete posts
 module.exports.deletePost = async (req, res) => {
-    console.log("deletePost")
     try {
         const { id } = req.params;
-        console.log(id)
         const post = await Post.find(id)
-        await Post.findByIdAndDelete(id);
+        await Post.findByIdAndDelete(post);
         req.flash('success', 'Successfully deleted post')
         res.redirect('/places');
     } catch (e) {
-        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/places')
     }
@@ -247,7 +242,6 @@ module.exports.deletePost = async (req, res) => {
 
 //update post
 module.exports.updatePost = async (req, res) => {
-    console.log("updatePost")
     try {
         const { id } = req.params;
         const post = await Post.findByIdAndUpdate(id, { ...req.body.post });
@@ -271,8 +265,6 @@ module.exports.updatePost = async (req, res) => {
 //creates order but doesn't show anyewhere until iser specifies ppayment method
 module.exports.RapidOrder = async (req, res) => {
     try {
-        console.log('RapidOrder')
-        console.log(req.body)
         const { id } = req.params
         const post = await Post.findById(id).populate({
             path: 'place',
@@ -301,8 +293,6 @@ module.exports.RapidOrder = async (req, res) => {
         }
         order.seat = req.body.seat
         order.letter = req.body.row
-        console.log(order.le)
-        console.log(parseInt(req.body.how_many) * post.price)
         order.price = parseInt(req.body.how_many) * post.price
         var price = (order.price + .3) / (1 - .059)
         price = price.toFixed(2)
@@ -451,7 +441,6 @@ module.exports.RapidCash = async (req, res) => {
 
     try {
         if (req.user) {
-            console.log('hi')
 
             const { id } = req.params
             const user = await User.findById(req.user.id)
@@ -478,7 +467,6 @@ module.exports.RapidCash = async (req, res) => {
             res.render('places/show_numbered.ejs', { place, all_posts, seat, row, section })
         }
         else {
-            console.log("Rapid Cash no user")
             const { id } = req.params
             const order = await Order.findById(id).populate({
                 path: 'place',
@@ -501,7 +489,6 @@ module.exports.RapidCash = async (req, res) => {
             res.render('places/show_numbered.ejs', { place, all_posts, seat, row, section })
         }
     } catch (e) {
-        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/places')
     }
@@ -594,10 +581,8 @@ module.exports.ShowRapid = async (req, res) => {
 
 //grab the orders and create a pdf invoce with the selected items
 module.exports.createPDF = async (req, res, next) => {
-    console.log("CreatePdf")
     try {
         const id = req.body.id
-        console.log(id)
         const doc = new jsPDF({
             orientation: 'p',
             unit: 'mm',
@@ -605,7 +590,6 @@ module.exports.createPDF = async (req, res, next) => {
         });
         var txtFormat = ''
         var recipt_name = ''
-        console.log(typeof id)
         if (typeof id != "string") {
             for (let id_num of id) {
 
@@ -643,7 +627,6 @@ module.exports.createPDF = async (req, res, next) => {
 
         file_num = Math.floor(1000 + Math.random() * 9000);
         doc.save(`${day}_${month}_${year}--${file_num}.pdf`)
-        console.log(doc)
 
         const id_user = req.user.id
         const user = await User.findById(id_user).populate({
@@ -670,15 +653,12 @@ module.exports.createPDF = async (req, res, next) => {
         res.render('users/render_vendor_orders', { user, place })
 
     } catch (e) {
-        console.log("sup")
-        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.redirect('/places')
     }
 }
 
 module.exports.createReport = async (req, res) => {
-    console.log("Create Report")
     try {
         const workBook = XLSX.utils.book_new();
 
@@ -686,7 +666,6 @@ module.exports.createReport = async (req, res) => {
         var all_orders = []
         for (let id_num of id) {
             const order = await Order.findById(id_num)
-            console.log(order)
             const new_order = { quantity: order.quantity, price: order.price, articulo: order.name, date: order.date, section: order.section }
             all_orders.push(new_order)
             order.is_reported = true
@@ -706,10 +685,8 @@ module.exports.createReport = async (req, res) => {
         const wb_opts = { bookType: 'xlsx', type: 'binary' };   // workbook options
         XLSX.writeFile(workBook, filename, wb_opts);
 
-        console.log(XLSX)
         res.redirect('/')
     } catch (e) {
-        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.redirect('/')
     }
@@ -730,7 +707,6 @@ module.exports.showPostNum = async (req, res) => {
         }
 
     } catch (e) {
-        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.redirect('/')
     };
@@ -748,23 +724,19 @@ module.exports.ShowRapidNum = async (req, res) => {
         if (req.query.seat) {
             res.render("posts/show_rapid_num", { post, place, seat, row, section })
         } else {
-            console.log("whyRapid")
             res.render("posts/show", { post, place })
         }
 
 
     } catch (e) {
-        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.redirect('/')
     }
 }
 
 module.exports.createPDFSection = async (req, res) => {
-    console.log("CreatePdfSection")
     try {
         const id = req.body.id
-        console.log(id)
         const doc = new jsPDF({
             orientation: 'p',
             unit: 'mm',
@@ -772,7 +744,6 @@ module.exports.createPDFSection = async (req, res) => {
         });
         var txtFormat = ''
         var recipt_name = ''
-        console.log(typeof id)
         if (typeof id != "string") {
             for (let id_num of id) {
 
@@ -810,7 +781,6 @@ module.exports.createPDFSection = async (req, res) => {
 
         file_num = Math.floor(1000 + Math.random() * 9000);
         doc.save(`${day}_${month}_${year}--${file_num}.pdf`)
-        console.log(doc)
 
         const id_user = req.user.id
         const user = await User.findById(id_user).populate({
@@ -844,8 +814,6 @@ module.exports.createPDFSection = async (req, res) => {
 
 
     } catch (e) {
-        console.log("sup")
-        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.redirect('/places')
     }

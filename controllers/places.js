@@ -37,7 +37,6 @@ module.exports.createplace = async (req, res, next) => {
     place.author = req.user._id;
     user.places.push(place);
     user.is_manager = true
-    console.log(place)
     await place.save();
     await user.save();
     req.flash('success', 'Successfully made a new place!');
@@ -156,7 +155,6 @@ module.exports.RenderConfirmOrder = async (req, res) => {
 }
 
 module.exports.renderCategory = async (req, res) => {
-    console.log('RenderCategory')
     try {
         const { id } = req.params
         const place = await Place.findById(id).populate({
@@ -189,13 +187,11 @@ module.exports.renderCategory = async (req, res) => {
 }
 
 module.exports.renderNumbered = async (req, res) => {
-    console.log(req)
     res.render('/places')
 }
 
 module.exports.renderCategoryNum = async (req, res) => {
     try {
-        console.log(req.query)
         const { id } = req.params
         const place = await Place.findById(id).populate({
             path: 'posts',
@@ -220,7 +216,6 @@ module.exports.renderCategoryNum = async (req, res) => {
         res.render('places/show_numbered.ejs', { place, all_posts, seat, row, section })
 
     } catch (e) {
-        console.log(e)
         res.redirect('/places')
     }
 }
