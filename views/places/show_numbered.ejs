@@ -79,66 +79,58 @@
                                                                     </div>
 
                                                                     <div class="row">
-                                                                        <% if(currentUser){%>
-                                                                            <div class="col-md-4 mt-3">
-                                                                                <form
-                                                                                    action="/posts/show_cart_numbered/<%=post._id%>"
-                                                                                    method="GET">
-                                                                                    <input type="hidden" id="seat"
-                                                                                        name="seat" value="<%=seat%>">
-                                                                                    <input type="hidden" id="row"
-                                                                                        name="row" value="<%=row%>">
-                                                                                    <input type="hidden" id="section"
-                                                                                        name="section"
-                                                                                        value="<%=section%>">
-                                                                                    <button
-                                                                                        class="btn btn-outline-secondary btn-block">Agregar
-                                                                                        a Carrito</button>
-                                                                                </form>
-                                                                            </div>
-                                                                            <%}%>
-                                                                                <div class="col-md-4 mt-3">
-                                                                                    <form
-                                                                                        action="/posts/ordena_rapida/<%=post._id%>"
-                                                                                        method="POST">
-                                                                                        <div
-                                                                                            class="col-12 col-md-4 mb-2">
-                                                                                            <label class="form-label"
-                                                                                                for="how_many">Cantidad:</label>
-                                                                                            <select id="how_many"
-                                                                                                name="how_many"
-                                                                                                class="form-control">
-                                                                                                <option value="1">
-                                                                                                    1
-                                                                                                </option>
-                                                                                                <% for (let i=2;i<=5;
-                                                                                                    i++){%>
-                                                                                                    <option
-                                                                                                        value="<%=i%>"
-                                                                                                        <%=i%>>
-                                                                                                        <%=i%>
-                                                                                                    </option>}
-                                                                                                    <%}%>
-                                                                                            </select>
-                                                                                        </div>
-                                                                                        <input type="hidden" id="seat"
-                                                                                            name="seat"
-                                                                                            value="<%=seat%>">
-                                                                                        <input type="hidden" id="row"
-                                                                                            name="row" value="<%=row%>">
-                                                                                        <input type="hidden"
-                                                                                            id="section" name="section"
-                                                                                            value="<%=section%>">
-
-                                                                                        <button
-                                                                                            class="btn btn-dark btn-block">Compra
-                                                                                            en Efectivo</button>
-                                                                                        <button
-                                                                                            class="btn btn-dark btn-block mt-2">Compra
-                                                                                            con Terminal</button>
-                                                                                    </form>
-
+                                                                        <div class="col-md-4 mt-3">
+                                                                            <form
+                                                                                action="/posts/show_cart_numbered/<%=post._id%>"
+                                                                                method="GET">
+                                                                                <input type="hidden" id="seat"
+                                                                                    name="seat" value="<%=seat%>">
+                                                                                <input type="hidden" id="row" name="row"
+                                                                                    value="<%=row%>">
+                                                                                <input type="hidden" id="section"
+                                                                                    name="section" value="<%=section%>">
+                                                                                <button
+                                                                                    class="btn btn-outline-secondary btn-block">Agregar
+                                                                                    a Carrito</button>
+                                                                            </form>
+                                                                        </div>
+                                                                        <div class="col-md-4 mt-3">
+                                                                            <form
+                                                                                action="/posts/ordena_rapida/<%=post._id%>"
+                                                                                method="POST">
+                                                                                <div class="col-12 col-md-4 mb-2">
+                                                                                    <label class="form-label"
+                                                                                        for="how_many">Cantidad:</label>
+                                                                                    <select id="how_many"
+                                                                                        name="how_many"
+                                                                                        class="form-control">
+                                                                                        <option value="1">
+                                                                                            1
+                                                                                        </option>
+                                                                                        <% for (let i=2;i<=5; i++){%>
+                                                                                            <option value="<%=i%>"
+                                                                                                <%=i%>>
+                                                                                                <%=i%>
+                                                                                            </option>}
+                                                                                            <%}%>
+                                                                                    </select>
                                                                                 </div>
+                                                                                <input type="hidden" id="seat"
+                                                                                    name="seat" value="<%=seat%>">
+                                                                                <input type="hidden" id="row" name="row"
+                                                                                    value="<%=row%>">
+                                                                                <input type="hidden" id="section"
+                                                                                    name="section" value="<%=section%>">
+
+                                                                                <button
+                                                                                    class="btn btn-dark btn-block">Compra
+                                                                                    en Efectivo o Terminal</button>
+                                                                                <!-- <button
+                                                                                    class="btn btn-dark btn-block mt-2">Compra
+                                                                                    en Linea</button> -->
+                                                                            </form>
+
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>

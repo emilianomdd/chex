@@ -3,6 +3,8 @@
         <% if(!currentUser) {%>
             <!-- <a class="navbar-brand" href="/places">CARTERO</a> -->
             <a class="navbar-brand">CARTERO</a>
+
+
             <%}else{%>
                 <% if(currentUser.places.length==0) {%>
                     <a class="navbar-brand" href="/render-cart/<%=currentUser.id%>">Ver Carrito</a>
