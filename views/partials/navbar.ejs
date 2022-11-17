@@ -2,9 +2,11 @@
     <div class="container-fluid">
         <% if(!currentUser) {%>
             <!-- <a class="navbar-brand" href="/places">CARTERO</a> -->
-            <a class="navbar-brand">CARTERO</a>
-
-
+            <div class="d-flex bd-highlight">
+                <a class="navbar-brand flex-fill bd-highlight" href="/render-cart">Ver Carrito</a>
+                <a class="navbar-brand flex-fill bd-highlight">CARTERO</a>
+                <a class="navbar-brand flex-fill bd-highlight" href="/render_orders">Mis Ordenes</a>
+            </div>
             <%}else{%>
                 <% if(currentUser.places.length==0) {%>
                     <a class="navbar-brand" href="/render-cart/<%=currentUser.id%>">Ver Carrito</a>
