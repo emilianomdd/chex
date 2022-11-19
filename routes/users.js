@@ -18,7 +18,7 @@ router.get('/render_vendor_register/:id', users.RenderVendor)
 
 router.post('/create_store/:id', users.RegisterVendor)
 
-router.get('/render-cart/:id', users.RenderCart)
+router.get('/render-cart', users.RenderCart)
 
 router.post('/five/:id', users.FiveMin)
 
@@ -44,7 +44,7 @@ router.post('/order/create_invoice', posts.createPDF)
 
 router.post('/order/create_invoice_section', posts.createPDFSection)
 
-router.get('/render_orders/:id', isLoggedIn, users.RenderMyOrders)
+router.get('/render_orders', users.RenderMyOrders)
 
 router.route('/login')
     .get(users.renderLogin)

@@ -90,17 +90,29 @@ module.exports.RegisterVendor = async (req, res, next) => {
 
 //show route to see your cart
 module.exports.RenderCart = async (req, res) => {
-
-    const { id } = req.params
-    const user = await User.findById(id)
-    const cart = await Carrito.findById(user.cart).populate({
-        path: 'pre_orders',
-        populate: {
-            path: 'posts'
+    var all_posts = []
+    if (req.user) {
+        const { id } = req.user.id
+        const user = await User.findById(id)
+        const cart = await Carrito.findById(user.cart).populate({
+            path: 'pre_orders',
+            populate: {
+                path: 'posts'
+            }
+        })
+        all_posts = cart.pre_orders
+    } else {
+        console.log("else")
+        if (!req.session.cart) {
+            req.session.cart = []
         }
-    })
-    const all_posts = cart.pre_orders
-    res.render('users/render_cart', { user, all_posts })
+        all_posts = req.session.cart
+
+    }
+    console.log(all_posts)
+    const place = req.session.place
+    console.log(place)
+    res.render('users/render_cart', { all_posts, place })
 
 }
 
@@ -138,6 +150,7 @@ module.exports.createMessage = async (req, res) => {
 
 //renders orders of final customers
 module.exports.RenderMyOrders = async (req, res) => {
+    console.log("RenderMyOrders")
     try {
         const { id } = req.params
         const user = await User.findById(id).populate({
@@ -151,9 +164,12 @@ module.exports.RenderMyOrders = async (req, res) => {
                 path: 'place'
             }
         })
-
-        res.render('users/render_orders', { user })
+        console.log(req.session.orders)
+        const orders = req.session.orders
+        const place = req.session.place
+        res.render('users/render_orders', { orders, place })
     } catch (e) {
+        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/place')
     }
@@ -186,6 +202,7 @@ module.exports.RenderStoreOrders = async (req, res) => {
 
         res.render('users/render_vendor_orders', { user, place })
     } catch (e) {
+        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/place')
     }
@@ -219,6 +236,7 @@ module.exports.RenderSelect = async (req, res) => {
         }
         res.render('users/render_vendor_section', { user, place, section, all_posts })
     } catch (e) {
+        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/place')
     }
@@ -258,6 +276,7 @@ module.exports.completeOrder = async (req, res) => {
         res.render('users/render_vendor_orders', { user, place })
 
     } catch (e) {
+        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/place')
     }
@@ -287,6 +306,7 @@ module.exports.renderActiveMessage = async (req, res) => {
         await message.save()
         res.render('users/message-active', { message, user_to, user_from, Current_user })
     } catch (e) {
+        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/place')
     }
@@ -312,6 +332,7 @@ module.exports.renderActiveMessageOther = async (req, res) => {
         const user_from = await User.findById(message.from)
         res.render('users/message-active', { message, user_to, user_from, Current_user })
     } catch (e) {
+        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/place')
     }
@@ -387,6 +408,7 @@ module.exports.FiveMin = async (req, res) => {
         const place = user.places[0]
         res.render('users/render_vendor_orders', { user, place })
     } catch (e) {
+        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/place')
     }
@@ -424,6 +446,7 @@ module.exports.Ready = async (req, res) => {
         const place = user.places[0]
         res.render('users/render_vendor_orders', { user, place })
     } catch (e) {
+        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/place')
     }
@@ -447,6 +470,7 @@ module.exports.renderPDF = async (req, res) => {
 
         res.render('users/order_xlx', { user, place })
     } catch (e) {
+        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/place')
     }
@@ -469,6 +493,7 @@ module.exports.renderReport = async (req, res) => {
 
         res.render('users/order_xlx', { user, place })
     } catch (e) {
+        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/place')
     }

@@ -10,6 +10,7 @@ const { jsPDF } = require('jspdf');
 const order = require('../models/order');
 const XLSX = require('xlsx');
 const users = require('../controllers/users');
+const flash = require('connect-flash');
 const { CommandInstance } = require('twilio/lib/rest/preview/wireless/command');
 
 //Creates an article in a place
@@ -79,6 +80,11 @@ module.exports.purchase = async (req, res) => {
         comish = comish.toFixed(2)
         await post_author.save()
         await order.save()
+        if (!req.session.orders) {
+            req.session.orders = [order]
+        } else {
+            req.session.orders.push(order)
+        }
         await place.save()
 
         const session = await stripe.checkout.sessions.create({
@@ -131,6 +137,7 @@ module.exports.renderNew = async (req, res) => {
 
 //agrefa orden al carrito
 module.exports.carrito = async (req, res) => {
+    console.log('carrito')
     try {
         const { id } = req.params
         const post = await Post.findById(id).populate({
@@ -139,35 +146,29 @@ module.exports.carrito = async (req, res) => {
                 path: 'posts'
             }
         }).populate('author')
+        console.log(req.body)
         const pre_order = new Pre_order()
-        const user = await User.findById(req.user.id).populate('messages').populate('cart')
-
-        pre_order.customer = user
         pre_order.posts = post
-        if (req.body.drop_off != 'N/A') {
-
-            pre_order.drop_off = req.body.drop_off
-        }
-        if (req.body.section != 'N/A') {
-
-            pre_order.section = req.body.section
-        }
-        pre_order.letter = req.body.letter
+        pre_order.section = req.body.section
+        pre_order.letter = req.body.row
         pre_order.seat = req.body.seat
         pre_order.price = parseInt(req.body.how_many) * post.price
         var price = (pre_order.price + .3) / (1 - 0.59)
         price = price.toFixed(2)
         pre_order.price_final = price
-        pre_order.quantity = req.body.how_many
-        const cart = user.cart
-        cart.pre_orders.push(pre_order)
-        await cart.save()
-        await user.save()
+        pre_order.quantity = req.body.how_man
+        req.session.cart.push(pre_order)
         await pre_order.save()
         const place = post.place
         const all_posts = place.posts
-        res.render('places/show.ejs', { place, all_posts })
+        const seat = pre_order.seat
+        const row = pre_order.letter
+        const section = pre_order.section
+        const cart_message = true
+        res.render('places/show_numbered.ejs', { place, all_posts, seat, row, section, cart_message })
+
     } catch (e) {
+        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/places')
     }
@@ -186,6 +187,7 @@ module.exports.renderPost = async (req, res) => {
         const all_posts = place.posts
         res.render('places/show_posts.ejs', { place, all_posts })
     } catch (e) {
+        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/places')
     }
@@ -222,6 +224,7 @@ module.exports.showPost = async (req, res) => {
             res.render('users/register_route', { place })
         }
     } catch (e) {
+        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/places')
     };
@@ -235,6 +238,7 @@ module.exports.deletePost = async (req, res) => {
         req.flash('success', 'Successfully deleted post')
         res.redirect('/places');
     } catch (e) {
+        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/places')
     }
@@ -257,6 +261,7 @@ module.exports.updatePost = async (req, res) => {
         req.flash('success', 'Successfully updated space!');
         res.redirect(`/posts/${post._id}`)
     } catch (e) {
+        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/places')
     }
@@ -314,9 +319,15 @@ module.exports.RapidOrder = async (req, res) => {
         await post_author.save()
 
         await order.save()
+        if (!req.session.orders) {
+            req.session.orders = [order]
+        } else {
+            req.session.orders.push(order)
+        }
         res.render('places/payment_method', { order, transaction_fee, price })
     }
     catch (e) {
+        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/places')
     }
@@ -337,9 +348,15 @@ module.exports.RenderConfirmOrder = async (req, res) => {
         const place = await Place.findById(order.posts.place)
         await user.save()
         await order.save()
+        if (!req.session.orders) {
+            req.session.orders = [order]
+        } else {
+            req.session.orders.push(order)
+        }
         const all_posts = place.posts
         res.render('places/show.ejs', { place, all_posts })
     } catch (e) {
+        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/places')
     }
@@ -349,17 +366,23 @@ module.exports.RenderConfirmOrder = async (req, res) => {
 module.exports.Delete = async (req, res) => {
     try {
         const { id } = req.params
+        console.log(id)
+        const pre = await Pre_order.findById(id)
+        console.log(pre)
         await Pre_order.findByIdAndDelete(id)
-        const user = await User.findById(req.user.id)
-        const cart = await Carrito.findById(user.cart).populate({
-            path: 'pre_orders',
-            populate: {
-                path: 'posts'
+        console.log(pre)
+        for (let i = 0; i < req.session.cart.length; i++) {
+            if (!await Pre_order.findById(req.session.cart[i].id)) {
+
+                req.session.cart.splice(i, 1);
             }
-        })
-        const all_posts = cart.pre_orders
-        res.render('users/render_cart', { user, all_posts })
+        }
+        const all_posts = req.session.cart
+
+        const place = req.session.place
+        res.render('users/render_cart', { all_posts, place })
     } catch (e) {
+        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/places')
     }
@@ -367,70 +390,121 @@ module.exports.Delete = async (req, res) => {
 
 
 module.exports.purchaseCash = async (req, res) => {
+    console.log("purchaseCash")
     try {
-        const { id } = req.params
-        const pre_order = await Pre_order.findById(id).populate('posts')
-        const see_pre = await Pre_order.findById(id).populate('posts')
-        const post_author = await User.findById(pre_order.posts.author)
-        const order = new Order()
-        order.is_reported = false
-        order.status = 'En proceso'
-        const day = new Date()
-        order.date = day.getTime()
+        if (req.user) {
+            const { id } = req.params
+            const pre_order = await Pre_order.findById(id).populate('posts')
+            const see_pre = await Pre_order.findById(id).populate('posts')
+            const post_author = await User.findById(pre_order.posts.author)
+            const order = new Order()
+            order.is_reported = false
+            order.status = 'En proceso'
+            const day = new Date()
+            order.date = day.getTime()
 
-        const user = await User.findById(req.user.id).populate('messages')
+            const user = await User.findById(req.user.id).populate('messages')
 
-        order.letter = pre_order.letter
-        order.customer = pre_order.customer
-        order.posts = pre_order.posts
-        order.name = see_pre.posts.title
-        if (req.body.drop_off != 'N/A') {
+            order.letter = pre_order.letter
+            order.customer = pre_order.customer
+            order.posts = pre_order.posts
+            order.name = see_pre.posts.title
+            if (req.body.drop_off != 'N/A') {
 
-            order.drop_off = req.body.drop_off
-        }
-        if (req.body.section != 'N/A') {
-
-            order.section = req.body.section
-        }
-        order.seat = pre_order.seat
-        post_author.orders_to_complete.push(order)
-        order.price = post.price
-        var price = (pre_order.price + .3) / (1 - 0.59)
-        price = price.toFixed(2)
-        order.price_final = price
-        order.place = pre_order.posts.place
-        order.is_delivered = false
-        order.is_paid = false
-        order.cash = true
-        await Pre_order.findByIdAndDelete(id)
-        const place = await Place.findById(pre_order.posts.place)
-        place.orders.push(order)
-        order.conf_num = Math.floor(1000 + Math.random() * 9000);
-
-        await user.save()
-        await post_author.save()
-        await order.save()
-        await place.save()
-        const cart = await Carrito.findById(user.cart).populate({
-            path: 'pre_orders',
-            populate: {
-                path: 'posts'
+                order.drop_off = req.body.drop_off
             }
-        })
-        const all_posts = cart.pre_orders
-        res.render('users/render_cart', { user, all_posts })
+            if (req.body.section != 'N/A') {
 
+                order.section = req.body.section
+            }
+            order.seat = pre_order.seat
+            post_author.orders_to_complete.push(order)
+            order.price = post.price
+            var price = (pre_order.price + .3) / (1 - 0.59)
+            price = price.toFixed(2)
+            order.price_final = price
+            order.place = pre_order.posts.place
+            order.is_delivered = false
+            order.is_paid = false
+            order.cash = true
+            await Pre_order.findByIdAndDelete(id)
+            const place = await Place.findById(pre_order.posts.place)
+            place.orders.push(order)
+            order.conf_num = Math.floor(1000 + Math.random() * 9000);
+
+            await user.save()
+            await post_author.save()
+            await order.save()
+            if (!req.session.orders) {
+                req.session.orders = [order]
+            } else {
+                req.session.orders.push(order)
+            }
+            await place.save()
+            const cart = await Carrito.findById(user.cart).populate({
+                path: 'pre_orders',
+                populate: {
+                    path: 'posts'
+                }
+            })
+            const all_posts = cart.pre_orders
+            res.render('users/render_cart', { user, all_posts })
+        } else {
+            const { id } = req.params
+            console.log(id)
+            const pre_order = await Pre_order.findById(id).populate('posts')
+            console.log(pre_order)
+            const place = await Place.findById(pre_order.posts.place)
+            const see_pre = await Pre_order.findById(id).populate('posts')
+            const post_author = await User.findById(pre_order.posts.author)
+            const order = new Order()
+            order.is_reported = false
+            order.status = 'En proceso'
+            const day = new Date()
+            order.date = day.getTime()
+            order.letter = pre_order.letter
+            order.customer = pre_order.customer
+            order.posts = pre_order.posts
+            order.name = see_pre.posts.title
+            if (req.body.drop_off != 'N/A') {
+
+                order.drop_off = req.body.drop_off
+            }
+            if (req.body.section != 'N/A') {
+
+                order.section = req.body.section
+            }
+            order.seat = pre_order.seat
+            post_author.orders_to_complete.push(order)
+            order.price = pre_order.posts.price
+            var price = (pre_order.price + .3) / (1 - 0.59)
+            price = price.toFixed(2)
+            order.price_final = price
+            order.place = pre_order.posts.place
+            order.is_delivered = false
+            order.is_paid = false
+            order.cash = true
+            await Pre_order.findByIdAndDelete(id)
+            place.orders.push(order)
+            order.conf_num = Math.floor(1000 + Math.random() * 9000);
+
+
+            await post_author.save()
+            await order.save()
+            if (!req.session.orders) {
+                req.session.orders = [order]
+            } else {
+                req.session.orders.push(order)
+            }
+            await place.save()
+            const all_posts = req.session.cart
+            res.render('users/render_cart', { all_posts })
+        }
     } catch (e) {
-        const user = await User.findById(req.user.id)
-        const cart = await Carrito.findById(user.cart).populate({
-            path: 'pre_orders',
-            populate: {
-                path: 'posts'
-            }
-        })
-        const all_posts = cart.pre_orders
+        console.log(e)
+        const all_posts = req.session.cart
         req.flash('Favor de Refrescar Pagine e intentar de nuevo');
-        res.redirect('users/render_cart', { user, all_posts });
+        res.render('users/render_cart', { all_posts });
     }
 }
 
@@ -438,7 +512,7 @@ module.exports.purchaseCash = async (req, res) => {
 
 //route used when user decides to do rapid checkout and uses cash
 module.exports.RapidCash = async (req, res) => {
-
+    console.log('RapidCash')
     try {
         if (req.user) {
 
@@ -460,10 +534,17 @@ module.exports.RapidCash = async (req, res) => {
             await post_author.save()
             await user.save()
             await order.save()
+            if (!req.session.orders) {
+                req.session.orders = [order]
+            } else {
+                req.session.orders.push(order)
+            }
+            console.log(req.session.orders)
             const all_posts = place.posts
             const seat = order.seat
             const row = order.letter
             const section = order.section
+            req.flash('success', 'Se creo tu orden')
             res.render('places/show_numbered.ejs', { place, all_posts, seat, row, section })
         }
         else {
@@ -482,13 +563,21 @@ module.exports.RapidCash = async (req, res) => {
             await place.save()
             await post_author.save()
             await order.save()
+            if (!req.session.orders) {
+                req.session.orders = [order]
+            } else {
+                req.session.orders.push(order)
+            }
+            console.log(req.session.orders)
             const all_posts = place.posts
             const seat = order.seat
             const row = order.letter
             const section = order.section
-            res.render('places/show_numbered.ejs', { place, all_posts, seat, row, section })
+            const order_message = true
+            res.render('places/show_numbered.ejs', { place, all_posts, seat, row, section, order_message })
         }
     } catch (e) {
+        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/places')
     }
@@ -531,6 +620,7 @@ module.exports.RapidCard = async (req, res) => {
         });
         res.redirect(session.url)
     } catch (e) {
+        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/places')
     }
@@ -574,6 +664,7 @@ module.exports.ShowRapid = async (req, res) => {
             res.render('users/register_route', { place })
         }
     } catch (e) {
+        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/places')
     }
@@ -708,6 +799,7 @@ module.exports.showPostNum = async (req, res) => {
         }
 
     } catch (e) {
+        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.redirect('/')
     };
@@ -731,6 +823,7 @@ module.exports.ShowRapidNum = async (req, res) => {
 
 
     } catch (e) {
+        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.redirect('/')
     }
@@ -816,7 +909,12 @@ module.exports.createPDFSection = async (req, res) => {
 
 
     } catch (e) {
+        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.redirect('/places')
     }
+}
+
+module.exports.carritoOrdena = async (req, res) => {
+    console.log(req.body)
 }

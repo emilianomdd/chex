@@ -1,75 +1,75 @@
 <% layout('layouts/boilerplate')%>
     <link rel="stylesheet" href="/stylesheets/stars.css">
     <div class="row">
-        <div class="col-6">
-            <div>
-                <h1>
-                    <%= user.username %>
-                </h1>
+        <% if(place.name){%>
+            <form action="/places/<%=place._id%>" method="GET">
+                <button class="btn btn-primary mb-2">Regresar a <%=place.name%></button>
+            </form>
+            <%}%>
+                <div>
 
-            </div>
 
-        </div>
+                    <% if (orders.length> 0) {%>
 
-        <% if (user.orders.length> 0) {%>
-
-            <h3>Orders: </h3>
-            <% for(let order of user.orders) {%>
-                <% const total_price=((order.price + .3)/(1-.059)).toFixed(2)%>
-                    <% const fees=(total_price - order.price).toFixed(2)%>
-                        <% if((!order.is_delivered && order.is_paid) || (!order.is_delivered && order.cash)){%>
-                            <div class="card mb-3">
-                                <div class="col-md-8">
-                                    <div class="card-body">
-                                        <h3>
-                                            <%=order.quantity%>
-                                                <%= order.posts.title%>
-                                                    <br>
-                                                    Status: <%= order.status %>
-                                        </h3>
-                                        <h5>
-                                            <br>
-                                            Precio: <%=order.price%>$
-                                                <!-- <br>
+                        <h3>Orders: </h3>
+                        <% for(let order of orders) {%>
+                            <% const total_price=((order.price + .3)/(1-.059)).toFixed(2)%>
+                                <% const fees=(total_price - order.price).toFixed(2)%>
+                                    <% if((!order.is_delivered && order.is_paid) || (!order.is_delivered &&
+                                        order.cash)){%>
+                                        <div class="card mb-3">
+                                            <div class="col-md-8">
+                                                <div class="card-body">
+                                                    <h3>
+                                                        <%=order.quantity%>
+                                                            <%= order.posts.title%>
+                                                                <br>
+                                                                Status: <%= order.status %>
+                                                    </h3>
+                                                    <h5>
+                                                        <br>
+                                                        Precio: <%=order.price%>$
+                                                            <!-- <br>
                                                 Fees: <%=fees%>
                                         </h5>
                                         <br>
                                         <h3>
                                             Total Price: <%=total_price%>
                                         </h3> -->
-                                                <% if (order.drop_off=='N/A' ){%>
+                                                            <% if (order.drop_off=='N/A' ){%>
 
-                                                    <%}else{%>
-                                                        <h3 class="card-text">
-                                                            Drop off: <%= order.drop_off %>
-                                                        </h3>
-                                                        <%}%>
-                                                            <% if (order.seat !='N/A' ){%>
-                                                                <h3 class="card-text">
-                                                                    Asiento: <%= order.seat %>
-                                                                        <%=order.letter%>
-                                                                            Section: <%= order.section%>
-                                                                </h3>
-                                                                <%}%>
-                                                                    <% if(order.cash){%>
-                                                                        <p class="card-text">
-                                                                            Metodo de Pago: Efectivo/Terminal
-                                                                        </p>
-                                                                        <%}%>
+                                                                <%}else{%>
+                                                                    <h3 class="card-text">
+                                                                        Drop off: <%= order.drop_off %>
+                                                                    </h3>
+                                                                    <%}%>
+                                                                        <% if (order.seat !='N/A' ){%>
+                                                                            <h3 class="card-text">
+                                                                                Asiento: <%= order.seat %>
+                                                                                    <%=order.letter%>
+                                                                                        Section: <%= order.section%>
+                                                                            </h3>
+                                                                            <%}%>
+                                                                                <% if(order.cash){%>
+                                                                                    <p class="card-text">
+                                                                                        Metodo de Pago:
+                                                                                        Efectivo/Terminal
+                                                                                    </p>
+                                                                                    <%}%>
 
-                                                                            <p class="card-text">
-                                                                                Numero de Confirmacion: <%=
-                                                                                    order.conf_num %>
-                                                                            </p>
-                                    </div>
+                                                                                        <p class="card-text">
+                                                                                            Numero de Confirmacion:
+                                                                                            <%= order.conf_num %>
+                                                                                        </p>
+                                                </div>
 
-                                </div>
-                            </div>
-                            <%}%>
-                                <%}%>
-                                    <% } else{ %>
-                                        <h1>Sin Ordenes al Momento</h1>
+                                            </div>
+                                        </div>
                                         <%}%>
+                                            <%}%>
+                                                <% } else{ %>
+                                                    <h1>Sin Ordenes al Momento</h1>
+                                                    <%}%>
 
 
-    </div>
+                </div>

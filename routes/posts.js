@@ -25,20 +25,21 @@ router.get('/show_rapid_numbered/:id', posts.ShowRapidNum)
 
 router.post('/ordena_rapida/:id', posts.RapidOrder)
 
-router.post('/purchase/:id', isLoggedIn, posts.purchase)
+router.post('/purchase/:id', posts.purchase)
 
 router.post('/rapid_cash/:id', posts.RapidCash)
 
-router.post('/rapid_card/:id', isLoggedIn, posts.RapidCard)
+router.post('/rapid_card/:id', posts.RapidCard)
 
-router.post('/purchase_efectivo/:id', isLoggedIn, posts.purchaseCash)
+router.post('/purchase_efectivo/:id', posts.purchaseCash)
 
-router.post('/cancel/:id', isLoggedIn, posts.Delete)
+router.post('/cancel/:id', posts.Delete)
 
-router.get('/purchase', isLoggedIn, posts.RenderConfirmOrder)
+router.get('/purchase', posts.RenderConfirmOrder)
 
+router.post('/carrito_ordena/:id', posts.carritoOrdena)
 
-router.post('/carrito/:id', isLoggedIn, posts.carrito)
+router.post('/cart_numbered/:id', posts.carrito)
 
 
 router.route('/create_invoice')

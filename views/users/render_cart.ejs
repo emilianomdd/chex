@@ -4,14 +4,16 @@
 
     <div class="row">
         <div class="col-6">
-            <div>
-                <h1>
-                    <%= user.username %>
-                </h1>
-                <h3>
-                    Cart
-                </h3>
-            </div>
+            <% if(place.name){%>
+                <form action="/places/<%=place._id%>" method="GET">
+                    <button class="btn btn-primary mb-2">Regresar a <%=place.name%></button>
+                </form>
+                <%}%>
+                    <div>
+                        <h3>
+                            Carrito
+                        </h3>
+                    </div>
 
         </div>
         <% for(let post of all_posts) {%>
@@ -42,6 +44,7 @@
                                             <%=post.quantity%>
                                                 <%= post.posts.title %> Entregados en Asiento: <%=post.seat%>
                                                         <%=post.letter%>
+                                                            <%=post.section%>
                                         </h3>
                                         <p>
                                             Precio: <%=post.price%>$
@@ -60,12 +63,13 @@
                                                 <!-- <form action="/posts/purchase/<%=post.id%>" method="POST">
                                                     <button class="btn btn-primary mb-2">Pago con Tarjeta</button>
                                                 </form> -->
-                                                <form action="/posts/purchase_efectivo/<%=post.id%>" method="POST">
+                                                <form action="/posts/purchase_efectivo/<%=post._id%>" method="POST">
                                                     <button class="btn btn-primary mb-2">Pago con
                                                         Efectivo/Terminal</button>
                                                 </form>
-                                                <form action="/posts/cancel/<%=post.id%>" method="POST"> <button
-                                                        class="btn btn-primary">Borrar del Carrito</button>
+                                                <form action="/posts/cancel/<%=post._id%>" method="POST"> <button
+                                                        class="btn btn-primary">Borrar del Carrito
+                                                    </button>
                                                 </form>
                                     </div>
                                 </div>

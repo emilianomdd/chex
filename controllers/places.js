@@ -47,6 +47,7 @@ module.exports.createplace = async (req, res, next) => {
 
 //function that will show the place and it's products
 module.exports.showplace = async (req, res,) => {
+    console.log("hi")
     try {
         const user = req.user
         const { id } = req.params
@@ -56,21 +57,33 @@ module.exports.showplace = async (req, res,) => {
                 path: 'author'
             }
         }).populate('author');
+        req.session.place = place
         const all_posts = place.posts
         if (!place) {
             req.flash('error', 'Cannot find that place!');
             return res.redirect('/places');
         }
         if (Object.keys(req.query).length != 0) {
+            req.session.seat = req.query.seat
+            req.session.row = req.query.row
+            req.session.section = req.query.section
             const seat = req.query.seat
             const row = req.query.row
             const section = req.query.section
             res.render('places/show_numbered.ejs', { place, all_posts, seat, row, section, user })
+        } else if (req.session.seat && req.session.row && req.session.section) {
+            const seat = req.session.seat
+            const row = req.session.row
+            const section = req.session.section
+            res.render('places/show_numbered.ejs', { place, all_posts, seat, row, section, user })
         } else {
-            res.render('places/show.ejs', { place, all_posts })
+
+            req.flash('error', 'Escanea el codigo QR!');
+            return res.redirect('/places');
         }
 
     } catch (e) {
+        console.log(e)
         res.falsh('Refresca la Pagina e Intenta de Nuevo')
         res.render('/places')
     }
@@ -90,6 +103,7 @@ module.exports.renderEditForm = async (req, res) => {
         res.render('places/edit', { place });
     }
     catch (e) {
+        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/places')
     }
@@ -105,6 +119,7 @@ module.exports.updateplace = async (req, res) => {
         res.redirect(`/places/${place._id}`)
     }
     catch (e) {
+        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/places')
     }
@@ -120,6 +135,7 @@ module.exports.deleteplace = async (req, res) => {
         res.redirect('/places');
     }
     catch (e) {
+        cosnole.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/places')
     }
@@ -148,6 +164,7 @@ module.exports.RenderConfirmOrder = async (req, res) => {
         res.render('places/show.ejs', { place, all_posts })
     }
     catch (e) {
+        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/places')
     }
@@ -180,6 +197,7 @@ module.exports.renderCategory = async (req, res) => {
         router.get('/render-orders-store/:id', users.RenderStoreOrders)
 
     } catch (e) {
+        console.log(e)
         res.falsh('Refresca la Pagina e Intenta de Nuevo')
         res.render('/places')
     }
@@ -215,6 +233,7 @@ module.exports.renderCategoryNum = async (req, res) => {
         res.render('places/show_numbered.ejs', { place, all_posts, seat, row, section })
 
     } catch (e) {
+        console.log(e)
         res.redirect('/places')
     }
 }
