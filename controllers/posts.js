@@ -166,7 +166,6 @@ module.exports.carrito = async (req, res) => {
         const section = pre_order.section
         const cart_message = true
         res.render('places/show_numbered.ejs', { place, all_posts, seat, row, section, cart_message })
-
     } catch (e) {
         console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
