@@ -773,7 +773,7 @@ module.exports.createReport = async (req, res) => {
         file_num = Math.floor(1000 + Math.random() * 9000);
         const filename = `${day}_${month}_${year}--${file_num}.xlsx`;
         const wb_opts = { bookType: 'xlsx', type: 'binary' };   // workbook options
-        XLSX.writeFile(workBook, filename, wb_opts);
+        res.sendFile(XLSX.writeFile(workBook, filename, wb_opts));
 
         res.redirect('/')
     } catch (e) {
@@ -874,7 +874,6 @@ module.exports.createPDFSection = async (req, res) => {
         year = date.getFullYear()
 
         file_num = Math.floor(1000 + Math.random() * 9000);
-        doc.save(`${day}_${month}_${year}--${file_num}.pdf`)
 
         const id_user = req.user.id
         const user = await User.findById(id_user).populate({
@@ -904,6 +903,7 @@ module.exports.createPDFSection = async (req, res) => {
                 all_posts.push(order)
             }
         }
+        res.sendFile(doc)
         res.render('users/render_vendor_section', { user, place, section, all_posts })
 
 
