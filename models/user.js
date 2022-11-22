@@ -2,8 +2,6 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const passportLocalMongoose = require('passport-local-mongoose');
 const Place = require('./place')
-const Review = require('./review')
-const Message = require('./message')
 const Post = require('./post')
 const Order = require('./order')
 const Carrito = require('./carrito')
@@ -49,12 +47,7 @@ const UserSchema = new Schema({
             ref: 'Place'
         }
     ],
-    reviews: [
-        {
-            type: Schema.Types.ObjectId,
-            ref: 'Review'
-        }
-    ],
+
     messages: [
         {
             type: Schema.Types.ObjectId,

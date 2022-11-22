@@ -32,6 +32,7 @@ module.exports.createPost = async (req, res, next) => {
         await user.save();
         res.redirect('/places')
     } catch (e) {
+        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.redirect('/places')
     }
@@ -109,6 +110,7 @@ module.exports.purchase = async (req, res) => {
         });
         res.redirect(session.url)
     } catch (e) {
+        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/places')
     }
@@ -129,6 +131,7 @@ module.exports.renderNew = async (req, res) => {
         const place = await Place.findById(id)
         res.render('posts/new.ejs', { place })
     } catch (e) {
+        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/places')
     }
@@ -137,7 +140,6 @@ module.exports.renderNew = async (req, res) => {
 
 //agrefa orden al carrito
 module.exports.carrito = async (req, res) => {
-    console.log('carrito')
     try {
         const { id } = req.params
         const post = await Post.findById(id).populate({
@@ -146,7 +148,6 @@ module.exports.carrito = async (req, res) => {
                 path: 'posts'
             }
         }).populate('author')
-        console.log(req.body)
         const pre_order = new Pre_order()
         pre_order.posts = post
         pre_order.section = req.body.section
@@ -365,11 +366,8 @@ module.exports.RenderConfirmOrder = async (req, res) => {
 module.exports.Delete = async (req, res) => {
     try {
         const { id } = req.params
-        console.log(id)
         const pre = await Pre_order.findById(id)
-        console.log(pre)
         await Pre_order.findByIdAndDelete(id)
-        console.log(pre)
         for (let i = 0; i < req.session.cart.length; i++) {
             if (!await Pre_order.findById(req.session.cart[i].id)) {
 
@@ -389,7 +387,6 @@ module.exports.Delete = async (req, res) => {
 
 
 module.exports.purchaseCash = async (req, res) => {
-    console.log("purchaseCash")
     try {
         if (req.user) {
             const { id } = req.params
@@ -450,9 +447,7 @@ module.exports.purchaseCash = async (req, res) => {
             res.render('users/render_cart', { user, all_posts })
         } else {
             const { id } = req.params
-            console.log(id)
             const pre_order = await Pre_order.findById(id).populate('posts')
-            console.log(pre_order)
             const place = await Place.findById(pre_order.posts.place)
             const see_pre = await Pre_order.findById(id).populate('posts')
             const post_author = await User.findById(pre_order.posts.author)
@@ -511,7 +506,6 @@ module.exports.purchaseCash = async (req, res) => {
 
 //route used when user decides to do rapid checkout and uses cash
 module.exports.RapidCash = async (req, res) => {
-    console.log('RapidCash')
     try {
         if (req.user) {
 
@@ -538,7 +532,6 @@ module.exports.RapidCash = async (req, res) => {
             } else {
                 req.session.orders.push(order)
             }
-            console.log(req.session.orders)
             const all_posts = place.posts
             const seat = order.seat
             const row = order.letter
@@ -567,7 +560,6 @@ module.exports.RapidCash = async (req, res) => {
             } else {
                 req.session.orders.push(order)
             }
-            console.log(req.session.orders)
             const all_posts = place.posts
             const seat = order.seat
             const row = order.letter
@@ -743,6 +735,7 @@ module.exports.createPDF = async (req, res, next) => {
         res.render('users/render_vendor_orders', { user, place })
 
     } catch (e) {
+        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.redirect('/places')
     }
@@ -777,6 +770,7 @@ module.exports.createReport = async (req, res) => {
 
         res.redirect('/')
     } catch (e) {
+        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.redirect('/')
     }
@@ -790,7 +784,6 @@ module.exports.showPostNum = async (req, res) => {
         const seat = req.query.seat
         const row = req.query.row
         const section = req.query.section
-        console.log("showPost")
         if (req.query.seat) {
             res.render("posts/show_num", { post, place, seat, row, section })
         } else {
@@ -806,7 +799,6 @@ module.exports.showPostNum = async (req, res) => {
 //show  route for when user clicks rapid checkout
 module.exports.ShowRapidNum = async (req, res) => {
     try {
-        console.log("showRapidNum")
         const { id } = req.params;
         const post = await Post.findById(id).populate("place");
         const place = post.place;

@@ -24,19 +24,13 @@ router.post('/five/:id', users.FiveMin)
 
 router.post('/ready/:id', users.Ready)
 
-router.route('/message/:id')
-    .get(users.renderMessage)
-    .put(users.renderActiveMessage)
-    .post(users.createMessage)
 
 
 router.get('/render-orders-store/:id', users.RenderStoreOrders)
 
 router.get('/render_vendor_section/:id', users.RenderSelect)
 
-router.get('/message-active/:id', users.renderActiveMessageOther)
 
-router.get('/render-messages', users.renderMessages)
 
 router.post('/order/complete/:id', isLoggedIn, users.completeOrder)
 

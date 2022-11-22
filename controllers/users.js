@@ -1,6 +1,5 @@
 const User = require('../models/user');
 const Place = require('../models/place');
-const Message = require('../models/message');
 const stripe = require('stripe')(process.env.STRIPE_KEY)
 const Order = require('../models/order')
 const Carrito = require('../models/carrito');
@@ -34,6 +33,7 @@ module.exports.register = async (req, res, next) => {
             res.redirect('/places');
         })
     } catch (e) {
+        console.log(e)
         req.flash('error', e.message);
         res.redirect('/places');
     }
@@ -47,6 +47,7 @@ module.exports.RenderVendor = async (req, res, next) => {
         res.render('users/register_vendor', { place })
     }
     catch (e) {
+        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/camoground')
     }
@@ -81,6 +82,7 @@ module.exports.RegisterVendor = async (req, res, next) => {
             res.redirect(accountLink.url);
         })
     } catch (e) {
+        console.log(e)
         req.flash('error', e.message);
         res.redirect('/place');
     }
@@ -109,9 +111,7 @@ module.exports.RenderCart = async (req, res) => {
         all_posts = req.session.cart
 
     }
-    console.log(all_posts)
     const place = req.session.place
-    console.log(place)
     res.render('users/render_cart', { all_posts, place })
 
 }
@@ -245,6 +245,7 @@ module.exports.RenderSelect = async (req, res) => {
 
 //Completes order
 module.exports.completeOrder = async (req, res) => {
+    console.log('completeOrder 246')
     try {
         const { id } = req.params
         const order = await Order.findById(id)
@@ -261,17 +262,9 @@ module.exports.completeOrder = async (req, res) => {
                 }
             }
         ).populate('places')
-        client.messages
-            .create({
-                body: 'Su orden ha sido entregada',
-                from: 'whatsapp:+14155238886',
-                to: `whatsapp:+15129654086`
-            })
-            .done()
         order.is_delivered = true
         order.is_paid = true
         await order.save()
-
         const place = user.places[0]
         res.render('users/render_vendor_orders', { user, place })
 
@@ -282,82 +275,9 @@ module.exports.completeOrder = async (req, res) => {
     }
 }
 
-//renders messages between people
-module.exports.renderActiveMessage = async (req, res) => {
-    try {
-        const { id } = req.params
-        const message = await Message.findById(id)
-        var txt = req.body.message.body
-        const Current_user = await User.findById(req.user.id).populate({
-            path: 'messages',
-            populate: {
-                path: 'to'
-            }
-        }).populate({
-            path: 'messages',
-            populate: {
-                path: 'from'
-            }
-        });
-        txt = txt + ` - ${Current_user.username}`
-        const user_to = await User.findById(message.to)
-        const user_from = await User.findById(message.from)
-        message.body.push(txt)
-        await message.save()
-        res.render('users/message-active', { message, user_to, user_from, Current_user })
-    } catch (e) {
-        console.log(e)
-        req.flash('Refresca la Pagina e Intenta de Nuevo')
-        res.render('/place')
-    }
-}
-
-//don't know doesn't matter right now
-module.exports.renderActiveMessageOther = async (req, res) => {
-    try {
-        const { id } = req.params
-        const message = await Message.findById(id)
-        const Current_user = await User.findById(req.user.id).populate({
-            path: 'messages',
-            populate: {
-                path: 'to'
-            }
-        }).populate({
-            path: 'messages',
-            populate: {
-                path: 'from'
-            }
-        });
-        const user_to = await User.findById(message.to)
-        const user_from = await User.findById(message.from)
-        res.render('users/message-active', { message, user_to, user_from, Current_user })
-    } catch (e) {
-        console.log(e)
-        req.flash('Refresca la Pagina e Intenta de Nuevo')
-        res.render('/place')
-    }
-}
 
 
-module.exports.renderMessage = async (req, res) => {
-    const user = await User.findById(req.params.id)
-    res.render('users/message', { user })
-}
 
-module.exports.renderMessages = async (req, res) => {
-    const Current_user = await User.findById(req.user.id).populate({
-        path: 'messages',
-        populate: {
-            path: 'to'
-        }
-    }).populate({
-        path: 'messages',
-        populate: {
-            path: 'from'
-        }
-    });
-    res.render('users/render-messages', { Current_user })
-}
 module.exports.renderLogin = (req, res) => {
     res.render('users/login');
 }

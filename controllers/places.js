@@ -47,7 +47,6 @@ module.exports.createplace = async (req, res, next) => {
 
 //function that will show the place and it's products
 module.exports.showplace = async (req, res,) => {
-    console.log("hi")
     try {
         const user = req.user
         const { id } = req.params
@@ -83,7 +82,6 @@ module.exports.showplace = async (req, res,) => {
         }
 
     } catch (e) {
-        console.log(e)
         res.falsh('Refresca la Pagina e Intenta de Nuevo')
         res.render('/places')
     }
@@ -103,7 +101,6 @@ module.exports.renderEditForm = async (req, res) => {
         res.render('places/edit', { place });
     }
     catch (e) {
-        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/places')
     }
@@ -119,7 +116,6 @@ module.exports.updateplace = async (req, res) => {
         res.redirect(`/places/${place._id}`)
     }
     catch (e) {
-        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/places')
     }
@@ -164,7 +160,6 @@ module.exports.RenderConfirmOrder = async (req, res) => {
         res.render('places/show.ejs', { place, all_posts })
     }
     catch (e) {
-        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/places')
     }
@@ -197,7 +192,6 @@ module.exports.renderCategory = async (req, res) => {
         router.get('/render-orders-store/:id', users.RenderStoreOrders)
 
     } catch (e) {
-        console.log(e)
         res.falsh('Refresca la Pagina e Intenta de Nuevo')
         res.render('/places')
     }
@@ -233,7 +227,6 @@ module.exports.renderCategoryNum = async (req, res) => {
         res.render('places/show_numbered.ejs', { place, all_posts, seat, row, section })
 
     } catch (e) {
-        console.log(e)
         res.redirect('/places')
     }
 }

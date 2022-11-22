@@ -86,20 +86,19 @@
                                                                                 Metodo de Pago: Paid
                                                                             </p>
                                                                             <%}%>
-                                                                                <form
-                                                                                    action="/order/complete/<%=order.id%>"
-                                                                                    method="POST">
-                                                                                    <button>Completar Orden</button>
-                                                                                </form>
-                                                                                <form action="/five/<%=order.id%>"
-                                                                                    method="POST">
-                                                                                    <button>Lista en 5 Minutos</button>
-                                                                                </form>
 
-                                                                                <form action="/ready/<%=order.id%>"
-                                                                                    method="POST">
-                                                                                    <button>Lista para Recoger</button>
-                                                                                </form>
+                                                                                <input type="submit"
+                                                                                    formaction="/order/complete/<%=order.id%>"
+                                                                                    value="Completar Orden"
+                                                                                    class="btn mt-2 btn-outline-secondary btn-block">
+                                                                                <input type="submit"
+                                                                                    formaction="/five/<%=order.id%>"
+                                                                                    value="Lista en 5 Minutos"
+                                                                                    class="btn mt-2 btn-outline-secondary btn-block">
+                                                                                <input type="submit"
+                                                                                    formaction="/ready/<%=order.id%>"
+                                                                                    value="Lista para Recoger"
+                                                                                    class="btn mt-2 btn-outline-secondary btn-block">
                             </div>
                         </div>
 
