@@ -10,6 +10,7 @@ const { jsPDF } = require('jspdf');
 const order = require('../models/order');
 const XLSX = require('xlsx');
 const users = require('../controllers/users');
+const path = require('path')
 const flash = require('connect-flash');
 const { CommandInstance } = require('twilio/lib/rest/preview/wireless/command');
 
@@ -766,7 +767,9 @@ module.exports.createReport = async (req, res) => {
         file_num = Math.floor(1000 + Math.random() * 9000);
         const filename = `${day}_${month}_${year}--${file_num}.xlsx`;
         const wb_opts = { bookType: 'xlsx', type: 'binary' };   // workbook options
-        res.sendFile(XLSX.writeFile(workBook, filename, wb_opts));
+        const xl_file = XLSX.writeFile(workBook, filename, wb_opts)
+        // res.sendFile(xl_file);
+        res.download(path.resolve(`./${wb_opts}`))
 
         res.redirect('/')
     } catch (e) {

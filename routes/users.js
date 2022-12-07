@@ -30,7 +30,9 @@ router.get('/render-orders-store/:id', users.RenderStoreOrders)
 
 router.get('/render_vendor_section/:id', users.RenderSelect)
 
+router.get('/order/complete/:id', users.RenderSelectConfirm)
 
+router.get('/render_vendor_section_xlx/:id', users.RenderSelectXlx)
 
 router.post('/order/complete/:id', isLoggedIn, users.completeOrder)
 

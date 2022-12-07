@@ -198,9 +198,9 @@ module.exports.RenderStoreOrders = async (req, res) => {
             }
         ).populate('places')
         const place = user.places[0]
+        const order_completed = 'q'
 
-
-        res.render('users/render_vendor_orders', { user, place })
+        res.render('users/render_vendor_orders', { user, place, order_completed })
     } catch (e) {
         console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
@@ -210,8 +210,9 @@ module.exports.RenderStoreOrders = async (req, res) => {
 
 //Renders incomoing orders on a specific location
 module.exports.RenderSelect = async (req, res) => {
+    console.log('RenderSelect')
     try {
-        const section = req.query.section
+        const section = req.query.section.trim()
         const { id } = req.params
         const user = await User.findById(id).populate({
             path: 'orders_to_complete',
@@ -234,7 +235,8 @@ module.exports.RenderSelect = async (req, res) => {
                 all_posts.push(order)
             }
         }
-        res.render('users/render_vendor_section', { user, place, section, all_posts })
+        const order_completed = 'd'
+        res.render('users/render_vendor_section', { user, place, section, all_posts, order_completed })
     } catch (e) {
         console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
@@ -245,7 +247,7 @@ module.exports.RenderSelect = async (req, res) => {
 
 //Completes order
 module.exports.completeOrder = async (req, res) => {
-    console.log('completeOrder 246')
+    console.log('completeOrder 251')
     try {
         const { id } = req.params
         const order = await Order.findById(id)
@@ -264,9 +266,12 @@ module.exports.completeOrder = async (req, res) => {
         ).populate('places')
         order.is_delivered = true
         order.is_paid = true
+        console.log(order.is_paid)
+        console.log(order.is_delivered)
         await order.save()
         const place = user.places[0]
-        res.render('users/render_vendor_orders', { user, place })
+        const order_completed = order
+        res.render('users/render_vendor_orders', { user, place, order_completed })
 
     } catch (e) {
         console.log(e)
@@ -326,7 +331,9 @@ module.exports.FiveMin = async (req, res) => {
             .done()
         await order.save()
         const place = user.places[0]
-        res.render('users/render_vendor_orders', { user, place })
+
+        const order_completed = 'q'
+        res.render('users/render_vendor_orders', { user, place, order_completed })
     } catch (e) {
         console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
@@ -364,7 +371,8 @@ module.exports.Ready = async (req, res) => {
         order.status = 'Orden lista para recoger'
         await order.save()
         const place = user.places[0]
-        res.render('users/render_vendor_orders', { user, place })
+        const order_completed = 'q'
+        res.render('users/render_vendor_orders', { user, place, order_completed })
     } catch (e) {
         console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
@@ -418,6 +426,84 @@ module.exports.renderReport = async (req, res) => {
         res.render('/place')
     }
 }
+
+module.exports.RenderSelectXlx = async (req, res) => {
+    try {
+        const section = req.query.section.trim()
+        const { id } = req.params
+        const user = await User.findById(id).populate({
+            path: 'orders_to_complete',
+            populate: {
+                path: 'posts',
+            }
+        }).populate(
+            {
+                path: 'orders_to_complete',
+                populate: {
+                    path: 'customer',
+                }
+            }
+        ).populate('places')
+        const place = user.places[0]
+        const orders = user.orders_to_complete
+        const all_posts = []
+        console.log(orders.length)
+        for (let order of orders) {
+            if (order.section == section) {
+                all_posts.push(order)
+            }
+        }
+        console.log(all_posts)
+        res.render('users/render_vendor_section_xlx', { user, place, section, all_posts })
+    } catch (e) {
+        console.log(e)
+        req.flash('Refresca la Pagina e Intenta de Nuevo')
+        res.render('/place')
+
+    }
+}
+
+module.exports.RenderSelectConfirm = async (req, res) => {
+    console.log('Render Select Confirm 496')
+    console.log(req.query)
+    try {
+        const section = req.query.trim()
+        const { id } = req.params
+        const order = await Order.findById(id)
+        const user = await User.findById(req.user.id).populate({
+            path: 'orders_to_complete',
+            populate: {
+                path: 'posts',
+            }
+        }).populate(
+            {
+                path: 'orders_to_complete',
+                populate: {
+                    path: 'customer',
+                }
+            }
+        ).populate('places')
+        order.is_delivered = true
+        order.is_paid = true
+        await order.save()
+        const place = user.places[0]
+        const order_completed = order
+        const orders = user.orders_to_complete
+        const all_posts = []
+        for (let order of orders) {
+            if (order.section == section) {
+                all_posts.push(order)
+            }
+        }
+        res.render('users/render_vendor_section', { all_posts, user, place, order_completed, section })
+
+    } catch (e) {
+        console.log(e)
+        req.flash('Refresca la Pagina e Intenta de Nuevo')
+        res.render('/place')
+    }
+}
+
 // module.exports.renderForgot = async (req, res) => {
 //     res.render("users/forgot");
 // };

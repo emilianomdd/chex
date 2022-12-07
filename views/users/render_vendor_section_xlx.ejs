@@ -11,25 +11,22 @@
                 <%}%>
                     <button class="btn btn-dark btn-block mt-2">Buscar Ordenes en Seccion Especifica</button>
         </form>
-    </div>
-    <div class="col-6">
-        <h1>Vendorr</h1>
-        <div>
-            <h1>
-                <%= section%>
-            </h1>
-            <h3>
-                Orders:
-            </h3>
-        </div>
+        <div class="col-6">
+            <div>
+                <h1>
+                    <%= section%>
+                </h1>
+                <h3>
+                    Orders:
+                </h3>
+            </div>
 
-    </div>
-    <form action="/order/create_invoice" method="POST">
-        <button class="btn btn-dark btn-block mb-2">Crear Recivo</button>
-        <h1>section</h1>
-        <% for(let order of all_posts) {%>
-            <% if((!order.is_delivered && order.is_paid) || (!order.is_delivered && order.cash)){%>
-                <%if(order.id !=order_completed.id){%>
+        </div>
+        <form action="/order/create_report" method="POST">
+            <input type="hidden" name="section" id="section" value="<%=section%>">
+            <button class="btn btn-dark btn-block mt-2">Crear Reporte</button>
+            <% for(let order of all_posts) {%>
+                <% if(order.is_delivered && !order.is_reported){%>
                     <div class="card mb-3">
 
                         <div class="col-md-8">
@@ -90,26 +87,36 @@
                                                                                 Metodo de Pago: Paid
                                                                             </p>
                                                                             <%}%>
-                                                                                <input type="submit"
-                                                                                    formaction="/order/complete?section=<%=section%>"
-                                                                                    value="Completar Orden"
-                                                                                    class="btn mt-2 btn-outline-secondary btn-block">
-                                                                                <input type="submit"
-                                                                                    formaction="/five/<%=order.id%>"
-                                                                                    value="Lista en 5 Minutos"
-                                                                                    class="btn mt-2 btn-outline-secondary btn-block">
-                                                                                <input type="submit"
-                                                                                    formaction="/ready/<%=order.id%>"
-                                                                                    value="Lista para Recoger"
-                                                                                    class="btn mt-2 btn-outline-secondary btn-block">
+                                                                                <form
+                                                                                    action="/order/complete/<%=order.id%>"
+                                                                                    method="POST">
+                                                                                    <button
+                                                                                        class="btn btn-dark btn-block mt-2">Completar
+                                                                                        Orden</button>
+                                                                                </form>
+                                                                                <form action="/five/<%=order.id%>"
+                                                                                    method="POST">
+                                                                                    <button
+                                                                                        class="btn btn-dark btn-block mt-2">Lista
+                                                                                        en 5
+                                                                                        Minutos</button>
+                                                                                </form>
+
+                                                                                <form action="/ready/<%=order.id%>"
+                                                                                    method="POST">
+                                                                                    <button
+                                                                                        class="btn btn-dark btn-block mt-2">Lista
+                                                                                        para
+                                                                                        Recoger</button>
+                                                                                </form>
                             </div>
                         </div>
+
                         <%}%>
-                            <%}%>
-                                <% } %>
+                            <% } %>
                     </div>
 
-    </form>
+        </form>
     </div>
     </div>
 
