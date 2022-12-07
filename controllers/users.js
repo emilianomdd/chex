@@ -75,6 +75,9 @@ module.exports.RegisterVendor = async (req, res, next) => {
         user.store = true
         user.stripe_account = account.id
         user.is_vendor = true
+
+        place.online_payments = true
+        await place.save()
         const registeredUser = await User.register(user, password);
         req.login(registeredUser, err => {
             if (err) return next(err);
@@ -521,7 +524,7 @@ module.exports.RenderStripe = async (req, res, next) => {
 //registers the vendor in the system with stripe onboarding andliked to its proper place
 module.exports.RegisterStripe = async (req, res, next) => {
 
-    const { id } = req.paramss
+    const { id } = req.params
     const place = await Place.findById(id)
     const { email } = req.body
     const account = await stripe.accounts.create({ type: 'express' });
@@ -534,18 +537,15 @@ module.exports.RegisterStripe = async (req, res, next) => {
     });
 
     try {
-        const { username, password } = req.body;
-        const user = new User({ email, username, password });
-        user.places.push(place)
+        const user = req.user
         user.store = true
         user.stripe_account = account.id
+
+        place.online_payments = true
+        await place.save()
         user.is_vendor = true
-        const registeredUser = await User.register(user, password);
-        req.login(registeredUser, err => {
-            if (err) return next(err);
-            req.flash('success', 'Welcome to Cargi!');
-            res.redirect(accountLink.url);
-        })
+        user.email = email
+        res.redirect(accountLink.url);
     } catch (e) {
         console.log(e)
         req.flash('error', e.message);
