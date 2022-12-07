@@ -36,7 +36,8 @@ const OrderSchema = new Schema({
     },
     date: Date,
     cash: Boolean,
-    conf_num: Number
+    conf_num: Number,
+    tip: Number
 });
 
 

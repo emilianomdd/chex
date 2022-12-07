@@ -16,6 +16,8 @@ router.post('register_special', users.register)
 
 router.get('/render_vendor_register/:id', users.RenderVendor)
 
+router.post('/register_stripe/:id', users.RenderStripe)
+
 router.post('/create_store/:id', users.RegisterVendor)
 
 router.get('/render-cart', users.RenderCart)

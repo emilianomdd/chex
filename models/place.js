@@ -33,7 +33,8 @@ const PlaceSchema = new Schema({
     author: {
         type: Schema.Types.ObjectId,
         ref: 'User'
-    }
+    },
+    online_payments: Boolean
 }, opts);
 
 

@@ -24,6 +24,12 @@ module.exports.renderNewForm = (req, res) => {
 //Function to create a place
 module.exports.createplace = async (req, res, next) => {
     const place = new Place(req.body.place);
+    if (req.body.online_payments == 'si') {
+        place.online_payments = true
+    }
+    else {
+        place.online_payments = false
+    }
     const user = await User.findById(req.user._id);
     if (req.body.place.drop_offs != '') {
         place.drop_offs = req.body.place.drop_offs.split(',')

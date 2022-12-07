@@ -504,6 +504,55 @@ module.exports.RenderSelectConfirm = async (req, res) => {
     }
 }
 
+module.exports.RenderStripe = async (req, res, next) => {
+    console.log('hi')
+    try {
+        const { id } = req.params
+        const place = await Place.findById(id)
+        res.render('users/register_stripe.ejs', { place })
+    }
+    catch (e) {
+        console.log(e)
+        req.flash('Refresca la Pagina e Intenta de Nuevo')
+        res.render('/camoground')
+    }
+}
+
+//registers the vendor in the system with stripe onboarding andliked to its proper place
+module.exports.RegisterStripe = async (req, res, next) => {
+
+    const { id } = req.paramss
+    const place = await Place.findById(id)
+    const { email } = req.body
+    const account = await stripe.accounts.create({ type: 'express' });
+    const accountLink = await stripe.accountLinks.create({
+
+        account: account.id,
+        refresh_url: 'https://cargi.herokuapp.com/places',
+        return_url: 'https://cargi.herokuapp.com/places',
+        type: 'account_onboarding'
+    });
+
+    try {
+        const { username, password } = req.body;
+        const user = new User({ email, username, password });
+        user.places.push(place)
+        user.store = true
+        user.stripe_account = account.id
+        user.is_vendor = true
+        const registeredUser = await User.register(user, password);
+        req.login(registeredUser, err => {
+            if (err) return next(err);
+            req.flash('success', 'Welcome to Cargi!');
+            res.redirect(accountLink.url);
+        })
+    } catch (e) {
+        console.log(e)
+        req.flash('error', e.message);
+        res.redirect('/place');
+    }
+
+}
 // module.exports.renderForgot = async (req, res) => {
 //     res.render("users/forgot");
 // };

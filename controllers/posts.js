@@ -541,6 +541,9 @@ module.exports.RapidCash = async (req, res) => {
             res.render('places/show_numbered.ejs', { place, all_posts, seat, row, section })
         }
         else {
+            console.log(req.body)
+            console.log(req.params)
+            console.log(req.query)
             const { id } = req.params
             const order = await Order.findById(id).populate({
                 path: 'place',
@@ -553,6 +556,11 @@ module.exports.RapidCash = async (req, res) => {
             const post_author = await User.findById(order.posts.author)
             order.cash = true
             order.is_delivered = false
+            order.tip = (parseInt(req.body.tip) / 100) * order.price
+            order.email = req.body.user_email
+            if (order.email) {
+                //send email with twilio!!!!!!!!!!
+            }
             await place.save()
             await post_author.save()
             await order.save()
@@ -562,6 +570,7 @@ module.exports.RapidCash = async (req, res) => {
                 req.session.orders.push(order)
             }
             const all_posts = place.posts
+
             const seat = order.seat
             const row = order.letter
             const section = order.section

@@ -15,6 +15,9 @@
                     <div class="btn-group">
                         <a href="/render_vendor_register/<%=place.id%>">link para invitar a vandedores</a>
                     </div>
+                    <div class="btn-group">
+                        <a href="/render_vendor_register/<%=place.id%>">link para activar pagos en linea</a>
+                    </div>
                     <%}%>
                         <%if( currentUser.is_vendor && place.author.equals(currentUser._id) || currentUser.is_manager &&
                             place.author.equals(currentUser._id) ){%>

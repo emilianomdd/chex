@@ -9,7 +9,7 @@
                 <div>
 
 
-                    <% if (orders.length> 0) {%>
+                    <% if (orders) {%>
 
                         <h3>Orders: </h3>
                         <% for(let order of orders) {%>
@@ -29,38 +29,48 @@
                                                     <h5>
                                                         <br>
                                                         Precio: <%=order.price%>$
-                                                            <!-- <br>
+                                                            <br>
+                                                            Propina: <%=order.tip%>$
+                                                                <% const total=order.price + order.tip%>
+                                                                    <br>
+                                                                    Total: <%=total%>
+
+                                                                        <!-- <br>
                                                 Fees: <%=fees%>
                                         </h5>
                                         <br>
                                         <h3>
                                             Total Price: <%=total_price%>
                                         </h3> -->
-                                                            <% if (order.drop_off=='N/A' ){%>
+                                                                        <% if (order.drop_off=='N/A' ){%>
 
-                                                                <%}else{%>
-                                                                    <h3 class="card-text">
-                                                                        Drop off: <%= order.drop_off %>
-                                                                    </h3>
-                                                                    <%}%>
-                                                                        <% if (order.seat !='N/A' ){%>
-                                                                            <h3 class="card-text">
-                                                                                Asiento: <%= order.seat %>
-                                                                                    <%=order.letter%>
-                                                                                        Section: <%= order.section%>
-                                                                            </h3>
-                                                                            <%}%>
-                                                                                <% if(order.cash){%>
-                                                                                    <p class="card-text">
-                                                                                        Metodo de Pago:
-                                                                                        Efectivo/Terminal
-                                                                                    </p>
-                                                                                    <%}%>
+                                                                            <%}else{%>
+                                                                                <h3 class="card-text">
+                                                                                    Drop off: <%= order.drop_off %>
+                                                                                </h3>
+                                                                                <%}%>
+                                                                                    <% if (order.seat !='N/A' ){%>
+                                                                                        <h3 class="card-text">
+                                                                                            Asiento: <%= order.seat %>
+                                                                                                <%=order.letter%>
+                                                                                                    Section: <%=
+                                                                                                        order.section%>
+                                                                                        </h3>
+                                                                                        <%}%>
+                                                                                            <% if(order.cash){%>
+                                                                                                <p class="card-text">
+                                                                                                    Metodo de Pago:
+                                                                                                    Efectivo/Terminal
+                                                                                                </p>
+                                                                                                <%}%>
 
-                                                                                        <p class="card-text">
-                                                                                            Numero de Confirmacion:
-                                                                                            <%= order.conf_num %>
-                                                                                        </p>
+                                                                                                    <p
+                                                                                                        class="card-text">
+                                                                                                        Numero de
+                                                                                                        Confirmacion:
+                                                                                                        <%= order.conf_num
+                                                                                                            %>
+                                                                                                    </p>
                                                 </div>
 
                                             </div>

@@ -10,10 +10,14 @@
                     <button class="btn btn-success">Agrgar Producto</button>
                 </form>
             </div>
+            <br>
             <%}%>
                 <% if(currentUser.places.includes(place.id) && currentUser.is_manager){%>
                     <div class="btn-group">
-                        <a href="/render_vendor_register/<%=place.id%>">link para invitar a vandedores</a>
+                        <a href="/render_vendor_register/<%=place.id%>">link para invitar a vendedores</a>
+                    </div>
+                    <div class="btn-group">
+                        <a href="/render_stripe/<%=place.id%>">link para activar pagos en linea</a>
                     </div>
                     <%}%>
                         <%if( currentUser.is_vendor && place.author.equals(currentUser._id) || currentUser.is_manager &&

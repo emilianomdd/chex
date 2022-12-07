@@ -22,7 +22,33 @@
                     </p>
 
                     <form action="/posts/rapid_cash/<%=order.id%>" method="POST">
-                        <button class="btn btn-primary mb-2">Crear Orden</button>
+                        <div class="col-12 col-md-4 mb-2">
+                            <label class="form-label" for="tip">Agregar Propina:</label>
+                            <select id="tip" name="tip" class="form-control">
+                                <option value="15">
+                                    15% (total: <%= order.price + ( order.price * 0.15)%>)
+                                </option>
+                                <option value="10">
+                                    10% (total: <%= order.price + ( order.price * 0.1)%>)
+                                </option>
+
+                                <option value="20">
+                                    20% (total: <%= order.price + ( order.price * 0.2)%>)
+                                </option>
+                                <option value="25">
+                                    25% (total: <%= order.price + ( order.price * 0.25)%>)
+                                </option>
+
+                            </select>
+                        </div>
+                        Proporcional email para recibir el recivo:
+                        <input type="email" name="user_email">
+                        <br>
+                        <button class="btn btn-primary mb-2 mt-2">Comprar con Efectivo/Terminal</button>
+                        <% if(order.place.online_payment){%>
+                            <input type="submit" formaction="/five/<%=order.id%>" value="Pagar en Linea"
+                                class="btn mt-2 btn-outline-secondary btn-block">
+                            <%}%>
                     </form>
                     <!-- <form action="/posts/rapid_card/<%=order.id%>" method="POST">
                                         <button class="btn btn-primary">Pay with Card</button>
