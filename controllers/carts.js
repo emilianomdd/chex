@@ -241,8 +241,8 @@ module.exports.onlinePurchase = async (req, res) => {
                 }
             }),
             mode: 'payment',
-            success_url: `http://localhost:3000/complete_order_cart/${order.id}`,
-            cancel_url: `http://localhost:3000/cancel_order/${order.id}`,
+            success_url: `https://cargi.herokuapp.com/complete_order_cart/${order.id}`,
+            cancel_url: `https://cargi.herokuapp.com/cancel_order/${order.id}`,
         });
         res.redirect(session.url)
 
