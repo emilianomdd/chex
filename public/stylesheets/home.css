@@ -3,7 +3,7 @@ body {
     /* background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
         url("./graph.png"); */
     background-image:
-        url("./cool_pic.jpg");
+        url("./sc.png");
     background-size: cover;
     background-position: center;
     text-shadow: 0 0.05rem 0.1rem rgba(0, 0, 0, 0.5);

@@ -19,6 +19,13 @@ const OrderSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Post'
     },
+    multiple_orders: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Order'
+    }],
+    stripe_fee: Number,
+    plat_fee: Number,
+    is_multiple: Boolean,
     seat: String,
     letter: String,
     is_paid: Boolean,
@@ -35,6 +42,8 @@ const OrderSchema = new Schema({
         ref: 'User'
     },
     date: Date,
+    email: String,
+    tip: Number,
     cash: Boolean,
     conf_num: Number,
     tip: Number

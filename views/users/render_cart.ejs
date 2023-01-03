@@ -1,83 +1,86 @@
 <% layout('layouts/boilerplate')%>
     <link rel="stylesheet" href="/stylesheets/stars.css">
 
-
-    <div class="row">
-        <div class="col-6">
-            <% if(place.name){%>
-                <form action="/places/<%=place._id%>" method="GET">
-                    <button class="btn btn-primary mb-2">Regresar a <%=place.name%></button>
-                </form>
-                <%}%>
-                    <div>
-                        <h3>
-                            Carrito
-                        </h3>
-                    </div>
-
+    <% if(typeof change_message !='undefined' ){%>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            Se Ha Modificado la Cantidad del Articulo
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
         </div>
-        <% for(let post of all_posts) {%>
-            <% const total_price=((post.price + .3)/(1-.059)).toFixed(2)%>
-                <% const fees=(total_price - post.price).toFixed(2)%>
-                    <% const how_many=post.price / post.posts.price%>
-                        <div class="row">
-                            <div class="card col-12 col-md-6 single-post-card p-1">
-                                <div id="placeCarousel" class="carousel slide" data-ride="carousel">
-                                    <div class="carousel-inner">
+        <%}%>
 
-                                        <%if(post.posts.images.length) {%>
-                                            <img class="d-block w-100" alt="" src="<%=post.posts.images[0].url%>">
+            <div class="row">
+                <div class="col-6">
+                    <% if(place.name){%>
+                        <form action="/places/<%=place._id%>" method="GET">
+                            <button class="btn btn-primary mb-2">Regresar a <%=place.name%></button>
+                        </form>
+                        <%}%>
+                            <div>
+                                <h3>
+                                    Carrito
+                                </h3>
+                            </div>
 
-                                            <% }else {%>
-                                                <img class="d-block w-100" alt=""
-                                                    src="https://res.cloudinary.com/squr/image/upload/v1600103881/YelpCamp/lz8jjv2gyynjil7lswf4.png">
-                                                <% } %>
+                </div>
+
+                <form action="/cart/payment_methods" method="GET">
+                    <button class="btn mt-2 btn-outline-secondary btn-block mb-2">Metodos De Pago</button>
+
+                    <% for(let i=0 ; i < all_posts.length ; i++) {%>
+                        <% var post=all_posts[i]%>
+                            <div class="row">
+                                <div class="card col-12 col-md-6 single-post-card p-1">
+                                    <div id="placeCarousel" class="carousel slide" data-ride="carousel">
+                                        <div class="carousel-inner">
+
+                                            <%if(post.posts.images.length) {%>
+                                                <img class="d-block w-100" alt="" src="<%=post.posts.images[0].url%>">
+
+                                                <% }else {%>
+                                                    <img class="d-block w-100" alt=""
+                                                        src="https://res.cloudinary.com/squr/image/upload/v1600103881/YelpCamp/lz8jjv2gyynjil7lswf4.png">
+                                                    <% } %>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-md-8">
-                                    <div class="card-body">
-                                        <h3>
-                                            <%= post.posts.author.username%>
-                                        </h3>
-                                        <h3 class="card-text">
+                                    <div class="col-md-8">
+                                        <div class="card-body">
+                                            <h3>
+                                                <%= post.posts.author.username%>
+                                            </h3>
+                                            <h3 class="card-text">
 
-                                            <%=post.quantity%>
-                                                <%= post.posts.title %> Entregados en Asiento: <%=post.seat%>
-                                                        <%=post.letter%>
-                                                            <%=post.section%>
-                                        </h3>
-                                        <p>
-                                            Precio: <%=post.price%>$
-                                                <!-- <br>
-                                                Fees: <%=fees%>
-                                        </h5>
-                                        <br>
-                                        <h3>
-                                            Total Price: <%=total_price%>
-                                        </h3> -->
+                                                <%=post.quantity%>
+                                                    <%= post.posts.title %> Entregados en Asiento: <%=post.seat%>
+                                                            <%=post.letter%>
+                                                                <%=post.section%>
+                                            </h3>
+                                            <p>
+                                                Precio: <%=post.price%>
+                                                    <p class="card-text">
+                                                        <%= post.posts.caption %>
+                                                    </p>
 
-                                                <p class="card-text">
-                                                    <%= post.posts.caption %>
-                                                </p>
-
-                                                <!-- <form action="/posts/purchase/<%=post.id%>" method="POST">
+                                                    <!-- <form action="/posts/purchase/<%=post.id%>" method="POST">
                                                     <button class="btn btn-primary mb-2">Pago con Tarjeta</button>
                                                 </form> -->
-                                                <form action="/posts/purchase_efectivo/<%=post._id%>" method="POST">
-                                                    <button class="btn btn-primary mb-2">Pago con
-                                                        Efectivo/Terminal</button>
-                                                </form>
-                                                <form action="/posts/cancel/<%=post._id%>" method="POST"> <button
-                                                        class="btn btn-primary">Borrar del Carrito
-                                                    </button>
-                                                </form>
+
+                                                    <input class="form-check-input  mt-2" type="checkbox" value="<%=i%>"
+                                                        name="index" id="index" checked style="display:none">
+
+                                                    <input type="submit" formaction="/cart/change_qnty/<%=post._id%>"
+                                                        value="Modificar Cantidad"
+                                                        class="btn mt-2 btn-outline-secondary btn-block" formnovalidate>
+
+                                                    <input type="submit" formaction="/cart/delete/<%=post._id%>"
+                                                        value="Borrar del Carrito"
+                                                        class="btn mt-2 btn-outline-secondary btn-block" formnovalidate>
+
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-    </div>
-    </div>
-    </div>
-    </a>
-    <% } %>
-        </div>
+                            <% } %>
+                </form>
+            </div>

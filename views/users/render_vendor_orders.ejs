@@ -55,6 +55,9 @@
                                                 Seleccionar para agregar al recivo
                                             </label>
                                             <h3>
+                                                <%= order.email%>
+                                            </h3>
+                                            <h3>
                                                 <%=order.quantity%>: <%= order.name%>
                                             </h3>
                                             <%}%>
@@ -89,6 +92,10 @@
                                                                                     Metodo de Pago: Paid
                                                                                 </p>
                                                                                 <%}%>
+                                                                                    <input type="submit"
+                                                                                        formaction="/render_bulk/<%=order._id%>"
+                                                                                        value="Ver Orden Compuesta"
+                                                                                        class="btn mt-2 btn-outline-secondary btn-block">
                                                                                     <input type="submit"
                                                                                         formaction="/order/complete/<%=order.id%>"
                                                                                         value="Completar Orden"

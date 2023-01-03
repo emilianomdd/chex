@@ -1,0 +1,39 @@
+<% layout('layouts/boilerplate')%>
+    <link rel="stylesheet" href="/stylesheets/stars.css">
+    <div class="row">
+
+        <div>
+
+            <p class="Cool">
+                Numero de
+                Confirmacion:
+                <%= order.conf_num %>
+            </p>
+            <% for(let each_order of order.multiple_orders) {%>
+                <div class="row">
+                    <div class="card col-12 col-md-6 single-post-card p-1">
+                        <div id="placeCarousel" class="carousel slide" data-ride="carousel">
+                            <div class="carousel-inner">
+
+                                <%if(each_order.posts.images.length) {%>
+                                    <img class="d-block w-100" alt="" src="<%=each_order.posts.images[0].url%>">
+
+                                    <% }else {%>
+                                        <img class="d-block w-100" alt=""
+                                            src="https://res.cloudinary.com/squr/image/upload/v1600103881/YelpCamp/lz8jjv2gyynjil7lswf4.png">
+                                        <% } %>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+
+                                <h3 class="card-text">
+                                    <%=each_order.quantity%>: <%= each_order.posts.title %>
+                                </h3>
+                                <br>
+                            </div>
+
+                        </div>
+                    </div>
+                    <%}%>
+                </div>

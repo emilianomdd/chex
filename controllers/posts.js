@@ -141,6 +141,7 @@ module.exports.renderNew = async (req, res) => {
 
 //agrefa orden al carrito
 module.exports.carrito = async (req, res) => {
+
     try {
         const { id } = req.params
         const post = await Post.findById(id).populate({
@@ -155,11 +156,17 @@ module.exports.carrito = async (req, res) => {
         pre_order.letter = req.body.row
         pre_order.seat = req.body.seat
         pre_order.price = parseInt(req.body.how_many) * post.price
-        var price = (pre_order.price + .3) / (1 - 0.59)
+        var price = (pre_order.price + 3) / (1 - 0.4)
         price = price.toFixed(2)
         pre_order.price_final = price
-        pre_order.quantity = req.body.how_man
-        req.session.cart.push(pre_order)
+        pre_order.quantity = req.body.how_many
+        if (req.session.cart) {
+            req.session.cart.push(pre_order)
+        } else {
+            req.session.cart = [pre_order]
+        }
+        console.log(req.session.cart, '*********')
+        console.log(pre_order, 'PRE_ORDER')
         await pre_order.save()
         const place = post.place
         const all_posts = place.posts
@@ -270,6 +277,7 @@ module.exports.updatePost = async (req, res) => {
 
 //creates order but doesn't show anyewhere until iser specifies ppayment method
 module.exports.RapidOrder = async (req, res) => {
+    console.log("RapidOrder")
     try {
         const { id } = req.params
         const post = await Post.findById(id).populate({
@@ -278,7 +286,7 @@ module.exports.RapidOrder = async (req, res) => {
                 path: 'posts'
             }
         }).populate('author')
-        const post_author = await post.author
+        const post_author = post.author
         const order = new Order()
         order.is_reported = false
         order.status = 'En proceso'
@@ -289,6 +297,7 @@ module.exports.RapidOrder = async (req, res) => {
         order.is_delivered = false
         order.posts = post
         order.name = post.title
+        order.email = req.body.email
         if (req.body.drop_off != 'N/A') {
 
             order.drop_off = req.body.drop_off
@@ -300,7 +309,7 @@ module.exports.RapidOrder = async (req, res) => {
         order.seat = req.body.seat
         order.letter = req.body.row
         order.price = parseInt(req.body.how_many) * post.price
-        var price = (order.price + .3) / (1 - .059)
+        var price = (order.price + 3) / (1 - .04)
         price = price.toFixed(2)
         order.price_final = price
         var transaction_fee = ((order.price + .3) / (1 - .059)) - order.price
@@ -308,24 +317,15 @@ module.exports.RapidOrder = async (req, res) => {
         order.quantity = req.body.how_many
         order.place = post.place
         order.conf_num = Math.floor(1000 + Math.random() * 9000);
-
-        post_author.orders_to_complete.push(order)
-        if (req.user) {
-            const user = await User.findById(req.user.id).populate('messages').populate('cart')
-
-            order.customer = user
-            user.orders.push(order)
-            await user.save()
-        }
         await post_author.save()
-
         await order.save()
-        if (!req.session.orders) {
-            req.session.orders = [order]
-        } else {
-            req.session.orders.push(order)
-        }
-        res.render('places/payment_method', { order, transaction_fee, price })
+        // if (!req.session.orders) {
+        //     req.session.orders = [order]
+        // } else {
+        //     req.session.orders.push(order)
+        // }
+        console.log(post_author)
+        res.render('places/payment_method', { post_author, order, transaction_fee, price })
     }
     catch (e) {
         console.log(e)
@@ -508,75 +508,43 @@ module.exports.purchaseCash = async (req, res) => {
 //route used when user decides to do rapid checkout and uses cash
 module.exports.RapidCash = async (req, res) => {
     try {
-        if (req.user) {
-
-            const { id } = req.params
-            const user = await User.findById(req.user.id)
-            const order = await Order.findById(id).populate({
-                path: 'place',
-                populate: {
-                    path: 'posts'
-                }
-            }).populate('posts')
-            const place = order.place
-            place.orders.push(order)
-            const post_author = await User.findById(order.posts.author)
-            order.cash = true
-            order.is_delivered = false
-            order.user = user
-            await place.save()
-            await post_author.save()
-            await user.save()
-            await order.save()
-            if (!req.session.orders) {
-                req.session.orders = [order]
-            } else {
-                req.session.orders.push(order)
+        console.log(req.body)
+        console.log(req.params)
+        console.log(req.query)
+        const { id } = req.params
+        const order = await Order.findById(id).populate({
+            path: 'place',
+            populate: {
+                path: 'posts'
             }
-            const all_posts = place.posts
-            const seat = order.seat
-            const row = order.letter
-            const section = order.section
-            req.flash('success', 'Se creo tu orden')
-            res.render('places/show_numbered.ejs', { place, all_posts, seat, row, section })
+        }).populate('posts')
+        const place = order.place
+        place.orders.push(order)
+        const post_author = await User.findById(order.posts.author)
+        post_author.orders_to_complete.push(order)
+        order.cash = true
+        order.is_delivered = false
+        order.tip = (parseInt(req.body.tip) / 100) * order.price
+        order.email = req.body.user_email
+        if (order.email) {
+            //send email with twilio!!!!!!!!!!
         }
-        else {
-            console.log(req.body)
-            console.log(req.params)
-            console.log(req.query)
-            const { id } = req.params
-            const order = await Order.findById(id).populate({
-                path: 'place',
-                populate: {
-                    path: 'posts'
-                }
-            }).populate('posts')
-            const place = order.place
-            place.orders.push(order)
-            const post_author = await User.findById(order.posts.author)
-            order.cash = true
-            order.is_delivered = false
-            order.tip = (parseInt(req.body.tip) / 100) * order.price
-            order.email = req.body.user_email
-            if (order.email) {
-                //send email with twilio!!!!!!!!!!
-            }
-            await place.save()
-            await post_author.save()
-            await order.save()
-            if (!req.session.orders) {
-                req.session.orders = [order]
-            } else {
-                req.session.orders.push(order)
-            }
-            const all_posts = place.posts
-
-            const seat = order.seat
-            const row = order.letter
-            const section = order.section
-            const order_message = true
-            res.render('places/show_numbered.ejs', { place, all_posts, seat, row, section, order_message })
+        await place.save()
+        await post_author.save()
+        await order.save()
+        if (!req.session.orders) {
+            req.session.orders = [order]
+        } else {
+            req.session.orders.push(order)
         }
+        const all_posts = place.posts
+
+        const seat = order.seat
+        const row = order.letter
+        const section = order.section
+        const order_message = true
+        res.render('places/show_numbered.ejs', { place, all_posts, seat, row, section, order_message })
+
     } catch (e) {
         console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
@@ -586,46 +554,141 @@ module.exports.RapidCash = async (req, res) => {
 
 //route used when user chooses to pay with card after rapid checkout
 module.exports.RapidCard = async (req, res) => {
+    console.log('RapidCard')
+    console.log(req.body.user_email)
+    console.log(req.params)
+    console.log(req.query)
     try {
         const { id } = req.params
         const order = await Order.findById(id).populate('place').populate('posts')
-        const post_author = await User.findById(order.posts.author)
         order.cash = false
+        order.email = req.body.user_email
+        order.tip = parseInt(req.body.tip) * order.price / 100
         await order.save()
-        const user = await User.findById(req.user.id)
-        var price = (order.price + 3) / (1 - 0.066)
+        var price = (order.price + order.tip + 3) / (1 - 0.04)
         price = price.toFixed(2)
-        var comish = price - order.price
+        var comish = price - order.price - order.tip
         comish = comish.toFixed(2)
         order.price_final = price
         await order.save()
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
-            payment_intent_data: {
-                application_fee_amount: Math.trunc(100 * comish),
-                receipt_email: user.email,
-                transfer_data: {
-                    destination: post_author.stripe_account
-                }
-
-            },
+            invoice_creation: { enabled: true },
             line_items: [{
-                amount: Math.trunc(price * 100),
-                name: order.posts.title,
-                currency: 'mxn',
-                quantity: 1,
+                price_data: {
+                    currency: "usd",
+                    product_data: {
+                        name: order.posts.title,
+                    },
+                    unit_amount: order.price * 100,
+                },
+                quantity: order.quantity
+            }, {
+                price_data: {
+                    currency: "usd",
+                    product_data: {
+                        name: 'fees',
+                    },
+                    unit_amount: Math.trunc(comish * 100),
+                }, quantity: 1
+            }, {
+                price_data: {
+                    currency: "usd",
+                    product_data: {
+                        name: 'tip',
+                    },
+                    unit_amount: order.tip * 100,
+                }, quantity: 1
             }],
             mode: 'payment',
-            success_url: 'https://cargi.herokuapp.com/places/purchase',
-            cancel_url: 'https://cargi.herokuapp.com/places',
+            success_url: `http://localhost:3000/complete_order/${order.id}`,
+            cancel_url: `http://localhost:3000/cancel_order/${order.id}`,
         });
         res.redirect(session.url)
+
     } catch (e) {
         console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/places')
     }
 }
+
+// try {
+//     const how_many = req.body.how_many.split(',')
+//     const cart = req.session.cart
+//     const day = new Date()
+//     const post_author = await User.findById(cart[0].posts.author)
+
+//     const order = new Order()
+//     order.is_reported = false
+//     order.date = day.getTime()
+//     order.email = req.body.email
+//     order.price = req.body.price
+//     order.price_final = req.body.total
+//     order.place = cart[0].posts.place
+//     order.is_delivered = false
+//     order.is_paid = false
+//     order.cash = false
+
+//     order.quantity_per = {}
+//     for (let each_item of cart) {
+//         if (order.posts.includes(each_item.posts._id)) {
+//             console.log(each_item.posts._id in order.posts)
+//             continue
+//         } else {
+//             order.posts.push(each_item.posts._id)
+//         }
+//     }
+//     for (let i = 0; i < cart.length; i++) {
+//         console.log(parseInt(how_many[i]))
+//         if (cart[i].posts._id in order.quantity_per) {
+//             const new_amt = parseInt(how_many[i]) + order.quantity_per[cart[i].posts._id]
+
+//             order.quantity_per[cart[i].posts._id] = new_amt
+//         } else {
+//             order.quantity_per[cart[i].posts._id] = parseInt(how_many[i])
+//         }
+//     }
+//     order.conf_num = Math.floor(1000 + Math.random() * 9000);
+//     post_author.orders_to_complete.push(order)
+//     await post_author.save()
+//     await order.save()
+//     const { id } = req.params
+//     order.cash = false
+//     await order.save()
+//     // const user = await User.findById(req.user.id)
+//     const email = req.body.email
+//     var price = (order.price + 3) / (1 - 0.036)
+//     price = price.toFixed(2)
+//     var comish = price - order.price
+//     comish = comish.toFixed(2)
+//     order.price_final = price
+//     await order.save()
+//     const each_item = []
+//     console.log(order)
+//     for (let each_id of order.posts) {
+//         console.log(each_id)
+//         const each_one = await Post.findById(each_id)
+//         const price = each_one.price * 100
+//         const item_deets = { 'name': each_one.title, 'quantity': order.quantity_per[each_id], 'price': price }
+//         each_item.push(item_deets)
+//     }
+//     var fees = order.price_final - order.price
+//     fees = fees.toFixed(2)
+//     each_item.push({
+//         'name': 'fees', 'quantity': 1, 'price': Math.trunc(fees * 100)
+//     })
+
+
+
+
+
+// }
+// catch (e) {
+//     console.log(e)
+//     req.flash('Refresca la Pagina e Intenta de Nuevo')
+//     res.render('/places')
+// }
 
 //show  route for when user clicks rapid checkout
 module.exports.ShowRapid = async (req, res) => {
@@ -756,11 +819,27 @@ module.exports.createReport = async (req, res) => {
         const workBook = XLSX.utils.book_new();
 
         const id = req.body.id
+        console.log(id)
         var all_orders = []
         for (let id_num of id) {
             const order = await Order.findById(id_num)
-            const new_order = { quantity: order.quantity, price: order.price, articulo: order.name, date: order.date, section: order.section }
-            all_orders.push(new_order)
+            if (order.is_multiple) {
+                for (let i of order.multiple_orders) {
+                    console.log(i)
+                    const each_order = await Order.findById(i)
+                    if (each_order) {
+                        console.log(each_order)
+                        const post = await Post.findById(each_order.posts)
+                        const new_order = { quantity: each_order.quantity, price: each_order.price, articulo: post.title, date: order.date, section: order.section }
+                        all_orders.push(new_order)
+                    } else {
+                        continue
+                    }
+                }
+            } else {
+                const new_order = { quantity: order.quantity, price: order.price, articulo: order.name, date: order.date, section: order.section }
+                all_orders.push(new_order)
+            }
             order.is_reported = true
             order.save()
         }

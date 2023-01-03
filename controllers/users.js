@@ -7,6 +7,8 @@ const { UserBindingPage } = require('twilio/lib/rest/chat/v2/service/user/userBi
 const accountSid = process.env.TW_ID;
 const authToken = process.env.TW_AUTH;
 const client = require('twilio')(accountSid, authToken);
+const Post = require('../models/post');
+const { ModelBuildPage } = require('twilio/lib/rest/autopilot/v1/assistant/modelBuild');
 // const async = require("async")
 // const nodemailer = require('nodemailer')
 // const crypto = require('crypto')
@@ -107,15 +109,38 @@ module.exports.RenderCart = async (req, res) => {
         })
         all_posts = cart.pre_orders
     } else {
-        console.log("else")
         if (!req.session.cart) {
             req.session.cart = []
         }
+        var cart_price = 0
+        for (let i = 0; i < req.session.cart.length; i++) {
+            req.session.cart[i].posts = await Post.findById(req.session.cart[i].posts._id)
+        }
         all_posts = req.session.cart
+        for (let item of all_posts) {
+            if (item.price) {
+                cart_price += parseInt(item.price)
+            } else {
+                cart_price += parseInt(item.posts.price)
+            }
+
+        }
+        const cart = req.session.cart
+        if (cart.length > 0) {
+
+            var place = await Place.findById(cart[0].posts.place)
+            var online_payment = place.online_payments
+            const cart_message = false
+            const delete_message = false
+            console.log(cart)
+
+            res.render('users/render_cart', { delete_message, cart_message, all_posts, place, cart_price, online_payment })
+        } else {
+            req.session.cart = []
+            res.render('users/cart_no_items')
+        }
 
     }
-    const place = req.session.place
-    res.render('users/render_cart', { all_posts, place })
 
 }
 
@@ -254,24 +279,14 @@ module.exports.completeOrder = async (req, res) => {
     try {
         const { id } = req.params
         const order = await Order.findById(id)
-        const user = await User.findById(req.user.id).populate({
-            path: 'orders_to_complete',
-            populate: {
-                path: 'posts',
-            }
-        }).populate(
-            {
-                path: 'orders_to_complete',
-                populate: {
-                    path: 'customer',
-                }
-            }
-        ).populate('places')
+        console.log(order)
         order.is_delivered = true
         order.is_paid = true
+        await order.save()
         console.log(order.is_paid)
         console.log(order.is_delivered)
-        await order.save()
+        const user = await User.findById(req.user.id).populate('orders_to_complete').populate('places')
+
         const place = user.places[0]
         const order_completed = order
         res.render('users/render_vendor_orders', { user, place, order_completed })
@@ -474,16 +489,10 @@ module.exports.RenderSelectConfirm = async (req, res) => {
         const { id } = req.params
         const order = await Order.findById(id)
         const user = await User.findById(req.user.id).populate({
-            path: 'orders_to_complete',
-            populate: {
-                path: 'posts',
-            }
+            path: 'orders_to_complete'
         }).populate(
             {
-                path: 'orders_to_complete',
-                populate: {
-                    path: 'customer',
-                }
+                path: 'orders_to_complete'
             }
         ).populate('places')
         order.is_delivered = true
@@ -552,6 +561,26 @@ module.exports.RegisterStripe = async (req, res, next) => {
         res.redirect('/place');
     }
 
+}
+
+module.exports.renderBulk = async (req, res) => {
+    console.log('renderBulk')
+    try {
+        const { id } = req.params
+        console.log(id)
+        const order = await Order.findById(id)
+        const mult_orders = []
+        for (let bulk_order of order.multiple_orders) {
+            mult_orders.push(await Order.findById(bulk_order).populate('posts'))
+        }
+        order.multiple_orders = mult_orders
+        console.log(order)
+        res.render('users/render_bulk', { order })
+    } catch (e) {
+        console.log(e)
+        req.flash('error', e.message);
+        res.redirect('/place');
+    }
 }
 // module.exports.renderForgot = async (req, res) => {
 //     res.render("users/forgot");

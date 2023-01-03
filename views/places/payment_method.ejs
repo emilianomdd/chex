@@ -1,59 +1,77 @@
 <% layout('layouts/boilerplate')%>
     <link rel="stylesheet" href="/stylesheets/stars.css">
 
-    <div class="container">
-        <div class="card mb-3">
-            <div class="col-md-8">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <%= order.posts.title %>
-                    </h5>
+    <% if(typeof cancel_msg !='undefined' ){%>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            No se pudo ejecutar el pago, favor de cambiar metodo de pago e intentar de nuevo.
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <%}%>
+            <div class="container">
+                <div class="card mb-3">
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <%= order.posts.title %>
+                            </h5>
 
-                    <p class="card-text">
-                        Cantidad:<%= order.quantity%>
+                            <p class="card-text">
+                                Cantidad:<%= order.quantity%>
 
-                            <br>
-                            Precio: <%= order.price %>$
-                                </br>
-                    </p>
-                    <p class="card-text">
-                        Asiento: <%=order.seat%>
-                            <%=order.letter%> Seccion: <%=order.section%>
-                    </p>
+                                    <br>
+                                    Precio: <%= order.price %>$
+                                        </br>
+                                        <% const fees=order.final_price - order.price%>
+                            </p>
+                            <p class="card-text">
+                                Asiento: <%=order.seat%>
+                                    <%=order.letter%> Seccion: <%=order.section%>
+                            </p>
 
-                    <form action="/posts/rapid_cash/<%=order.id%>" method="POST">
-                        <div class="col-12 col-md-4 mb-2">
-                            <label class="form-label" for="tip">Agregar Propina:</label>
-                            <select id="tip" name="tip" class="form-control">
-                                <option value="15">
-                                    15% (total: <%= order.price + ( order.price * 0.15)%>)
-                                </option>
-                                <option value="10">
-                                    10% (total: <%= order.price + ( order.price * 0.1)%>)
-                                </option>
+                            <form action="/posts/rapid_cash/<%=order.id%>" method="POST">
+                                <div class="col-12 col-md-4 mb-2">
+                                    <label class="form-label" for="tip">Agregar Propina:</label>
+                                    <select id="tip" name="tip" class="form-control">
+                                        <option value="15">
+                                            15% (total + fees: <%= ((order.price + ( order.price * 0.15) +
+                                                3)/(1-0.04)).toFixed(2)%>)
+                                        </option>
+                                        <option value="5">
+                                            5% (total + fees: <%= ((order.price + ( order.price * 0.05) +
+                                                3)/(1-0.04)).toFixed(2)%>)
+                                        </option>
 
-                                <option value="20">
-                                    20% (total: <%= order.price + ( order.price * 0.2)%>)
-                                </option>
-                                <option value="25">
-                                    25% (total: <%= order.price + ( order.price * 0.25)%>)
-                                </option>
+                                        <option value="0">
+                                            N/A (total + fees: <%= ((order.price + 3)/(1-0.04)).toFixed(2)%>)
+                                        </option>
+                                        <option value="10">
+                                            10% (total + fees: <%= ((order.price + ( order.price * 0.1) +
+                                                3)/(1-0.04)).toFixed(2)%>)
+                                        </option>
 
-                            </select>
+                                        <option value="20">
+                                            20% (total + fees: <%= ((order.price + ( order.price * 0.2) +
+                                                3)/(1-0.04)).toFixed(2)%>)
+                                        </option>
+                                        <option value="25">
+                                            25% (total + fees: <%= ((order.price + ( order.price * 0.25) +
+                                                3)/(1-0.04)).toFixed(2)%>)
+                                        </option>
+
+                                    </select>
+                                </div>
+                                Proporcional email para recibir el recivo:
+                                <input type="email" name="user_email" required>
+                                <br>
+                                <button class="btn btn-primary mb-2 mt-2">Pagar con Efectivo/Terminal</button>
+
+                                <input type="submit" formaction="/posts/rapid_card/<%=order.id%>" value="Pagar en Linea"
+                                    method="POST" class="btn mt-2 btn-outline-secondary btn-block">
+
+                            </form>
                         </div>
-                        Proporcional email para recibir el recivo:
-                        <input type="email" name="user_email">
-                        <br>
-                        <button class="btn btn-primary mb-2 mt-2">Comprar con Efectivo/Terminal</button>
-                        <% if(order.place.online_payment){%>
-                            <input type="submit" formaction="/five/<%=order.id%>" value="Pagar en Linea"
-                                class="btn mt-2 btn-outline-secondary btn-block">
-                            <%}%>
-                    </form>
-                    <!-- <form action="/posts/rapid_card/<%=order.id%>" method="POST">
-                                        <button class="btn btn-primary">Pay with Card</button>
-                                    </form> -->
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>

@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const places = require('../controllers/places');
 const catchAsync = require('../utils/catchAsync');
-const { isLoggedIn, isAuthor, validatePlace } = require('../middleware');
+const { isLoggedIn, isAuthor, validatePlace, keepCartConsistent, hasCart } = require('../middleware');
 const multer = require('multer');
 const { storage } = require('../cloudinary');
 const upload = multer({ storage });
@@ -19,7 +19,7 @@ router.get('/show_cart/:id', catchAsync(posts.showPost))
 
 router.get('/show_rapid/:id', posts.ShowRapid)
 
-router.get('/show_cart_numbered/:id', catchAsync(posts.showPostNum))
+router.get('/show_cart_numbered/:id', hasCart, catchAsync(posts.showPostNum))
 
 router.get('/show_rapid_numbered/:id', posts.ShowRapidNum)
 

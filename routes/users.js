@@ -6,7 +6,7 @@ const User = require('../models/user');
 const users = require('../controllers/users');
 const posts = require('../controllers/posts')
 
-const { isLoggedIn, isAuthor, validatePlace } = require('../middleware');
+const { isLoggedIn, isAuthor, validatePlace, hasCart } = require('../middleware');
 
 router.route('/register')
     .get(users.renderRegister)
@@ -22,13 +22,16 @@ router.post('/register_stripe/:id', users.RegisterStripe)
 
 router.post('/create_store/:id', users.RegisterVendor)
 
-router.get('/render-cart', users.RenderCart)
+router.get('/render-cart', hasCart, users.RenderCart)
 
 router.post('/five/:id', users.FiveMin)
 
 router.post('/ready/:id', users.Ready)
 
+router.get('/render_bulk/:id', users.renderBulk)
 
+
+router.post('/render_bulk/:id', users.renderBulk)
 
 router.get('/render-orders-store/:id', users.RenderStoreOrders)
 
@@ -56,6 +59,7 @@ router.get('/render_xlx/:id', users.renderReport)
 
 
 router.post('/order/create_report', posts.createReport)
+
 
 // router.route('/forgot')
 //     .get(users.renderForgot)

@@ -17,6 +17,9 @@ const mongoSanitize = require('express-mongo-sanitize');
 const userRoutes = require('./routes/users');
 const placeRoutes = require('./routes/places');
 const postRoutes = require('./routes/posts')
+const cartRoutes = require('./routes/carts')
+const orderRoutes = require('./routes/orders')
+const Order = require('./models/order')
 
 const MongoDBStore = require("connect-mongo")(session);
 
@@ -141,10 +144,56 @@ app.use((req, res, next) => {
 app.use('/', userRoutes);
 app.use('/places', placeRoutes)
 app.use('/posts', postRoutes)
-
+app.use('/cart', cartRoutes)
+app.use('/orders', orderRoutes)
 
 app.get('/', (req, res) => {
     res.render('home')
+});
+
+app.get('/complete_order/:id', async (req, res) => {
+    const { id } = req.params
+    const order = await Order.findById(id).populate('place')
+    console.log(order)
+    order.is_paid = true
+    const post_author = await User.findById(order.place.author)
+    post_author.orders_to_complete.push(order)
+    req.session.orders.push(order)
+    const orders = req.session.orders
+    const order_message = 'true'
+    const place = order.place
+
+    res.render('users/render_orders', { orders, order_message, place })
+});
+
+app.get('/complete_order_cart/:id', async (req, res) => {
+    const { id } = req.params
+    const order = await Order.findById(id).populate('place')
+    console.log(order)
+    order.is_paid = true
+    req.session.cart = []
+    const post_author = await User.findById(order.place.author)
+    post_author.orders_to_complete.push(order)
+    req.session.orders.push(order)
+    const orders = req.session.orders
+    const order_message = 'true'
+    const place = order.place
+
+    res.render('users/render_orders', { orders, order_message, place })
+});
+
+app.get('/cancel_order/:id', async (req, res) => {
+    const { id } = req.params
+    const order = await Order.findById(id).populate('place')
+    const post_author = await User.findById(order.place.author)
+    const place = order.place
+
+    var transaction_fee = ((order.price + .3) / (1 - .059)) - order.price
+    transaction_fee = transaction_fee.toFixed(2)
+    const price = order.price_final
+    const cancel_msg = 'cancelOrder'
+
+    res.render('places/payment_method', { cancel_msg, post_author, order, transaction_fee, price })
 });
 
 
