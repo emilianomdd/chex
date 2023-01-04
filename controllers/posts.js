@@ -13,6 +13,8 @@ const users = require('../controllers/users');
 const path = require('path')
 const flash = require('connect-flash');
 const { CommandInstance } = require('twilio/lib/rest/preview/wireless/command');
+const fs = require("fs")
+
 
 //Creates an article in a place
 module.exports.createPost = async (req, res, next) => {
@@ -830,14 +832,14 @@ module.exports.createReport = async (req, res) => {
                     if (each_order) {
                         console.log(each_order)
                         const post = await Post.findById(each_order.posts)
-                        const new_order = { quantity: each_order.quantity, price: each_order.price, articulo: post.title, date: order.date, section: order.section }
+                        const new_order = { email: order.email, quantity: each_order.quantity, price: each_order.price, articulo: post.title, date: order.date, section: order.section }
                         all_orders.push(new_order)
                     } else {
                         continue
                     }
                 }
             } else {
-                const new_order = { quantity: order.quantity, price: order.price, articulo: order.name, date: order.date, section: order.section }
+                const new_order = { email: order.email, quantity: order.quantity, price: order.price, articulo: order.name, date: order.date, section: order.section }
                 all_orders.push(new_order)
             }
             order.is_reported = true
@@ -854,12 +856,27 @@ module.exports.createReport = async (req, res) => {
 
         file_num = Math.floor(1000 + Math.random() * 9000);
         const filename = `${day}_${month}_${year}--${file_num}.xlsx`;
-        const wb_opts = { bookType: 'xlsx', type: 'binary' };   // workbook options
-        const xl_file = XLSX.writeFile(workBook, filename, wb_opts)
-        // res.sendFile(xl_file);
-        res.download(path.resolve(`./${wb_opts}`))
+        // Create a new workbook options object
+        const wb_opts = { bookType: "xlsx", type: "buffer" };
 
-        res.redirect('/')
+        // Write the workbook to a buffer
+        const xl_file = XLSX.write(workBook, wb_opts);
+
+        // Set the Content-Type and Content-Disposition headers and send the buffer as the response
+        res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        res.setHeader("Content-Disposition", `attachment; filename=${filename}`);
+        res.send(xl_file);
+        fs.unlink(filename, err => {
+            if (err) {
+                console.error(err);
+            }
+        });
+
+        // const wb_opts = { bookType: 'xlsx', type: 'binary' };   // workbook options
+        // const xl_file = XLSX.writeFile(workBook, filename, wb_opts)
+        // // res.sendFile(xl_file);
+        // res.download(`${filename}`)
+
     } catch (e) {
         console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
