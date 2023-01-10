@@ -1,6 +1,7 @@
 /* Custom Bootstrap code */
-html * {
-    font-family: 'Work Sans', sans-serif;
+@font-face {
+    font-family: 'CoolFont';
+    src: url('./YaroRg-Bold.ttf') format('truetype');
 }
 
 #menuContainer {
@@ -15,10 +16,18 @@ html * {
 
 }
 
-h1,
+html * {
+    font-family: 'CoolFont', sans-serif;
+}
+
+.Cool,
+.Cool {
+    font-family: 'CoolFont', sans-serif;
+}
+
 h2,
 h3 {
-    font-family: 'Work Sans', sans-serif;
+    font-family: 'CoolFont', sans-serif;
     font-weight: 500;
 }
 

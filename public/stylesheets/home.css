@@ -10,6 +10,11 @@ body {
     /* box-shadow: inset 0 0 5rem rgba(0, 0, 0, 0.5); */
 }
 
+@font-face {
+    font-family: 'CoolFont';
+    src: url('./YaroRg-Bold.ttf') format('truetype');
+}
+
 #menuContainer {
     display: inline-block;
     width: 300px;
@@ -20,6 +25,21 @@ body {
 #menuContainer button {
     display: inline-block;
 
+}
+
+html * {
+    font-family: 'CoolFont', sans-serif;
+}
+
+.Cool,
+.Cool {
+    font-family: 'CoolFont', sans-serif;
+}
+
+h2,
+h3 {
+    font-family: 'CoolFont', sans-serif;
+    font-weight: 500;
 }
 
 .cover-container {
