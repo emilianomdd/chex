@@ -3,6 +3,18 @@ html * {
     font-family: 'Work Sans', sans-serif;
 }
 
+#menuContainer {
+    display: inline-block;
+    width: 300px;
+    overflow-x: scroll;
+    white-space: nowrap;
+}
+
+#menuContainer button {
+    display: inline-block;
+
+}
+
 h1,
 h2,
 h3 {

@@ -59,103 +59,92 @@
 
                                                         </div>
 
-                                                        <form action="/places/render_category_numbered/<%=place.id%>">
-                                                            <input type="hidden" id="seat" name="seat"
-                                                                value="<%=seat%>">
-                                                            <input type="hidden" id="row" name="row" value="<%=row%>">
-                                                            <input type="hidden" id="section" name="section"
-                                                                value="<%=section%>">
+                                                        <div id="menuContainer" class="menuContainer btn-group row"
+                                                            role="group">
+
+
                                                             <% for(let category of place.categories){%>
-                                                                <input class="form-check-input  mt-2" type="checkbox"
+                                                                <a href="/places/render_category_numbered/<%=place.id%>?category=<%=category%>"
+                                                                    class="btn menu-buttons btn-xs btn-dark  selected-menu-button "
+                                                                    cl="2" hw="1.775" type="submit"
                                                                     value="<%=category%>" name="category"
                                                                     id="<%=category%>">
-                                                                <label class="form-check-label text-dark"
-                                                                    for="<%=category%>">
                                                                     <%=category%>
-                                                                </label>
+                                                                </a>
                                                                 <%}%>
-                                                                    <button class="mt-2 btn btn-dark btn-block"">Buscar Categoria</button>
-                                        </form>
+                                                        </div>
                                                         <% for(let post of all_posts) {%>
- 
+
                                                             <div class=" card individual-cards-shows mt-3 pt-3 pb-3">
-                                                                        <div class="card-body">
-                                                                            <div class="row">
-                                                                                <div class="col-6 col-md-4">
-                                                                                    <%if(post.images.length) {%>
-                                                                                        <img class="img-fluid" alt=""
-                                                                                            src="<%=post.images[0].url%>">
-                                                                                        <% }else {%>
-                                                                                            <img class="img-fluid"
-                                                                                                alt=""
-                                                                                                src="https://res.cloudinary.com/squr/image/upload/v1600103881/YelpCamp/lz8jjv2gyynjil7lswf4.png">
-                                                                                            <% } %>
-                                                                                </div>
-                                                                                <div class="col-6 col-md-8">
-                                                                                    <div class="mt-3">
-
-                                                                                        <h3 class="card-text">
-                                                                                            <%= post.title %>: $
-                                                                                                <%=post.price%>
-                                                                                                    /Unidad<br>
-
-                                                                                        </h3>
-
-                                                                                        <p class="card-text">
-                                                                                            <%= post.caption %>
-                                                                                        </p>
-                                                                                    </div>
-                                                                                    <form
-                                                                                        action="/posts/ordena_rapida/<%=post._id%>"
-                                                                                        method="POST">
-                                                                                        <div
-                                                                                            class="col-12 col-md-4 mb-2">
-
-                                                                                            <div class="col-md-4 mt-3">
-                                                                                                <label
-                                                                                                    class="form-label"
-                                                                                                    for="how_many">Cantidad:</label>
-                                                                                                <select id="how_many"
-                                                                                                    name="how_many"
-                                                                                                    class="form-control">
-                                                                                                    <option value="1">
-                                                                                                        1
-                                                                                                    </option>
-                                                                                                    <% for (let
-                                                                                                        i=2;i<=5;
-                                                                                                        i++){%>
-                                                                                                        <option
-                                                                                                            value="<%=i%>">
-                                                                                                            <%=i%>
-                                                                                                        </option>
-                                                                                                        <%}%>
-                                                                                                </select>
-
-                                                                                            </div>
-                                                                                            <input type="hidden"
-                                                                                                id="seat" name="seat"
-                                                                                                value="<%=seat%>">
-                                                                                            <input type="hidden"
-                                                                                                id="row" name="row"
-                                                                                                value="<%=row%>">
-                                                                                            <input type="hidden"
-                                                                                                id="section"
-                                                                                                name="section"
-                                                                                                value="<%=section%>">
-                                                                                            <input type="submit"
-                                                                                                value="Compra Rapida"
-                                                                                                class="btn btn-dark btn-block mt-2">
-                                                                                            <input type="submit"
-                                                                                                formaction="/posts/cart_numbered/<%=post._id%>"
-                                                                                                value=" Agregar a Carrito"
-                                                                                                class="btn mt-2 btn-outline-secondary btn-block">
-
-                                                                                    </form>
-
-                                                                                </div>
-                                                                            </div>
+                                                                <div class="card-body">
+                                                                    <div class="row">
+                                                                        <div class="col-6 col-md-4">
+                                                                            <%if(post.images.length) {%>
+                                                                                <img class="img-fluid" alt=""
+                                                                                    src="<%=post.images[0].url%>">
+                                                                                <% }else {%>
+                                                                                    <img class="img-fluid" alt=""
+                                                                                        src="https://res.cloudinary.com/squr/image/upload/v1600103881/YelpCamp/lz8jjv2gyynjil7lswf4.png">
+                                                                                    <% } %>
                                                                         </div>
-                                                    </div>
+                                                                        <div class="col-6 col-md-8">
+                                                                            <div class="mt-3">
+
+                                                                                <h3 class="card-text">
+                                                                                    <%= post.title %>: $
+                                                                                        <%=post.price%>
+                                                                                            /Unidad<br>
+
+                                                                                </h3>
+
+                                                                                <p class="card-text">
+                                                                                    <%= post.caption %>
+                                                                                </p>
+                                                                            </div>
+                                                                            <form
+                                                                                action="/posts/ordena_rapida/<%=post._id%>"
+                                                                                method="POST">
+                                                                                <div class="col-12 col-md-4 mb-2">
+
+                                                                                    <div class="col-md-4 mt-3">
+                                                                                        <label class="form-label"
+                                                                                            for="how_many">Cantidad:</label>
+                                                                                        <select id="how_many"
+                                                                                            name="how_many"
+                                                                                            class="form-control">
+                                                                                            <option value="1">
+                                                                                                1
+                                                                                            </option>
+                                                                                            <% for (let i=2;i<=5;
+                                                                                                i++){%>
+                                                                                                <option value="<%=i%>">
+                                                                                                    <%=i%>
+                                                                                                </option>
+                                                                                                <%}%>
+                                                                                        </select>
+
+                                                                                    </div>
+                                                                                    <input type="hidden" id="seat"
+                                                                                        name="seat" value="<%=seat%>">
+                                                                                    <input type="hidden" id="row"
+                                                                                        name="row" value="<%=row%>">
+                                                                                    <input type="hidden" id="section"
+                                                                                        name="section"
+                                                                                        value="<%=section%>">
+                                                                                    <input type="submit"
+                                                                                        value="Compra Rapida"
+                                                                                        class="btn btn-dark btn-block mt-2">
+                                                                                    <input type="submit"
+                                                                                        formaction="/posts/cart_numbered/<%=post._id%>"
+                                                                                        value=" Agregar a Carrito"
+                                                                                        class="btn mt-2 btn-outline-secondary btn-block">
+
+                                                                            </form>
+
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
                                                     </div>
                                                     </div>
                                                     </div>
