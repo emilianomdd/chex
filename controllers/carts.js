@@ -26,7 +26,7 @@ module.exports.renderMethods = async (req, res) => {
 
 //purchase contents of cart with terminal/cash, cart will be vacated in this function
 module.exports.purchase = async (req, res) => {
-
+    console.log('purchase')
     post_author = await User.findById(req.session.cart[0].posts.author)
     if (req.session.cart.length > 1) {
         const order = new Order()
@@ -59,20 +59,17 @@ module.exports.purchase = async (req, res) => {
             await Pre_order.findByIdAndDelete(each_order.id)
         }
 
-        var price = (order.price + 3) / (1 - 0.04)
-        price = price.toFixed(2)
-        order.price_final = price
+        order.tip = parseInt(req.body.tip) * req.body.price / 100
+        order.price_final = order.price + order.tip
+        order.fee = order.price_final - order.tip - order.price
         post_author.orders_to_complete.push(order)
         //add to orders in session
         if (req.session.orders) {
             req.session.orders.push(order)
         } else {
-            req.session.order = [order]
+            req.session.orders = [order]
         }
         await post_author.save()
-        console.log(order.letter)
-        console.log(order.seat)
-        console.log(order.section)
         await order.save()
 
     } else {
@@ -97,19 +94,18 @@ module.exports.purchase = async (req, res) => {
         order.is_delivered = false
         order.is_paid = false
         order.cash = true
-
         order.letter = pre_order.letter
         order.drop_off = pre_order.drop_off
         order.section = pre_order.section
         order.seat = pre_order.seat
-        var price = (pre_order.price + 3) / (1 - 0.04)
-        price = price.toFixed(2)
-        order.price_final = price
+        order.tip = parseInt(req.body.tip) * req.body.price / 100
+        order.price_final = order.price + order.tip
+        order.fee = order.price_final - order.tip - order.price
         //add to orders in session
         if (req.session.orders) {
             req.session.orders.push(order)
         } else {
-            req.session.order = [order]
+            req.session.orders = [order]
         }
         await Pre_order.findByIdAndDelete(id)
         await post_author.save()
@@ -135,7 +131,7 @@ module.exports.purchase = async (req, res) => {
     const orders = req.session.orders
     const order_message = 'true'
     const place = await Place.findById(req.session.cart[0].posts.place)
-
+    console.log(req.session.orders)
     req.session.cart = []
     res.render('users/render_orders', { orders, order_message, place })
 
@@ -143,12 +139,10 @@ module.exports.purchase = async (req, res) => {
 
 module.exports.delete = async (req, res) => {
     const { id } = req.params
-    console.log(req.session.cart)
     for (let i = 0; i < req.session.cart.length; i++) {
         const each = req.session.cart[i]
         if (each._id == id) {
-            console.log(i)
-            console.log(req.session.cart.splice(i, 1))
+            req.session.cart.splice(i, 1)
             // req.session.cart = req.session.cart.splice(i, 1);
         }
     }
@@ -168,7 +162,6 @@ module.exports.delete = async (req, res) => {
 }
 
 module.exports.onlinePurchase = async (req, res) => {
-    console.log("onlinePurchase")
     try {
         const cart = req.session.cart
         const day = new Date()
@@ -194,11 +187,8 @@ module.exports.onlinePurchase = async (req, res) => {
         order.email = req.body.email
         order.price = req.body.price
         order.tip = parseInt(req.body.tip) * order.price / 100
-        order.price_final = (order.price + order.tip + 3) / (1 - 0.04)
-        order.stripe_fee = (order.price_final * 0.036) + 3
-        order.plat_fee = order.price_final * 0.004
-        console.log(order.plat_fee, 'platform')
-        console.log(order.stripe_fee, 'stripe')
+        order.price_final = (order.price + order.tip + 3) / (1 - 0.036)
+        order.fee = (order.price_final * 0.036) + 3
         order.place = cart[0].posts.place
         order.is_delivered = false
         order.is_paid = false
@@ -207,9 +197,7 @@ module.exports.onlinePurchase = async (req, res) => {
         order.cash = false
         order.email = req.body.email
         const each_item = []
-        console.log(order)
         for (let each_order of order.multiple_orders) {
-            console.log(each_order)
             const posts = await Post.findById(each_order.posts)
             const item_deets = { 'name': posts.title, 'quantity': each_order.quantity, 'price': posts.price * 100 }
             each_item.push(item_deets)
@@ -224,14 +212,13 @@ module.exports.onlinePurchase = async (req, res) => {
         each_item.push({
             'name': 'Propina', 'quantity': 1, 'price': Math.trunc(tip * 100)
         })
-        console.log(each_item)
         await order.save()
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             line_items: each_item.map(item => {
                 return {
                     price_data: {
-                        currency: "usd",
+                        currency: "mxn",
                         product_data: {
                             name: item['name'],
                         },
@@ -252,7 +239,6 @@ module.exports.onlinePurchase = async (req, res) => {
 
     }
     catch (e) {
-        console.log(e)
         req.flash('Refresca la Pagina e Intenta de Nuevo')
         res.render('/places')
     }
@@ -260,30 +246,20 @@ module.exports.onlinePurchase = async (req, res) => {
 }
 
 module.exports.renderChangeQnty = async (req, res) => {
-    console.log('renderChangeQnty')
     const { id } = req.params
     const pre_order = await Pre_order.findById(id)
-    console.log(pre_order.posts)
     const post = await Post.findById(pre_order.posts)
     res.render('carts/change_qnty', { pre_order, post })
 }
 
 module.exports.changeQnty = async (req, res) => {
-    console.log('changeQnty')
-    console.log(req.body)
-    console.log(req.query)
-    console.log(req.params)
     const { id } = req.params
     const pre_order = await Pre_order.findById(id).populate('posts')
     pre_order.quantity = parseInt(req.body.how_many)
     pre_order.price = pre_order.quantity * pre_order.posts.price
     await pre_order.save()
     for (let i = 0; i < req.session.cart.length; i++) {
-        console.log("PREID", pre_order.id)
-        console.log("CARTID", req.session.cart[i]._id)
         if (req.session.cart[i]._id == pre_order.id) {
-            console.log("*********PRE ORDER*************", pre_order)
-            console.log("++++++++++++++CART++++++++++++", req.session.cart[i])
             req.session.cart[i] = pre_order
         }
     }

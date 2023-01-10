@@ -311,11 +311,9 @@ module.exports.RapidOrder = async (req, res) => {
         order.seat = req.body.seat
         order.letter = req.body.row
         order.price = parseInt(req.body.how_many) * post.price
-        var price = (order.price + 3) / (1 - .04)
+        var price = (order.price + 3) / (1 - .036)
         price = price.toFixed(2)
         order.price_final = price
-        var transaction_fee = ((order.price + .3) / (1 - .059)) - order.price
-        transaction_fee = transaction_fee.toFixed(2)
         order.quantity = req.body.how_many
         order.place = post.place
         order.conf_num = Math.floor(1000 + Math.random() * 9000);
@@ -327,7 +325,7 @@ module.exports.RapidOrder = async (req, res) => {
         //     req.session.orders.push(order)
         // }
         console.log(post_author)
-        res.render('places/payment_method', { post_author, order, transaction_fee, price })
+        res.render('places/payment_method', { post_author, order, price })
     }
     catch (e) {
         console.log(e)
@@ -527,6 +525,8 @@ module.exports.RapidCash = async (req, res) => {
         order.cash = true
         order.is_delivered = false
         order.tip = (parseInt(req.body.tip) / 100) * order.price
+        var price = (order.price + order.tip + 3) / (1 - 0.036)
+        order.price_final = price
         order.email = req.body.user_email
         if (order.email) {
             //send email with twilio!!!!!!!!!!
@@ -567,7 +567,7 @@ module.exports.RapidCard = async (req, res) => {
         order.email = req.body.user_email
         order.tip = parseInt(req.body.tip) * order.price / 100
         await order.save()
-        var price = (order.price + order.tip + 3) / (1 - 0.04)
+        var price = (order.price + order.tip + 3) / (1 - 0.036)
         price = price.toFixed(2)
         var comish = price - order.price - order.tip
         comish = comish.toFixed(2)
@@ -578,16 +578,16 @@ module.exports.RapidCard = async (req, res) => {
             invoice_creation: { enabled: true },
             line_items: [{
                 price_data: {
-                    currency: "usd",
+                    currency: "mxn",
                     product_data: {
                         name: order.posts.title,
                     },
-                    unit_amount: order.price * 100,
+                    unit_amount: (order.price / order.quantity) * 100,
                 },
                 quantity: order.quantity
             }, {
                 price_data: {
-                    currency: "usd",
+                    currency: "mxn",
                     product_data: {
                         name: 'fees',
                     },
@@ -595,7 +595,7 @@ module.exports.RapidCard = async (req, res) => {
                 }, quantity: 1
             }, {
                 price_data: {
-                    currency: "usd",
+                    currency: "mxn",
                     product_data: {
                         name: 'tip',
                     },
@@ -838,8 +838,10 @@ module.exports.createReport = async (req, res) => {
                         continue
                     }
                 }
+                const new_order = { email: order.email, date: order.date, section: order.section, tip: order.tip }
+                all_orders.push(new_order)
             } else {
-                const new_order = { email: order.email, quantity: order.quantity, price: order.price, articulo: order.name, date: order.date, section: order.section }
+                const new_order = { email: order.email, tip: order.tip, quantity: order.quantity, price: order.price, articulo: order.name, date: order.date, section: order.section }
                 all_orders.push(new_order)
             }
             order.is_reported = true

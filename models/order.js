@@ -23,8 +23,7 @@ const OrderSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Order'
     }],
-    stripe_fee: Number,
-    plat_fee: Number,
+    fee: Number,
     is_multiple: Boolean,
     seat: String,
     letter: String,

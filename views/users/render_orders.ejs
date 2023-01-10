@@ -33,13 +33,11 @@
                                                         Precio: <%=order.price%>$
                                                             <br>
                                                             Propina: <%=order.tip%>$
-
-                                                                <% var fees=order.price_final - order.price -order.tip
-                                                                    %>
-                                                                    <br>
-                                                                    <% var fees_round=fees.toFixed(2)%>
-                                                                        Fees: <%=fees_round%>$
-                                                                            <br>
+                                                                <br>
+                                                                <% if (!order.cash) {%>
+                                                                    Fees: <%=order.fee%>$
+                                                                        <br>
+                                                                        <%}%>
                                                                             Total: <%=order.price_final%>$
 
 
