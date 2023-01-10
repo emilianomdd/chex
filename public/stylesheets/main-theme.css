@@ -33,6 +33,7 @@ h3 {
 
 .btn {
     border-radius: 15px;
+    white-space: normal
 }
 
 .form-control {
