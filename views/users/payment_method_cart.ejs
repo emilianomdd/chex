@@ -1,12 +1,24 @@
 <% layout('layouts/boilerplate')%>
     <link rel="stylesheet" href="/stylesheets/stars.css">
-
+ 
     <form action="/cart/purchase" method="POST">
         <div class="container">
             <div class="card mb-3">
                 <div class="col-md-8">
                     <div class="card-body">
-
+                        <div class="col-6">
+                            <% if(place.name){%>
+                                <form action="/places/<%=place._id%>" method="GET">
+                                    <button class="btn btn-primary mb-2">Regresar a <%=place.name%></button>
+                                </form>
+                                <%}%>
+                                    <div>
+                                        <h3>
+                                            Carrito
+                                        </h3>
+                                    </div>
+        
+                        </div>
                         <% const pay_online=((price + 3) / (1 - 0.036)).toFixed(2) %>
                             <% const fees=(pay_online - price).toFixed(2) %>
                                 <p class="card-text">

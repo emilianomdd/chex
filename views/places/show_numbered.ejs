@@ -1,4 +1,4 @@
-<!-- <input type="hidden" name="place" value="<%=place.id%>"> -->
+<!-- <input type="hidden" name="place" value="<%=place.id%>">
 
 <% layout('layouts/boilerplate')%>
     <link rel="stylesheet" href="/stylesheets/stars.css">
@@ -50,8 +50,8 @@
                                                             <div>
 
                                                                 <h1>
-                                                                    <%= place.name %>
-                                                                </h1>
+                                                                    <!-- <%= place.name %> -->
+                                                                <!-- </h1>
                                                                 <h3>
                                                                     <%= place.description%>
                                                                 </h3>
@@ -152,4 +152,142 @@
                                                     </div>
                                                     </a>
                                                     <% } %>
-                                                        </div>
+                                                        </div> --> 
+
+                                                        <% layout('layouts/boilerplate') %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= place.name %></title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css" integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
+    <style>
+        .category-container {
+            margin-bottom: 40px;
+        }
+        .slider {
+            display: flex;
+            overflow-x: auto;
+            gap: 20px;
+            padding: 10px;
+        }
+        .post-card {
+            flex: 0 0 auto;
+            width: 200px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .carousel-inner img {
+            width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <% if(currentUser){%>
+        <% if( currentUser.is_vendor && place.author.equals(currentUser._id) || currentUser.is_manager &&
+            place.author.equals(currentUser._id) ){%>
+            <div class="btn-group">
+                <form action="/posts/new/<%=place.id%>" method="GET">
+                    <button class="btn btn-success">Agrgar Producto</button>
+                </form>
+            </div>
+            <br>
+            <%}%>
+                <% if(currentUser.places.includes(place.id) && currentUser.is_manager){%>
+                    <div class="btn-group">
+                        <a href="/render_vendor_register/<%=place.id%>">link para invitar a vendedores</a>
+                    </div>
+                    <div class="btn-group">
+                        <a href="/render_stripe/<%=place.id%>">link para activar pagos en linea</a>
+                    </div>
+                    <%}%>
+                        <%if( currentUser.is_vendor && place.author.equals(currentUser._id) || currentUser.is_manager &&
+                            place.author.equals(currentUser._id) ){%>
+                            <div class="btn-group">
+                                <a href="/render_carterp_register/<%=place.id%>">link para invitar a carteros</a>
+                            </div>
+                            <%}%>
+                                <%}%>
+                                    <% if(typeof order_message !='undefined' ){%>
+                                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                            Consigue tu Numbero de Confirmacion y sigue tus ordenes en Mis Ordenes
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <%}%>
+                                            <% if(typeof cart_message !='undefined' ){%>
+                                                <div class="alert alert-success alert-dismissible fade show"
+                                                    role="alert">
+                                                    Se Agrego una Orden al Carrito
+                                                    <button type="button" class="close" data-dismiss="alert"
+                                                        aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <%}%>
+    <h1><%= place.name %></h1>
+    <% Object.keys(categorizedPosts).forEach(function(category) { %>
+        <div class="category-container">
+            <h2><%= category %></h2>
+            <div class="slider">
+                <% categorizedPosts[category].forEach(function(post) { %>
+                    <div class="post-card">
+                        <div id="carousel<%= post._id %>" class="carousel slide" data-ride="carousel">
+                            <div class="carousel-inner">
+                                <% post.images.forEach(function(image, index) { %>
+                                    <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
+                                        <img src="<%= image.url %>" alt="Post image">
+                                    </div>
+                                <% }); %>
+                            </div>
+                            <% if(post.images.length > 1) { %>
+                                <a class="carousel-control-prev" href="#carousel<%= post._id %>" role="button" data-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="sr-only">Previous</span>
+                                </a>
+                                <a class="carousel-control-next" href="#carousel<%= post._id %>" role="button" data-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="sr-only">Next</span>
+                                </a>
+                            <% } %>
+                        </div>
+                        <h3><%= post.title %>: $<%= post.price %>/Unidad</h3>
+                        <p><%= post.caption %></p>
+                        <form
+                        action="/posts/ordena_rapida/<%=post._id%>"
+                        method="POST">
+                            <input type="hidden" name="productId" value="<%= post._id %>">
+                            <label for="how_many">Cantidad:</label>
+                            <select id="how_many" name="how_many" class="form-control">
+                                <% for (let i = 1; i <= 5; i++) { %>
+                                    <option value="<%= i %>"><%= i %></option>
+                                <% } %>
+                            </select>
+                            <!-- Additional hidden fields as needed -->
+                            <input type="hidden" name="seat" value="<%= seat %>">
+                            <input type="hidden" name="row" value="<%= row %>">
+                            <input type="hidden" name="section" value="<%= section %>">
+                            <!-- Assuming there might be additional user-specific or context-specific data to include -->
+                            <input type="hidden" name="additionalField" value="AdditionalValue">    
+                            <input type="submit"
+                            value="Compra Rapida"
+                            class="btn btn-dark btn-block mt-2"
+                            style="white-space: normal;">
+                        <input type="submit"
+                            formaction="/posts/cart_numbered/<%=post._id%>"
+                            value=" Agregar a Carrito"
+                            class="btn mt-2 btn-outline-secondary btn-block"
+                            style="white-space: normal;">
+                        </form>
+                    </div>
+                <% }); %>
+            </div>
+        </div>
+    <% }); %>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

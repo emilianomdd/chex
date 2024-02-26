@@ -21,7 +21,7 @@ module.exports.renderMethods = async (req, res) => {
         price += cart[i].price
     }
     const all_posts = cart
-    res.render('users/payment_method_cart.ejs', { all_posts, how_many, cart, price, online_payment })
+    res.render('users/payment_method_cart.ejs', { place, all_posts, how_many, cart, price, online_payment })
 }
 
 //purchase contents of cart with terminal/cash, cart will be vacated in this function

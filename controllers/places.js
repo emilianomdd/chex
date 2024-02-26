@@ -37,9 +37,7 @@ module.exports.createplace = async (req, res, next) => {
     if (req.body.place.sections != '') {
         place.sections = req.body.place.sections.split(',')
     }
-    if (req.body.place.categories != '') {
-        place.categories = req.body.place.categories.split(',')
-    }
+
     place.author = req.user._id;
     user.places.push(place);
     user.is_manager = true
@@ -52,46 +50,114 @@ module.exports.createplace = async (req, res, next) => {
 
 
 //function that will show the place and it's products
-module.exports.showplace = async (req, res,) => {
+// module.exports.showplace = async (req, res,) => {
+//     try {
+//         const user = req.user
+//         const { id } = req.params
+//         const place = await Place.findById(id).populate({
+//             path: 'posts',
+//             populate: {
+//                 path: 'author'
+//             }
+//         }).populate('author');
+//         req.session.place = place
+//         const all_posts = place.posts
+//         console.log(all_posts)
+//         if (!place) {
+//             req.flash('error', 'Cannot find that place!');
+//             return res.redirect('/places');
+//         }
+//         if (Object.keys(req.query).length != 0) {
+//             req.session.seat = req.query.seat
+//             req.session.row = req.query.row
+//             req.session.section = req.query.section
+//             const seat = req.query.seat
+//             const row = req.query.row
+//             const section = req.query.section
+//             res.render('places/show_numbered.ejs', { place, all_posts, seat, row, section, user })
+//         } else if (req.session.seat && req.session.row && req.session.section) {
+//             const seat = req.session.seat
+//             const row = req.session.row
+//             const section = req.session.section
+//             res.render('places/show_numbered.ejs', { place, all_posts, seat, row, section, user })
+//         } else {
+
+//             req.flash('error', 'Escanea el codigo QR!');
+//             return res.redirect('/places');
+//         }
+
+//     } catch (e) {
+//         res.falsh('Refresca la Pagina e Intenta de Nuevo')
+//         res.render('/places')
+//     }
+// }
+
+module.exports.showplace = async (req, res) => {
     try {
-        const user = req.user
-        const { id } = req.params
-        const place = await Place.findById(id).populate({
-            path: 'posts',
-            populate: {
-                path: 'author'
-            }
-        }).populate('author');
-        req.session.place = place
-        const all_posts = place.posts
+        const { id } = req.params;
+        const place = await Place.findById(id)
+            .populate({
+                path: 'posts',
+                populate: {
+                    path: 'author images', // Assuming each post has an 'images' array
+                },
+            })
+            .populate('author'); // Populate the author of the place for additional details
+
         if (!place) {
             req.flash('error', 'Cannot find that place!');
             return res.redirect('/places');
         }
-        if (Object.keys(req.query).length != 0) {
-            req.session.seat = req.query.seat
-            req.session.row = req.query.row
-            req.session.section = req.query.section
-            const seat = req.query.seat
-            const row = req.query.row
-            const section = req.query.section
-            res.render('places/show_numbered.ejs', { place, all_posts, seat, row, section, user })
-        } else if (req.session.seat && req.session.row && req.session.section) {
-            const seat = req.session.seat
-            const row = req.session.row
-            const section = req.session.section
-            res.render('places/show_numbered.ejs', { place, all_posts, seat, row, section, user })
-        } else {
 
-            req.flash('error', 'Escanea el codigo QR!');
+        // Organize posts by category for display in the EJS template
+        const categorizedPosts = {};
+        place.posts.forEach(post => {
+            const category = post.category; // Assuming each post has a 'category' field
+            if (!categorizedPosts[category]) {
+                categorizedPosts[category] = [];
+            }
+            categorizedPosts[category].push(post);
+        });
+        const all_posts = place.posts
+        // Check if query params or session data for seat, row, and section exist
+        let seat, row, section;
+        if (Object.keys(req.query).length !== 0) {
+            seat = req.query.seat;
+            row = req.query.row;
+            section = req.query.section;
+            // Update session with query params
+            req.session.seat = seat;
+            req.session.row = row;
+            req.session.section = section;
+        } else if (req.session.seat && req.session.row && req.session.section) {
+            // Use existing session data if available
+            seat = req.session.seat;
+            row = req.session.row;
+            section = req.session.section;
+        } else {
+            // Prompt for necessary information if not available
+            req.flash('error', 'Please scan the QR code!');
             return res.redirect('/places');
         }
 
+        // Render the specified EJS template with the place, posts organized by category, and any session-specific data
+        res.render('places/show_numbered', { // Corrected template path
+            place,
+            categorizedPosts,
+            seat,
+            row,
+            section,
+            all_posts,
+            user: req.user, // Include user data for access control and personalization
+        });
     } catch (e) {
-        res.falsh('Refresca la Pagina e Intenta de Nuevo')
-        res.render('/places')
+        console.error(e); // Improved error logging
+        req.flash('error', 'Refresh the page and try again');
+        return res.redirect('/places');
     }
-}
+};
+
+
 
 
 //renders the form to edit a place

@@ -21,18 +21,17 @@ module.exports.createPost = async (req, res, next) => {
     try {
         const { id } = req.params
         const post = new Post(req.body.post);
-        const user = await User.findById(req.user._id);
+        console.log(req.files)
         post.images = req.files.map(f => ({ url: f.path, filename: f.filename }));
         post.author = req.user._id;
         post.category = req.body.category
         post.price = parseInt(req.body.post.price)
-        user.posts.push(post);
         const place = await Place.findById(id)
         place.posts.push(post)
         post.place = place
         await post.save();
         await place.save();
-        await user.save();
+        console.log(post)
         res.redirect('/places')
     } catch (e) {
         console.log(e)
@@ -71,17 +70,16 @@ module.exports.purchase = async (req, res) => {
         const place = await Place.findById(pre_order.posts.place)
         place.orders.push(order)
         order.conf_num = Math.floor(1000 + Math.random() * 9000);
+        var user = {}
         if (req.user.id) {
-            const user = await User.findById(req.user.id).populate('messages')
+            user = await User.findById(req.user.id).populate('messages')
             user.orders.push(order)
             order.user = user
             await user.save()
         }
-        var price = (pre_order.price + .3) / (1 - 0.066)
+        var price = pre_order.price
         price = price.toFixed(2)
         order.price_final = price
-        var comish = price - order.price
-        comish = comish.toFixed(2)
         await post_author.save()
         await order.save()
         if (!req.session.orders) {
@@ -94,11 +92,7 @@ module.exports.purchase = async (req, res) => {
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             payment_intent_data: {
-                application_fee_amount: Math.trunc(100 * comish),
-                receipt_email: user.email,
-                transfer_data: {
-                    destination: post_author.stripe_account
-                }
+                receipt_email: user.email
 
             },
             line_items: [{
@@ -152,6 +146,8 @@ module.exports.carrito = async (req, res) => {
                 path: 'posts'
             }
         }).populate('author')
+        console.log(post)
+        console.log(req.body.how_many)
         const pre_order = new Pre_order()
         pre_order.posts = post
         pre_order.section = req.body.section
@@ -569,8 +565,6 @@ module.exports.RapidCard = async (req, res) => {
         await order.save()
         var price = (order.price + order.tip + 3) / (1 - 0.036)
         price = price.toFixed(2)
-        var comish = price - order.price - order.tip
-        comish = comish.toFixed(2)
         order.price_final = price
         await order.save()
         const session = await stripe.checkout.sessions.create({
@@ -585,14 +579,6 @@ module.exports.RapidCard = async (req, res) => {
                     unit_amount: (order.price / order.quantity) * 100,
                 },
                 quantity: order.quantity
-            }, {
-                price_data: {
-                    currency: "mxn",
-                    product_data: {
-                        name: 'fees',
-                    },
-                    unit_amount: Math.trunc(comish * 100),
-                }, quantity: 1
             }, {
                 price_data: {
                     currency: "mxn",
