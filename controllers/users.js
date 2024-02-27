@@ -225,6 +225,7 @@ module.exports.RenderStoreOrders = async (req, res) => {
                 }
             }
         ).populate('places')
+        console.log(user.orders_to_complete)
         const place = user.places[0]
         const order_completed = 'q'
 
