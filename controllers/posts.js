@@ -503,6 +503,7 @@ module.exports.purchaseCash = async (req, res) => {
 
 //route used when user decides to do rapid checkout and uses cash
 module.exports.RapidCash = async (req, res) => {
+    console.log('RapidCash')
     try {
         console.log(req.body)
         console.log(req.params)
@@ -535,13 +536,21 @@ module.exports.RapidCash = async (req, res) => {
         } else {
             req.session.orders.push(order)
         }
+        const categorizedPosts = {};
+        place.posts.forEach(post => {
+            const category = post.category; // Assuming each post has a 'category' field
+            if (!categorizedPosts[category]) {
+                categorizedPosts[category] = [];
+            }
+            categorizedPosts[category].push(post);
+        });
         const all_posts = place.posts
-
         const seat = order.seat
         const row = order.letter
         const section = order.section
         const order_message = true
-        res.render('places/show_numbered.ejs', { place, all_posts, seat, row, section, order_message })
+        console.log(categorizedPosts)
+        res.render('places/show_numbered.ejs', { categorizedPosts, place, all_posts, seat, row, section, order_message })
 
     } catch (e) {
         console.log(e)

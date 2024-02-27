@@ -162,6 +162,7 @@ module.exports.delete = async (req, res) => {
 }
 
 module.exports.onlinePurchase = async (req, res) => {
+    console.log('onlinePurchase')
     try {
         const cart = req.session.cart
         const day = new Date()

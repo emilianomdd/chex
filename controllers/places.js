@@ -274,6 +274,7 @@ module.exports.renderNumbered = async (req, res) => {
 }
 
 module.exports.renderCategoryNum = async (req, res) => {
+    console.log('renderCategoryNum')
     try {
         const { id } = req.params
         const place = await Place.findById(id).populate({
