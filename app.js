@@ -162,6 +162,7 @@ app.get('/complete_order/:id', async (req, res) => {
     const orders = req.session.orders
     const order_message = 'true'
     const place = order.place
+    await post_author.save()
 
     res.render('users/render_orders', { orders, order_message, place })
 });
