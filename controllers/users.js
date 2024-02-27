@@ -65,8 +65,8 @@ module.exports.RegisterVendor = async (req, res, next) => {
     const accountLink = await stripe.accountLinks.create({
 
         account: account.id,
-        refresh_url: 'https://cargi.herokuapp.com/places',
-        return_url: 'https://cargi.herokuapp.com/places',
+        refresh_url: 'https://chex-bf3796efb5a0.herokuapp.com/places',
+        return_url: 'https://chex-bf3796efb5a0.herokuapp.com/places',
         type: 'account_onboarding'
     });
 
@@ -540,8 +540,8 @@ module.exports.RegisterStripe = async (req, res, next) => {
     const accountLink = await stripe.accountLinks.create({
 
         account: account.id,
-        refresh_url: 'https://cargi.herokuapp.com/places',
-        return_url: 'https://cargi.herokuapp.com/places',
+        refresh_url: 'https://chex-bf3796efb5a0.herokuapp.com/places',
+        return_url: 'https://chex-bf3796efb5a0.herokuapp.com/places',
         type: 'account_onboarding'
     });
 

@@ -229,8 +229,8 @@ module.exports.onlinePurchase = async (req, res) => {
                 }
             }),
             mode: 'payment',
-            success_url: `https://cargi.herokuapp.com/complete_order_cart/${order.id}`,
-            cancel_url: `https://cargi.herokuapp.com/cancel_order/${order.id}`,
+            success_url: `https://chex-bf3796efb5a0.herokuapp.com/complete_order_cart/${order.id}`,
+            cancel_url: `https://chex-bf3796efb5a0.herokuapp.com/cancel_order/${order.id}`,
         });
         res.redirect(session.url)
 

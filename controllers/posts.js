@@ -102,8 +102,8 @@ module.exports.purchase = async (req, res) => {
                 quantity: 1,
             }],
             mode: 'payment',
-            success_url: 'https://cargi.herokuapp.com/places/purchase',
-            cancel_url: 'https://cargi.herokuapp.com/places',
+            success_url: 'https://chex-bf3796efb5a0.herokuapp.com/places/purchase',
+            cancel_url: 'https://chex-bf3796efb5a0.herokuapp.com/places',
         });
         res.redirect(session.url)
     } catch (e) {
@@ -598,8 +598,8 @@ module.exports.RapidCard = async (req, res) => {
                 }, quantity: 1
             }],
             mode: 'payment',
-            success_url: `https://cargi.herokuapp.com/complete_order/${order.id}`,
-            cancel_url: `https://cargi.herokuapp.com/cancel_order/${order.id}`,
+            success_url: `https://chex-bf3796efb5a0.herokuapp.com/complete_order/${order.id}`,
+            cancel_url: `https://chex-bf3796efb5a0.herokuapp.com/cancel_order/${order.id}`,
         });
         res.redirect(session.url)
 
