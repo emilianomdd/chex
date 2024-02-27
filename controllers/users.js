@@ -132,9 +132,17 @@ module.exports.RenderCart = async (req, res) => {
             var online_payment = place.online_payments
             const cart_message = false
             const delete_message = false
+            const categorizedPosts = {};
+            place.posts.forEach(post => {
+                const category = post.category; // Assuming each post has a 'category' field
+                if (!categorizedPosts[category]) {
+                    categorizedPosts[category] = [];
+                }
+                categorizedPosts[category].push(post);
+            });
             console.log(cart)
 
-            res.render('users/render_cart', { delete_message, cart_message, all_posts, place, cart_price, online_payment })
+            res.render('users/render_cart', { categorizedPosts, delete_message, cart_message, all_posts, place, cart_price, online_payment })
         } else {
             req.session.cart = []
             res.render('users/cart_no_items')
