@@ -34,6 +34,7 @@ module.exports.keepCartConsistent = async (req, res, next) => {
 }
 
 module.exports.hasCart = async (req, res, next) => {
+    console.log('hasCart')
     if (!req.session.cart) {
         req.session.cart = []
     }

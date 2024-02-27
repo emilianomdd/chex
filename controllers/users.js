@@ -97,21 +97,24 @@ module.exports.RegisterVendor = async (req, res, next) => {
 
 //show route to see your cart
 module.exports.RenderCart = async (req, res) => {
+    console.log('RenderCart')
+    var cart = {}
     var all_posts = []
     if (req.user) {
-        const { id } = req.user.id
-        const user = await User.findById(id)
-        const cart = await Carrito.findById(user.cart).populate({
+        const { id } = req.user._id
+        const user = await User.findById(id.toString('hex'))
+        console.log(user)
+        cart = await Carrito.findById(user.cart).populate({
             path: 'pre_orders',
             populate: {
                 path: 'posts'
             }
         })
-        all_posts = cart.pre_orders
     } else {
         if (!req.session.cart) {
             req.session.cart = []
         }
+        cart = req.session.cart
         var cart_price = 0
         for (let i = 0; i < req.session.cart.length; i++) {
             req.session.cart[i].posts = await Post.findById(req.session.cart[i].posts._id)
@@ -125,32 +128,33 @@ module.exports.RenderCart = async (req, res) => {
             }
 
         }
-        const cart = req.session.cart
-        if (cart.length > 0) {
+    }
+    console.log(cart)
+    cart = req.session.cart
+    if (cart.length > 0) {
+        var place = await Place.findById(cart[0].posts.place)
+        var online_payment = place.online_payments
+        const cart_message = false
+        const delete_message = false
+        const categorizedPosts = {};
+        place.posts.forEach(post => {
+            const category = post.category; // Assuming each post has a 'category' field
+            if (!categorizedPosts[category]) {
+                categorizedPosts[category] = [];
+            }
+            categorizedPosts[category].push(post);
+        });
+        console.log(cart)
+        all_posts = cart
+        res.render('users/render_cart', { delete_message, cart_message, all_posts, place, cart_price, online_payment })
+    } else {
 
-            var place = await Place.findById(cart[0].posts.place)
-            var online_payment = place.online_payments
-            const cart_message = false
-            const delete_message = false
-            const categorizedPosts = {};
-            place.posts.forEach(post => {
-                const category = post.category; // Assuming each post has a 'category' field
-                if (!categorizedPosts[category]) {
-                    categorizedPosts[category] = [];
-                }
-                categorizedPosts[category].push(post);
-            });
-            console.log(cart)
-
-            res.render('users/render_cart', { categorizedPosts, delete_message, cart_message, all_posts, place, cart_price, online_payment })
-        } else {
-            req.session.cart = []
-            res.render('users/cart_no_items')
-        }
-
+        req.session.cart = []
+        res.render('users/cart_no_items')
     }
 
 }
+
 
 
 //shelfed messaging function to create a message

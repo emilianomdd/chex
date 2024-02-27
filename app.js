@@ -169,18 +169,23 @@ app.get('/complete_order/:id', async (req, res) => {
 });
 
 app.get('/complete_order_cart/:id', async (req, res) => {
+    console.log('complete_order_cart')
     const { id } = req.params
     const order = await Order.findById(id).populate('place')
-    console.log(order)
+    console.log("+_)(*&^%$#@#$%^&*()_^%#$@#@$%^&^%%$#@#!$%^&^*UYJHTGDFSDADEWR$%^Y$H", order)
     order.is_paid = true
     req.session.cart = []
+    console.log(order.place)
+    console.log(order.place.author)
     const post_author = await User.findById(order.place.author)
     post_author.orders_to_complete.push(order)
     req.session.orders.push(order)
     const orders = req.session.orders
     const order_message = 'true'
     const place = order.place
-
+    await post_author.save()
+    await order.save()
+    console.log()
     res.render('users/render_orders', { orders, order_message, place })
 });
 
