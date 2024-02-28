@@ -22,6 +22,8 @@ router.post('/register_stripe/:id', users.RegisterStripe)
 
 router.post('/create_store/:id', users.RegisterVendor)
 
+router.get('/render-cart', users.RenderCart)
+
 router.get('/render-cart/:id', hasCart, users.RenderCart)
 
 router.post('/five/:id', users.FiveMin)
